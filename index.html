@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sổ tay PCCC & CNCH Tương tác (với Gemini AI) - Cảng HKQT Cần Thơ</title>
+    <title>Sổ tay PCCC & CNCH Tương tác - Cảng HKQT Cần Thơ</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Chosen Palette: Calm Harmony (Slate/Gray, White, Blue, Red, Amber for AI) -->
-    <!-- Application Structure Plan: The application uses a task-oriented, card-based navigation system instead of mirroring the report's linear chapters. This allows users to quickly select their specific airport zone (e.g., 'Public Areas', 'Technical Areas') and view relevant rules. Emergency contact information is given top priority in a fixed header. This structure prioritizes immediate access to relevant information over formal document structure, enhancing usability for airport staff and tenants in real-world scenarios. Gemini AI features (Q&A bot, Checklist Generator) are added to transform the static guide into an interactive assistant. -->
-    <!-- Visualization & Content Choices: Report Info: Area-specific rules. Goal: Inform/Guide. Presentation: Interactive accordions. Interaction: Click to expand/collapse. Justification: Breaks down dense text. Library: Vanilla JS. Report Info: Emergency contacts. Goal: Alert. Presentation: Fixed header banner. Interaction: None. Justification: Critical info is always visible. Gemini Feature 1: Natural Language Q&A. Goal: Answer specific user queries. Presentation: Modal with input and response area. Interaction: User types question, receives AI-generated answer based on report context. Justification: Provides immediate, contextual answers without manual searching. Gemini Feature 2: Safety Checklist Generation. Goal: Create actionable tools. Presentation: Button that generates a formatted list. Interaction: User clicks button, AI generates a checklist based on the current zone's rules using a JSON schema. Justification: Transforms passive rules into a practical, daily-use tool for safety inspections. -->
+    <!-- Chosen Palette: Calm Harmony (Slate/Gray, White, Blue, Red) -->
+    <!-- Application Structure Plan: The application uses a task-oriented, card-based navigation system. Instead of a separate content area, rules for each zone now appear directly beneath the selected card. This improves user experience, especially on mobile, by keeping the context and content together without requiring scrolling. All AI features have been removed for a more streamlined, focused guide. -->
+    <!-- Visualization & Content Choices: Report Info: Area-specific rules. Goal: Inform/Guide. Presentation: Interactive accordions within each zone card. Interaction: Click a zone card to expand/collapse its specific rules. Click an accordion header to expand/collapse details. Justification: This nested interaction model provides a clean overview and allows users to drill down into details intuitively. The inline display prevents users from losing their place on the page. -->
     <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
@@ -22,7 +22,6 @@
         .emergency-banner {
             background-color: #dc2626; /* red-600 */
             color: white;
-            /* Removed sticky positioning as requested */
         }
         .nav-card {
             transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
@@ -33,7 +32,6 @@
         }
         .nav-card.active {
             border-color: #2563eb; /* blue-600 */
-            transform: translateY(-2px);
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.4);
         }
         .content-section h3 {
@@ -56,66 +54,27 @@
         .safety li::before { content: '🛡️'; }
         .emergency li::before { content: '🔥'; color: #f97316; /* orange-500 */ }
         
-        .accordion-content { display: none; overflow: hidden; transition: max-height 0.3s ease-in-out; }
-        .accordion-content.show { display: block; }
+        .zone-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-in-out, padding 0.5s ease-in-out;
+            padding: 0 1.5rem;
+        }
+        .zone-content.show {
+            max-height: 2000px; /* Large enough to fit content */
+            padding: 1.5rem;
+        }
+
+        .accordion-content { 
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-in-out;
+        }
+        .accordion-content.show {
+            max-height: 1000px; /* Large enough */
+        }
         .accordion-arrow { transition: transform 0.3s ease-in-out; }
         .accordion-header.open .accordion-arrow { transform: rotate(180deg); }
-
-        /* Gemini Features Styling */
-        .gemini-fab {
-            position: fixed;
-            bottom: 2rem;
-            right: 2rem;
-            background-color: #2563eb; /* blue-600 */
-            color: white;
-            width: 4rem;
-            height: 4rem;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2rem;
-            cursor: pointer;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-            transition: transform 0.2s;
-            z-index: 100;
-        }
-        .gemini-fab:hover { transform: scale(1.1); }
-        .gemini-modal-overlay {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-color: rgba(0,0,0,0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 110;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s, visibility 0.3s;
-        }
-        .gemini-modal-overlay.show { opacity: 1; visibility: visible; }
-        .gemini-modal {
-            background-color: white;
-            padding: 2rem;
-            border-radius: 0.75rem;
-            width: 90%;
-            max-width: 600px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            transform: scale(0.95);
-            transition: transform 0.3s;
-        }
-        .gemini-modal-overlay.show .gemini-modal { transform: scale(1); }
-        .loader {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #3498db;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            animation: spin 1s linear infinite;
-            margin: 1rem auto;
-        }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .checklist-container { border: 1px solid #e2e8f0; border-radius: 0.5rem; padding: 1rem; margin-top: 1.5rem; }
     </style>
 </head>
 <body class="text-slate-800">
@@ -137,7 +96,7 @@
     <header class="main-header py-6 shadow-md">
         <div class="container mx-auto text-center px-4">
             <h1 class="text-3xl md:text-4xl font-bold text-blue-700">Sổ tay PCCC & CNCH Tương tác</h1>
-            <p class="text-lg text-slate-600 mt-2">Cảng Hàng không Quốc tế Cần Thơ</p>
+            <p class="text-lg text-slate-600 mt-2">Theo Quyết định số 712/QĐ-CHKQTCT ngày 07/07/2025 về việc Ban hành nội quy PCCC và Cứu hộ theo từng khu vực của Cảng Hàng không Quốc tế Cần Thơ</p>
         </div>
     </header>
 
@@ -145,38 +104,9 @@
         <section id="zone-selection" class="text-center mb-8">
             <h2 class="text-2xl font-semibold mb-2">Chọn khu vực của bạn</h2>
             <p class="text-slate-500 max-w-2xl mx-auto">Nhấp vào một khu vực dưới đây để xem các quy định PCCC & CNCH chi tiết.</p>
-            <div id="nav-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6"></div>
-        </section>
-
-        <section id="content-display" class="bg-white p-6 rounded-lg shadow-lg min-h-[300px]">
-             <div id="placeholder" class="flex flex-col items-center justify-center h-full text-center text-slate-500">
-                <span class="text-6xl mb-4">📖</span>
-                <p class="text-lg font-medium">Nội dung chi tiết sẽ được hiển thị ở đây.</p>
-                <p>Vui lòng chọn một khu vực từ danh sách trên.</p>
-            </div>
+            <div id="nav-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6"></div>
         </section>
     </main>
-
-    <!-- Gemini Q&A FAB -->
-    <div id="gemini-fab" class="gemini-fab" title="Hỏi đáp nhanh về PCCC">?</div>
-
-    <!-- Gemini Q&A Modal -->
-    <div id="gemini-modal-overlay" class="gemini-modal-overlay">
-        <div class="gemini-modal">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-xl font-bold text-blue-700">✨ Trợ lý Hỏi-Đáp An toàn PCCC</h3>
-                <button id="close-modal-btn" class="text-2xl text-slate-500 hover:text-slate-800">&times;</button>
-            </div>
-            <p class="text-slate-600 mb-4">Đặt câu hỏi về quy định PCCC tại sân bay. Ví dụ: "Tôi có được hút thuốc ở nhà xe không?"</p>
-            <div class="flex gap-2">
-                <input type="text" id="qa-input" class="w-full border border-slate-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Nhập câu hỏi của bạn...">
-                <button id="qa-submit" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 font-semibold">Gửi</button>
-            </div>
-            <div id="qa-response-area" class="mt-4 p-4 bg-slate-50 rounded-md min-h-[100px]">
-                <p class="text-slate-500 text-center">Câu trả lời sẽ xuất hiện ở đây.</p>
-            </div>
-        </div>
-    </div>
 
     <footer class="text-center p-6 text-slate-500 text-sm">
         <p>Theo Quyết định số 712/QĐ-CHKQTCT ngày 07/07/2025</p>
@@ -216,59 +146,6 @@
 
         document.addEventListener('DOMContentLoaded', function() {
             const navContainer = document.getElementById('nav-container');
-            const contentDisplay = document.getElementById('content-display');
-            const placeholder = document.getElementById('placeholder');
-
-            // Gemini Modal Elements
-            const fab = document.getElementById('gemini-fab');
-            const modalOverlay = document.getElementById('gemini-modal-overlay');
-            const closeModalBtn = document.getElementById('close-modal-btn');
-            const qaSubmitBtn = document.getElementById('qa-submit');
-            const qaInput = document.getElementById('qa-input');
-            const qaResponseArea = document.getElementById('qa-response-area');
-
-            // --- Gemini API Helper ---
-            async function callGemini(prompt, isJson = false, schema = null) {
-                const apiKey = ""; // Left blank for environment injection
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-                
-                let payload = {
-                    contents: [{ role: "user", parts: [{ text: prompt }] }]
-                };
-
-                if (isJson && schema) {
-                    payload.generationConfig = {
-                        responseMimeType: "application/json",
-                        responseSchema: schema
-                    };
-                }
-
-                try {
-                    const response = await fetch(apiUrl, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    });
-
-                    if (!response.ok) {
-                        const errorBody = await response.text();
-                        console.error("API Error Response:", errorBody);
-                        throw new Error(`API request failed with status ${response.status}`);
-                    }
-
-                    const result = await response.json();
-                    
-                    if (result.candidates && result.candidates.length > 0 && result.candidates[0].content && result.candidates[0].content.parts && result.candidates[0].content.parts.length > 0) {
-                        return result.candidates[0].content.parts[0].text;
-                    } else {
-                        console.error("Unexpected API response structure:", result);
-                        throw new Error("Không nhận được nội dung hợp lệ từ AI.");
-                    }
-                } catch (error) {
-                    console.error("Error calling Gemini API:", error);
-                    return `Đã xảy ra lỗi: ${error.message}. Vui lòng thử lại.`;
-                }
-            }
 
             function createAccordionItem(id, title, points, typeClass) {
                 const isFirst = id.endsWith('responsibilities');
@@ -283,153 +160,86 @@
                             <div class="accordion-content ${isShow} mt-2 pl-2"><ul class="${typeClass}">${listItems}</ul></div>
                         </div>`;
             }
-
-            function displayContent(zoneKey) {
-                placeholder.style.display = 'none';
+            
+            function createZoneContent(zoneKey) {
                 const zoneData = fireSafetyData[zoneKey];
-                let contentHTML = `<div class="flex justify-between items-start">
-                                      <h2 class="text-2xl font-bold mb-4 text-blue-700">${zoneData.icon} ${zoneData.title}</h2>
-                                      <button id="checklist-btn" data-zone="${zoneKey}" class="bg-amber-500 text-white px-4 py-2 rounded-md hover:bg-amber-600 font-semibold text-sm">✨ Tạo Checklist</button>
-                                   </div>
-                                   <div id="checklist-container-${zoneKey}" class="hidden"></div>`;
-
+                let contentHTML = '';
                 const sections = [
                     { key: 'responsibilities', class: 'responsibility' },
                     { key: 'safety', class: 'safety' },
                     { key: 'prohibitions', class: 'prohibition' },
                     { key: 'emergency', class: 'emergency' }
                 ];
-                
                 sections.forEach(section => {
                     if(zoneData.content[section.key]) {
                         contentHTML += createAccordionItem(`${zoneKey}-${section.key}`, zoneData.content[section.key].title, zoneData.content[section.key].points, section.class);
                     }
                 });
-
-                contentDisplay.innerHTML = contentHTML;
-
-                document.querySelectorAll('.accordion-header').forEach(header => {
-                    header.addEventListener('click', function() {
-                        this.classList.toggle('open');
-                        this.nextElementSibling.classList.toggle('show');
-                    });
-                });
-
-                document.getElementById('checklist-btn').addEventListener('click', handleChecklistGeneration);
-            }
-            
-            async function handleChecklistGeneration(event) {
-                const button = event.target;
-                const zoneKey = button.dataset.zone;
-                const container = document.getElementById(`checklist-container-${zoneKey}`);
-                
-                button.disabled = true;
-                button.innerHTML = '<div class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mx-auto"></div>';
-                container.classList.remove('hidden');
-                container.innerHTML = `<div class="loader"></div><p class="text-center text-slate-500">AI đang tạo checklist, vui lòng chờ...</p>`;
-
-                const zoneRules = fireSafetyData[zoneKey].content;
-                const context = `Quy định an toàn: ${zoneRules.safety.points.join('. ')}. Hành vi cấm: ${zoneRules.prohibitions.points.join('. ')}`;
-                const prompt = `Dựa trên nội quy sau đây cho một khu vực tại sân bay, hãy tạo một checklist kiểm tra an toàn PCCC hàng ngày. Phân loại từng mục kiểm tra. Nội quy: "${context}"`;
-                const schema = {
-                    type: "OBJECT",
-                    properties: {
-                        checklist: {
-                            type: "ARRAY",
-                            items: {
-                                type: "OBJECT",
-                                properties: {
-                                    category: { type: "STRING" },
-                                    item: { type: "STRING" }
-                                },
-                                required: ["category", "item"]
-                            }
-                        }
-                    },
-                    required: ["checklist"]
-                };
-
-                const result = await callGemini(prompt, true, schema);
-                button.disabled = false;
-                button.innerHTML = '✨ Tạo lại Checklist';
-
-                try {
-                    const parsedResult = JSON.parse(result);
-                    if (parsedResult.checklist && parsedResult.checklist.length > 0) {
-                        const groupedByCategory = parsedResult.checklist.reduce((acc, current) => {
-                            (acc[current.category] = acc[current.category] || []).push(current.item);
-                            return acc;
-                        }, {});
-
-                        let checklistHtml = '<h4 class="text-lg font-semibold mb-2 text-slate-800">Checklist Kiểm tra An toàn Hàng ngày</h4>';
-                        for (const category in groupedByCategory) {
-                            checklistHtml += `<p class="font-semibold mt-3 mb-1 text-slate-600">${category}:</p><ul class="list-disc list-inside space-y-1">`;
-                            groupedByCategory[category].forEach(item => {
-                                checklistHtml += `<li class="text-slate-700">${item}</li>`;
-                            });
-                            checklistHtml += `</ul>`;
-                        }
-                        container.innerHTML = `<div class="checklist-container">${checklistHtml}</div>`;
-                    } else {
-                        container.innerHTML = `<p class="text-center text-red-500">Không thể tạo checklist từ thông tin được cung cấp.</p>`;
-                    }
-                } catch (e) {
-                     container.innerHTML = `<p class="text-center text-red-500">Lỗi xử lý dữ liệu từ AI. Vui lòng thử lại.</p><p class="text-xs text-slate-400 mt-2">${result}</p>`;
-                }
+                return contentHTML;
             }
 
-            // --- Q&A Modal Logic ---
-            fab.addEventListener('click', () => modalOverlay.classList.add('show'));
-            closeModalBtn.addEventListener('click', () => modalOverlay.classList.remove('show'));
-            modalOverlay.addEventListener('click', (e) => {
-                if (e.target === modalOverlay) {
-                    modalOverlay.classList.remove('show');
-                }
-            });
-
-            qaSubmitBtn.addEventListener('click', handleQASubmit);
-            qaInput.addEventListener('keyup', (e) => {
-                if (e.key === 'Enter') handleQASubmit();
-            });
-
-            async function handleQASubmit() {
-                const question = qaInput.value.trim();
-                if (!question) return;
-
-                qaResponseArea.innerHTML = '<div class="loader"></div><p class="text-center text-slate-500">AI đang suy nghĩ...</p>';
-                qaSubmitBtn.disabled = true;
-                qaInput.disabled = true;
-
-                const fullContext = JSON.stringify(fireSafetyData);
-                const prompt = `Bạn là một chuyên gia an toàn PCCC tại sân bay. Dựa vào toàn bộ nội quy PCCC sau đây: ${fullContext}. Hãy trả lời câu hỏi của người dùng một cách ngắn gọn, chính xác và chỉ dựa vào thông tin được cung cấp. Câu hỏi: "${question}"`;
-                
-                const answer = await callGemini(prompt);
-                
-                qaResponseArea.innerHTML = `<p>${answer.replace(/\n/g, '<br>')}</p>`;
-                qaSubmitBtn.disabled = false;
-                qaInput.disabled = false;
-                qaInput.value = '';
-            }
-
-            // --- Initial Page Load ---
             Object.keys(fireSafetyData).forEach(key => {
                 const zone = fireSafetyData[key];
-                const card = document.createElement('div');
-                card.className = 'nav-card bg-white p-6 rounded-lg shadow-md border-2 border-transparent cursor-pointer text-left';
-                card.dataset.zoneKey = key;
-                card.innerHTML = `<div class="flex items-start gap-4">
-                                    <span class="text-4xl">${zone.icon}</span>
-                                    <div>
-                                        <h3 class="text-xl font-bold text-slate-800">${zone.title}</h3>
-                                        <p class="text-slate-500 mt-1">${zone.description}</p>
-                                    </div>
-                                  </div>`;
-                card.addEventListener('click', function() {
-                    document.querySelectorAll('.nav-card').forEach(c => c.classList.remove('active'));
-                    this.classList.add('active');
-                    displayContent(key);
+                const cardWrapper = document.createElement('div');
+                cardWrapper.className = 'nav-card bg-white rounded-lg shadow-md border-2 border-transparent cursor-pointer';
+                cardWrapper.dataset.zoneKey = key;
+
+                cardWrapper.innerHTML = `
+                    <div class="p-6">
+                        <div class="flex items-start gap-4">
+                            <span class="text-4xl">${zone.icon}</span>
+                            <div>
+                                <h3 class="text-xl font-bold text-slate-800">${zone.title}</h3>
+                                <p class="text-slate-500 mt-1">${zone.description}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="zone-content border-t border-slate-200"></div>
+                `;
+                
+                navContainer.appendChild(cardWrapper);
+
+                cardWrapper.addEventListener('click', function(event) {
+                    // Prevent closing when clicking inside the content area
+                    if (event.target.closest('.zone-content')) {
+                        return;
+                    }
+
+                    const contentDiv = this.querySelector('.zone-content');
+                    const isActive = this.classList.contains('active');
+
+                    // Close all other cards
+                    document.querySelectorAll('.nav-card').forEach(c => {
+                        if (c !== this) {
+                            c.classList.remove('active');
+                            c.querySelector('.zone-content').classList.remove('show');
+                            c.querySelector('.zone-content').innerHTML = '';
+                        }
+                    });
+
+                    // Toggle current card
+                    if (isActive) {
+                        this.classList.remove('active');
+                        contentDiv.classList.remove('show');
+                        contentDiv.innerHTML = '';
+                    } else {
+                        this.classList.add('active');
+                        contentDiv.innerHTML = createZoneContent(key);
+                        // Use a timeout to allow the element to be added to the DOM before adding the class
+                        setTimeout(() => {
+                            contentDiv.classList.add('show');
+                            // Add event listeners for the new accordions
+                            contentDiv.querySelectorAll('.accordion-header').forEach(header => {
+                                header.addEventListener('click', function() {
+                                    this.classList.toggle('open');
+                                    this.nextElementSibling.classList.toggle('show');
+                                });
+                            });
+                             // Scroll into view
+                            this.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                        }, 10);
+                    }
                 });
-                navContainer.appendChild(card);
             });
         });
     </script>
