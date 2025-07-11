@@ -3,287 +3,434 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cổng Thông Tin Văn Bản Pháp Luật - ACV</title>
+    <title>Sổ tay PCCC & CNCH Tương tác (với Gemini AI) - Cảng HKQT Cần Thơ</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Chosen Palette: Corporate Blue and Slate -->
-    <!-- Application Structure Plan: A dashboard-style single-page application. The core is a filterable, searchable list of legal documents presented as interactive cards. The main navigation will be based on legal domains (Xây dựng, Tài chính, PCCC, etc.) derived from the source report, rather than the original chronological grouping. This task-oriented structure helps users from different departments quickly find relevant information. A timeline chart at the top provides a high-level overview of when regulations become effective. Users can filter the document list by clicking on category tags. Clicking on a document card reveals its detailed summary in a modal window. A search bar allows for keyword-based filtering. This structure transforms a static list into an exploratory tool, prioritizing user efficiency. -->
-    <!-- Visualization & Content Choices: 
-        1. Report Info: Number of documents and their effective dates. Goal: Show the volume/timing of new regulations. Viz: Bar Chart (Chart.js/Canvas) showing count per month. Interaction: Hover for details. Justification: Provides a quick visual summary of upcoming changes.
-        2. Report Info: List of all legal documents. Goal: Organize and present detailed information clearly. Viz: Interactive Cards (HTML/CSS/Tailwind). Interaction: Click card to open a modal with details. List is filterable by category tags and searchable. Justification: Progressive disclosure via modals prevents information overload. Domain-based filtering is highly usable for the target audience.
-    -->
+    <!-- Chosen Palette: Calm Harmony (Slate/Gray, White, Blue, Red, Amber for AI) -->
+    <!-- Application Structure Plan: The application uses a task-oriented, card-based navigation system instead of mirroring the report's linear chapters. This allows users to quickly select their specific airport zone (e.g., 'Public Areas', 'Technical Areas') and view relevant rules. Emergency contact information is given top priority in a fixed header. This structure prioritizes immediate access to relevant information over formal document structure, enhancing usability for airport staff and tenants in real-world scenarios. Gemini AI features (Q&A bot, Checklist Generator) are added to transform the static guide into an interactive assistant. -->
+    <!-- Visualization & Content Choices: Report Info: Area-specific rules. Goal: Inform/Guide. Presentation: Interactive accordions. Interaction: Click to expand/collapse. Justification: Breaks down dense text. Library: Vanilla JS. Report Info: Emergency contacts. Goal: Alert. Presentation: Fixed header banner. Interaction: None. Justification: Critical info is always visible. Gemini Feature 1: Natural Language Q&A. Goal: Answer specific user queries. Presentation: Modal with input and response area. Interaction: User types question, receives AI-generated answer based on report context. Justification: Provides immediate, contextual answers without manual searching. Gemini Feature 2: Safety Checklist Generation. Goal: Create actionable tools. Presentation: Button that generates a formatted list. Interaction: User clicks button, AI generates a checklist based on the current zone's rules using a JSON schema. Justification: Transforms passive rules into a practical, daily-use tool for safety inspections. -->
     <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
     <style>
-        body { font-family: 'Inter', sans-serif; }
-        .chart-container { position: relative; width: 100%; max-width: 800px; margin-left: auto; margin-right: auto; height: 300px; max-height: 40vh; }
-        .modal-bg { transition: opacity 0.3s ease; }
-        .modal-box { transition: transform 0.3s ease, opacity 0.3s ease; }
-        .document-card { transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; }
-        .document-card:hover { transform: translateY(-4px); box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1); }
-        .filter-btn-active { background-color: #2563eb; color: white; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* slate-50 */
+        }
+        .main-header {
+            background-color: #ffffff;
+            border-bottom: 1px solid #e2e8f0; /* slate-200 */
+        }
+        .emergency-banner {
+            background-color: #dc2626; /* red-600 */
+            color: white;
+            /* Removed sticky positioning as requested */
+        }
+        .nav-card {
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .nav-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+        .nav-card.active {
+            border-color: #2563eb; /* blue-600 */
+            transform: translateY(-2px);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.4);
+        }
+        .content-section h3 {
+            cursor: pointer;
+            border-bottom: 1px solid #e5e7eb; /* gray-200 */
+            padding-bottom: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .content-section ul { list-style: none; padding-left: 0.5rem; }
+        .content-section li { display: flex; align-items: flex-start; margin-bottom: 0.5rem; }
+        .content-section li::before {
+            margin-right: 0.75rem;
+            flex-shrink: 0;
+            font-weight: bold;
+            font-size: 1.25rem;
+            line-height: 1.5rem;
+        }
+        .responsibility li::before { content: '✓'; color: #16a34a; /* green-600 */ }
+        .prohibition li::before { content: '✗'; color: #dc2626; /* red-600 */ }
+        .safety li::before { content: '🛡️'; }
+        .emergency li::before { content: '🔥'; color: #f97316; /* orange-500 */ }
+        
+        .accordion-content { display: none; overflow: hidden; transition: max-height 0.3s ease-in-out; }
+        .accordion-content.show { display: block; }
+        .accordion-arrow { transition: transform 0.3s ease-in-out; }
+        .accordion-header.open .accordion-arrow { transform: rotate(180deg); }
+
+        /* Gemini Features Styling */
+        .gemini-fab {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background-color: #2563eb; /* blue-600 */
+            color: white;
+            width: 4rem;
+            height: 4rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            transition: transform 0.2s;
+            z-index: 100;
+        }
+        .gemini-fab:hover { transform: scale(1.1); }
+        .gemini-modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 110;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+        .gemini-modal-overlay.show { opacity: 1; visibility: visible; }
+        .gemini-modal {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 0.75rem;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            transform: scale(0.95);
+            transition: transform 0.3s;
+        }
+        .gemini-modal-overlay.show .gemini-modal { transform: scale(1); }
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 1rem auto;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .checklist-container { border: 1px solid #e2e8f0; border-radius: 0.5rem; padding: 1rem; margin-top: 1.5rem; }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800">
+<body class="text-slate-800">
 
-    <div class="container mx-auto p-4 md:p-8">
-        
-        <header class="text-center mb-8">
-            <h1 class="text-3xl md:text-4xl font-bold text-slate-900">Cổng Thông Tin Văn Bản Pháp Luật</h1>
-            <p class="mt-2 text-lg text-slate-600">Cập nhật các quy định pháp luật mới liên quan đến hoạt động của ACV (T5-T6/2025)</p>
-        </header>
-
-        <main>
-            <section id="overview" class="mb-10">
-                <h2 class="text-2xl font-semibold mb-4 text-slate-700 text-center">Tổng Quan Lộ Trình Hiệu Lực</h2>
-                <p class="text-center text-slate-500 mb-6 max-w-3xl mx-auto">Biểu đồ dưới đây thể hiện số lượng văn bản quy phạm pháp luật có hiệu lực theo từng tháng, giúp các đơn vị có cái nhìn tổng thể và chuẩn bị kế hoạch tuân thủ kịp thời.</p>
-                <div class="bg-white p-4 rounded-xl shadow-md">
-                    <div class="chart-container">
-                        <canvas id="effectiveDateChart"></canvas>
-                    </div>
+    <div id="emergency-contact" class="emergency-banner p-4 text-center shadow-lg">
+        <div class="container mx-auto flex items-center justify-center gap-4">
+            <span class="text-2xl font-bold">📞</span>
+            <div>
+                <h2 class="text-lg md:text-xl font-bold uppercase">Báo cháy & Sự cố khẩn cấp</h2>
+                <div class="flex flex-wrap justify-center items-center gap-x-6 gap-y-2 mt-1">
+                    <p class="font-semibold">Nội bộ: <span class="text-xl">102</span></p>
+                    <p class="font-semibold">Hotline AOC: <span class="text-xl">0939 976 525</span></p>
+                    <p class="font-semibold">Cảnh sát PCCC: <span class="text-xl">114</span></p>
                 </div>
-            </section>
-
-            <section id="documents-section">
-                <h2 class="text-2xl font-semibold mb-4 text-slate-700 text-center">Tra Cứu Văn Bản Chi Tiết</h2>
-                <p class="text-center text-slate-500 mb-6 max-w-3xl mx-auto">Sử dụng thanh tìm kiếm hoặc lọc theo lĩnh vực để nhanh chóng tìm thấy văn bản bạn quan tâm. Nhấp vào từng văn bản để xem nội dung chi tiết.</p>
-
-                <div class="flex flex-col md:flex-row gap-4 mb-6">
-                    <div class="relative flex-grow">
-                        <input type="text" id="searchInput" placeholder="Tìm theo số hiệu, tiêu đề..." class="w-full p-3 pl-10 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
-                        <svg class="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                    </div>
-                </div>
-
-                <div id="filters" class="flex flex-wrap justify-center gap-2 mb-8">
-                </div>
-
-                <div id="documents-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                </div>
-                 <p id="no-results" class="text-center text-slate-500 text-lg py-10 hidden">Không tìm thấy văn bản nào phù hợp.</p>
-            </section>
-        </main>
-
-    </div>
-
-    <div id="modal" class="fixed inset-0 bg-black bg-opacity-60 modal-bg flex items-center justify-center p-4 z-50 hidden" role="dialog" aria-modal="true">
-        <div id="modal-box" class="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col transform scale-95 opacity-0 modal-box">
-            <div class="flex items-center justify-between p-5 border-b border-slate-200">
-                <h3 id="modal-title" class="text-xl font-semibold text-slate-800"></h3>
-                <button id="close-modal" class="text-slate-400 hover:text-slate-700 transition" aria-label="Đóng">
-                    <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                </button>
-            </div>
-            <div id="modal-content" class="p-6 overflow-y-auto">
-            </div>
-            <div class="p-4 bg-slate-50 border-t border-slate-200 text-sm text-slate-500">
-                <p>Nội dung chỉ mang tính chất tham khảo, vui lòng xem văn bản gốc để có thông tin đầy đủ và chính xác nhất.</p>
             </div>
         </div>
     </div>
 
+    <header class="main-header py-6 shadow-md">
+        <div class="container mx-auto text-center px-4">
+            <h1 class="text-3xl md:text-4xl font-bold text-blue-700">Sổ tay PCCC & CNCH Tương tác</h1>
+            <p class="text-lg text-slate-600 mt-2">Cảng Hàng không Quốc tế Cần Thơ</p>
+        </div>
+    </header>
+
+    <main class="container mx-auto p-4 md:p-8">
+        <section id="zone-selection" class="text-center mb-8">
+            <h2 class="text-2xl font-semibold mb-2">Chọn khu vực của bạn</h2>
+            <p class="text-slate-500 max-w-2xl mx-auto">Nhấp vào một khu vực dưới đây để xem các quy định PCCC & CNCH chi tiết.</p>
+            <div id="nav-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6"></div>
+        </section>
+
+        <section id="content-display" class="bg-white p-6 rounded-lg shadow-lg min-h-[300px]">
+             <div id="placeholder" class="flex flex-col items-center justify-center h-full text-center text-slate-500">
+                <span class="text-6xl mb-4">📖</span>
+                <p class="text-lg font-medium">Nội dung chi tiết sẽ được hiển thị ở đây.</p>
+                <p>Vui lòng chọn một khu vực từ danh sách trên.</p>
+            </div>
+        </section>
+    </main>
+
+    <!-- Gemini Q&A FAB -->
+    <div id="gemini-fab" class="gemini-fab" title="Hỏi đáp nhanh về PCCC">?</div>
+
+    <!-- Gemini Q&A Modal -->
+    <div id="gemini-modal-overlay" class="gemini-modal-overlay">
+        <div class="gemini-modal">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold text-blue-700">✨ Trợ lý Hỏi-Đáp An toàn PCCC</h3>
+                <button id="close-modal-btn" class="text-2xl text-slate-500 hover:text-slate-800">&times;</button>
+            </div>
+            <p class="text-slate-600 mb-4">Đặt câu hỏi về quy định PCCC tại sân bay. Ví dụ: "Tôi có được hút thuốc ở nhà xe không?"</p>
+            <div class="flex gap-2">
+                <input type="text" id="qa-input" class="w-full border border-slate-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Nhập câu hỏi của bạn...">
+                <button id="qa-submit" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 font-semibold">Gửi</button>
+            </div>
+            <div id="qa-response-area" class="mt-4 p-4 bg-slate-50 rounded-md min-h-[100px]">
+                <p class="text-slate-500 text-center">Câu trả lời sẽ xuất hiện ở đây.</p>
+            </div>
+        </div>
+    </div>
+
+    <footer class="text-center p-6 text-slate-500 text-sm">
+        <p>Theo Quyết định số 712/QĐ-CHKQTCT ngày 07/07/2025</p>
+        <p>&copy; 2025 Cảng Hàng không Quốc tế Cần Thơ</p>
+    </footer>
+
     <script>
-        const documentsData = [
-            { id: 1, category: 'Xây dựng', number: 'Thông tư 05/2025/TT-BXD', title: 'Ban hành định mức kinh tế - kỹ thuật trong bảo trì kết cấu hạ tầng hàng không thuộc khu bay tại các Cảng hàng không sân bay.', issuedDate: '12/05/2025', effectiveDate: '12/05/2025', details: '<ul><li class="mb-2">- Quy định định mức KT-KT trong bảo trì kết cấu hạ tầng hàng không thuộc khu bay sử dụng vốn NSNN.</li><li class="mb-2">- Định mức KT-KT đối với bảo trì công trình xây dựng.</li><li>- Định mức KT-KT đối với bảo dưỡng thiết bị.</li></ul>' },
-            { id: 2, category: 'Tài chính', number: 'Thông tư 27/2025/TT-BTC', title: 'Quy định về quyết toán vốn đầu tư dự án hoàn thành sử dụng vốn nhà nước ngoài vốn đầu tư công.', issuedDate: '22/05/2025', effectiveDate: '22/05/2025', details: '<ul><li>Quy định quyết toán vốn đầu tư đối với các dự án sử dụng vốn nhà nước ngoài vốn đầu tư công sau khi hoàn thành hoặc dừng thực hiện vĩnh viễn.</li></ul>' },
-            { id: 3, category: 'Chứng khoán', number: 'Thông tư 19/2025/TT-BTC', title: 'Quy định việc đăng ký công ty đại chúng, hủy tư cách công ty đại chúng, báo cáo về vốn điều lệ đã góp được kiểm toán.', issuedDate: '05/05/2025', effectiveDate: '05/05/2025', details: '<ul><li class="mb-2">- <strong>Đăng ký công ty đại chúng:</strong> Trình tự, thủ tục, hồ sơ.</li><li>- <strong>Hủy tư cách công ty đại chúng:</strong> Các trường hợp và trình tự, thủ tục.</li></ul>' },
-            { id: 4, category: 'Xây dựng', number: 'Nghị định 101/2025/NĐ-CP', title: 'Sửa đổi, bổ sung một số điều của NĐ 32/2016/NĐ-CP và NĐ 42/2016/NĐ-CP.', issuedDate: '09/05/2025', effectiveDate: '23/06/2025', details: '<ul><li class="mb-2">- Sửa đổi hình thức nộp hồ sơ chấp thuận độ cao công trình, thời hạn giải quyết.</li><li class="mb-2">- Bổ sung trách nhiệm của Bộ Xây dựng.</li><li>- Sửa đổi quy định về mở, đóng sân bay chuyên dùng.</li></ul>' },
-            { id: 5, category: 'Xây dựng', number: 'Thông tư 08/2025/TT-BXD', title: 'Sửa đổi, bổ sung một số định mức xây dựng ban hành tại TT 12/2021/TT-BXD.', issuedDate: '30/05/2025', effectiveDate: '15/07/2025', details: '<ul><li>Sửa đổi, bổ sung các định mức: dự toán xây dựng, sử dụng vật liệu, chi phí quản lý dự án.</li></ul>' },
-            { id: 6, category: 'PCCC & CNCH', number: 'Nghị định 105/2025/NĐ-CP', title: 'Quy định chi tiết Luật Phòng cháy, chữa cháy và cứu nạn, cứu hộ.', issuedDate: '15/05/2025', effectiveDate: '01/07/2025', details: '<ul><li class="mb-2">- Danh mục cơ sở, công trình thuộc diện quản lý, thẩm định PCCC.</li><li class="mb-2">- Quy định về nội quy, hồ sơ quản lý PCCC&CNCH.</li><li class="mb-2">- Yêu cầu kết nối thiết bị báo cháy (trước 01/07/2027).</li><li>- Quy định bảo hiểm cháy, nổ bắt buộc.</li></ul>' },
-            { id: 7, category: 'PCCC & CNCH', number: 'Nghị định 106/2025/NĐ-CP', title: 'Quy định xử phạt vi phạm hành chính trong lĩnh vực PCCC và CNCH.', issuedDate: '15/05/2025', effectiveDate: '01/07/2025', details: '<ul><li class="mb-2">- Hình thức xử phạt: Cảnh cáo, phạt tiền (tối đa 100 triệu cho tổ chức),...</li><li>- Thời hiệu xử phạt: 1 năm.</li></ul>' },
-            { id: 8, category: 'Lưu trữ', number: 'Thông tư 07/2025/TT-BXD', title: 'Quy định thời hạn lưu trữ hồ sơ, tài liệu thuộc phạm vi quản lý của Bộ Xây dựng.', issuedDate: '15/05/2025', effectiveDate: '01/07/2025', details: '<ul><li>Quy định thời hạn lưu trữ cho các lĩnh vực: quy hoạch, kiến trúc, đầu tư xây dựng, hạ tầng kỹ thuật, hàng không,...</li></ul>' },
-            { id: 9, category: 'Lưu trữ', number: 'TT 06/2025/TT-BNV & TT 05/2025/TT-BNV', title: 'Quy định chi tiết Luật Lưu trữ 2024 và nghiệp vụ lưu trữ tài liệu số.', issuedDate: '14-15/05/2025', effectiveDate: '01/07/2025', details: '<ul><li class="mb-2">- Quản lý, hủy, sử dụng tài liệu lưu trữ.</li><li>- Quy trình số hóa, bảo quản, sử dụng và hủy tài liệu lưu trữ số.</li></ul>' },
-            { id: 10, category: 'Tài chính', number: 'Nghị định 70/2025/NĐ-CP', title: 'Sửa đổi Nghị định 123/2020/NĐ-CP quy định về hóa đơn, chứng từ.', issuedDate: '20/03/2025', effectiveDate: '01/06/2025', details: '<ul><li class="mb-2">- Sửa đổi quy định về hóa đơn điện tử từ máy tính tiền.</li><li>- Bổ sung trách nhiệm của tổ chức cung cấp dịch vụ hóa đơn điện tử.</li></ul>' },
-            { id: 11, category: 'Lao động & Thi đua', number: 'Thông tư 003/2025/TT-BNV', title: 'Hướng dẫn thực hiện quản lý lao động, tiền lương, thù lao, tiền thưởng trong doanh nghiệp Nhà nước.', issuedDate: '28/04/2025', effectiveDate: '15/06/2025', details: '<ul><li>Nguyên tắc quản lý, xác định tiền lương, thù lao, tiền thưởng dựa trên lợi nhuận, năng suất lao động.</li></ul>' },
-            { id: 12, category: 'Chứng khoán', number: 'Thông tư 14/2025/TT-BTC', title: 'Sửa đổi TT 119/2020/TT-BTC và TT 58/2021/TT-BTC về giao dịch chứng khoán.', issuedDate: '04/04/2025', effectiveDate: '01/06/2025', details: '<ul><li class="mb-2">- Làm rõ tài liệu trong hồ sơ chuyển quyền sở hữu chứng khoán.</li><li class="mb-2">- Làm rõ thông tin khách hàng khi mở tài khoản lưu ký.</li><li>- Thay thế mẫu hợp đồng chứng khoán phái sinh.</li></ul>' },
-            { id: 13, category: 'Môi trường', number: 'Thông tư 01/2025/TT-BNNMT', title: 'Ban hành 03 Quy chuẩn Quốc gia về chất lượng môi trường xung quanh.', issuedDate: '15/05/2025', effectiveDate: '14/11/2025', details: '<ul><li class="mb-2">- QCVN 26:2025/BNNMT - Quy chuẩn kỹ thuật Quốc gia về tiếng ồn.</li><li class="mb-2">- QCVN 27:2025/BNNMT - Quy chuẩn kỹ thuật Quốc gia về độ rung.</li><li>- QCVN 28:2025/BNNMT - Quy chuẩn kỹ thuật Quốc gia về chất lượng trầm tích.</li></ul>' },
-            { id: 14, category: 'PCCC & CNCH', number: 'Thông tư 37/2025/TT-BCA', title: 'Quy định về nhiệm vụ công tác PCCC, CNCH của lực lượng Công an nhân dân.', issuedDate: '15/05/2025', effectiveDate: '01/07/2025', details: '<ul><li class="mb-2">- Quy trình thẩm định thiết kế về phòng cháy, chữa cháy.</li><li class="mb-2">- Quy trình kiểm tra công tác nghiệm thu về phòng cháy, chữa cháy.</li><li>- Quy trình kiểm tra về phòng cháy chữa cháy.</li></ul>' },
-            { id: 15, category: 'Lao động & Thi đua', number: 'Thông tư 28/2025/TT-BTC', title: 'Hướng dẫn mức chi tổ chức thực hiện công tác thi đua, khen thưởng.', issuedDate: '26/05/2025', effectiveDate: '15/07/2025', details: '<ul><li>Quy định chi tiết về mức chi cho công tác thi đua, khen thưởng, chi in ấn, làm hiện vật, chi tuyên truyền, phổ biến...</li></ul>' },
-            { id: 16, category: 'Tài chính', number: 'Thông tư 31/2025/TT-BTC', title: 'Sửa đổi Thông tư 23/2021/TT-BTC hướng dẫn việc in, phát hành, quản lý và sử dụng tem điện tử.', issuedDate: '31/05/2025', effectiveDate: '01/06/2025', details: '<ul><li class="mb-2">- Sửa đổi, bổ sung quy định về mẫu tem, dán tem điện tử.</li><li class="mb-2">- Sửa đổi quản lý, mua tem điện tử thuốc lá, rượu nhập khẩu và sản xuất trong nước.</li><li>- Lược bỏ một số giấy tờ khi mua tem tại cơ quan thuế.</li></ul>' },
-            { id: 17, category: 'Tài chính', number: 'Thông tư 32/2025/TT-BTC', title: 'Hướng dẫn thực hiện Luật Quản lý thuế, Nghị định 123/2020/NĐ-CP, Nghị định 70/2025/NĐ-CP.', issuedDate: '31/05/2025', effectiveDate: '01/06/2025', details: '<ul><li>Hướng dẫn việc chuyển đổi áp dụng hóa đơn điện tử có mã và không có mã của cơ quan thuế đối với các trường hợp, bao gồm cả các doanh nghiệp có rủi ro cao về thuế.</li></ul>' },
-        ];
-
-        document.addEventListener('DOMContentLoaded', () => {
-            const documentsList = document.getElementById('documents-list');
-            const filtersContainer = document.getElementById('filters');
-            const searchInput = document.getElementById('searchInput');
-            const noResults = document.getElementById('no-results');
-
-            const modal = document.getElementById('modal');
-            const modalBox = document.getElementById('modal-box');
-            const closeModalBtn = document.getElementById('close-modal');
-            const modalTitle = document.getElementById('modal-title');
-            const modalContent = document.getElementById('modal-content');
-
-            let currentFilter = 'Tất cả';
-
-            function renderDocuments(docs) {
-                documentsList.innerHTML = '';
-                if (docs.length === 0) {
-                    noResults.classList.remove('hidden');
-                } else {
-                    noResults.classList.add('hidden');
+        const fireSafetyData = {
+            public: {
+                title: "Khu vực Công cộng", icon: "👥", description: "Nhà ga, Văn phòng, Nhà xe, Quầy kinh doanh, Bếp ăn.",
+                content: {
+                    responsibilities: { title: "Trách nhiệm PCCC & CNCH", points: ["Là nghĩa vụ bắt buộc của mọi tổ chức, cá nhân, CB-NV và hành khách.", "Luôn ưu tiên cứu người, bảo vệ tài sản, phối hợp xử lý sự cố.", "Người đứng đầu đơn vị thuê mặt bằng chịu trách nhiệm toàn diện về PCCC.", "Tham gia huấn luyện, diễn tập PCCC & CNCH định kỳ."] },
+                    safety: { title: "Quy định an toàn chung", points: ["Hàng hóa trong kho, quầy hàng phải sắp xếp gọn gàng, cách xa nguồn nhiệt.", "Bếp ăn phải thông thoáng, có hệ thống hút khói, nhân viên được huấn luyện.", "Pin Lithium (trong xe điện, thiết bị) phải được lưu trữ trong hộp chống cháy, không sạc qua đêm.", "Xe trong bãi/nhà xe phải đỗ đúng nơi quy định, không rò rỉ nhiên liệu.", "Lối thoát hiểm, đèn sự cố, biển báo phải luôn thông thoáng, hoạt động tốt."] },
+                    prohibitions: { title: "Các hành vi bị cấm", points: ["Hút thuốc, đốt lửa, đun nấu, thắp hương trái phép.", "Tự ý câu móc, thay đổi kết cấu hệ thống điện.", "Mang chất cháy nổ, chất độc vào nhà ga, nhà xe.", "Cản trở hoạt động PCCC, che khuất phương tiện chữa cháy.", "Báo cháy giả, chống người thi hành nhiệm vụ."] },
+                    emergency: { title: "Khi có sự cố cháy, nổ", points: ["Hô to báo động, tìm cách ngắt điện/gas khu vực.", "Sử dụng ngay bình chữa cháy, phương tiện tại chỗ để dập lửa.", "TUYỆT ĐỐI KHÔNG dùng nước dập cháy dầu mỡ hoặc cháy pin Lithium.", "Hướng dẫn mọi người thoát nạn theo lối thoát hiểm gần nhất."] }
                 }
-                docs.forEach(doc => {
-                    const card = document.createElement('div');
-                    card.className = 'document-card bg-white rounded-xl shadow-md p-5 flex flex-col cursor-pointer';
-                    card.dataset.id = doc.id;
-                    card.innerHTML = `
-                        <div class="flex-grow">
-                            <span class="inline-block bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded-full mb-3">${doc.category}</span>
-                            <h3 class="text-base font-semibold text-slate-800 mb-2">${doc.number}</h3>
-                            <p class="text-slate-600 text-sm">${doc.title}</p>
-                        </div>
-                        <div class="mt-4 pt-4 border-t border-slate-100 text-xs text-slate-500 flex justify-between">
-                            <span>Hiệu lực: <strong>${doc.effectiveDate}</strong></span>
-                            <span>Ban hành: <strong>${doc.issuedDate}</strong></span>
-                        </div>
-                    `;
-                    card.addEventListener('click', () => openModal(doc));
-                    documentsList.appendChild(card);
-                });
+            },
+            technical: {
+                title: "Khu vực Kỹ thuật", icon: "⚙️", description: "Xưởng cơ khí, Trạm nguồn, Kho vật tư, Trạm điện, Phòng bơm.",
+                content: {
+                    responsibilities: { title: "Trách nhiệm PCCC & CNCH", points: ["Là trách nhiệm bắt buộc của mọi CB-NV làm việc tại khu vực.", "An toàn cho người và thiết bị là ưu tiên hàng đầu.", "Chỉ người có chuyên môn, được đào tạo mới được vận hành, sửa chữa thiết bị.", "Giám sát an toàn trong suốt quá trình làm việc, đặc biệt là khi hàn cắt."] },
+                    safety: { title: "Quy định an toàn chung", points: ["Hoạt động hàn điện, hàn hơi phải có giấy phép, người giám sát và che chắn bằng vật liệu chống cháy.", "Vệ sinh sạch sẽ khu vực hàn, di dời vật dễ cháy cách xa tối thiểu 2m.", "Thiết bị điện công suất lớn phải có aptomat riêng, dây dẫn đúng tiết diện.", "Thiết bị điện tại khu vực xăng dầu, hóa chất phải là loại phòng nổ.", "Trạm điện, máy phát phải có hệ thống tiếp địa, chống sét, thông gió đầy đủ.", "Thường xuyên kiểm tra định kỳ hệ thống điện, máy móc, thiết bị."] },
+                    prohibitions: { title: "Các hành vi bị cấm", points: ["Hút thuốc, sử dụng lửa trần, điện thoại di động tại khu vực có nguy cơ cháy nổ cao.", "Người không có nhiệm vụ tự ý vào khu vực kỹ thuật, trạm điện.", "Tự ý đấu nối, thay đổi kết cấu thiết bị điện.", "Để vật tư, hàng hóa cản trở lối đi, che khuất thiết bị PCCC.", "Sử dụng thiết bị hàn, điện không đảm bảo an toàn (rò rỉ, hở điện)."] },
+                    emergency: { title: "Khi có sự cố cháy, nổ", points: ["Hô to báo động, nhanh chóng ngắt nguồn điện bằng aptomat chính.", "Sử dụng bình chữa cháy CO2, bình bột khô để dập lửa.", "Sẵn sàng phương án di dời tài sản, vật tư quan trọng nếu có thể.", "Gọi ngay cho lực lượng chuyên trách để hỗ trợ."] }
+                }
+            },
+            airside: {
+                title: "Khu vực Hoạt động bay", icon: "✈️", description: "Sân đỗ tàu bay, Trụ bơm nhiên liệu, Khu điều hành bay (ATC).",
+                content: {
+                     responsibilities: { title: "Trách nhiệm PCCC & CNCH", points: ["Là trách nhiệm bắt buộc của mọi CB-NV và đơn vị hoạt động tại sân đỗ.", "Đảm bảo an toàn tuyệt đối, duy trì hoạt động điều hành bay liên tục.", "Nhân viên vận hành phương tiện, thiết bị phải được huấn luyện PCCC.", "Bảo vệ nghiêm ngặt các thiết bị đặc biệt quan trọng (ATC, Radar...)."] },
+                    safety: { title: "Quy định an toàn chung", points: ["Khi tra nạp nhiên liệu, phương tiện phải tắt máy, nối đất, giữ khoảng cách an toàn.", "Tất cả các phương tiện hoạt động tại sân đỗ phải được trang bị bình chữa cháy.", "Khu vực điều hành bay (ATC) phải được trang bị hệ thống báo cháy, chữa cháy tự động và hoạt động tốt.", "Thiết bị điện, UPS, điều hòa trong khu vực ATC phải có aptomat riêng và được kiểm tra định kỳ."] },
+                    prohibitions: { title: "Các hành vi bị cấm", points: ["Hút thuốc, sử dụng điện thoại, để động cơ xe hoạt động tại khu vực trụ bơm, sân đỗ.", "Mang nguồn nhiệt, chất cháy nổ, hóa chất vào khu vực sân đỗ, ATC.", "Tự ý thay đổi, lắp đặt thiết bị điện, mạng trong khu vực điều hành bay mà không có phê duyệt.", "Vô hiệu hóa, che chắn hệ thống báo cháy, chữa cháy, lối thoát nạn.", "Báo cháy giả, làm mất tín hiệu báo cháy kết nối về trung tâm."] },
+                    emergency: { title: "Khi có sự cố cháy, nổ", points: ["Hô to báo động cho mọi người xung quanh.", "Cắt điện khu vực sự cố bằng aptomat.", "Dùng phương tiện tại chỗ (bình CO2, bột) để xử lý ban đầu.", "Ưu tiên bảo vệ hệ thống, thiết bị điều hành bay, đảm bảo hoạt động không gián đoạn."] }
+                }
             }
+        };
 
-            function setupFilters() {
-                const categories = ['Tất cả', ...new Set(documentsData.map(d => d.category))];
-                filtersContainer.innerHTML = '';
-                categories.forEach(category => {
-                    const button = document.createElement('button');
-                    button.textContent = category;
-                    button.className = 'filter-btn px-4 py-2 text-sm font-medium border border-slate-300 rounded-full transition hover:bg-slate-100';
-                    if (category === currentFilter) {
-                        button.classList.add('filter-btn-active', 'border-blue-600');
-                    }
-                    button.addEventListener('click', () => {
-                        currentFilter = category;
-                        filterAndRender();
-                        updateActiveFilterButton();
+        document.addEventListener('DOMContentLoaded', function() {
+            const navContainer = document.getElementById('nav-container');
+            const contentDisplay = document.getElementById('content-display');
+            const placeholder = document.getElementById('placeholder');
+
+            // Gemini Modal Elements
+            const fab = document.getElementById('gemini-fab');
+            const modalOverlay = document.getElementById('gemini-modal-overlay');
+            const closeModalBtn = document.getElementById('close-modal-btn');
+            const qaSubmitBtn = document.getElementById('qa-submit');
+            const qaInput = document.getElementById('qa-input');
+            const qaResponseArea = document.getElementById('qa-response-area');
+
+            // --- Gemini API Helper ---
+            async function callGemini(prompt, isJson = false, schema = null) {
+                const apiKey = ""; // Left blank for environment injection
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+                
+                let payload = {
+                    contents: [{ role: "user", parts: [{ text: prompt }] }]
+                };
+
+                if (isJson && schema) {
+                    payload.generationConfig = {
+                        responseMimeType: "application/json",
+                        responseSchema: schema
+                    };
+                }
+
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
                     });
-                    filtersContainer.appendChild(button);
-                });
+
+                    if (!response.ok) {
+                        const errorBody = await response.text();
+                        console.error("API Error Response:", errorBody);
+                        throw new Error(`API request failed with status ${response.status}`);
+                    }
+
+                    const result = await response.json();
+                    
+                    if (result.candidates && result.candidates.length > 0 && result.candidates[0].content && result.candidates[0].content.parts && result.candidates[0].content.parts.length > 0) {
+                        return result.candidates[0].content.parts[0].text;
+                    } else {
+                        console.error("Unexpected API response structure:", result);
+                        throw new Error("Không nhận được nội dung hợp lệ từ AI.");
+                    }
+                } catch (error) {
+                    console.error("Error calling Gemini API:", error);
+                    return `Đã xảy ra lỗi: ${error.message}. Vui lòng thử lại.`;
+                }
             }
 
-            function updateActiveFilterButton() {
-                document.querySelectorAll('.filter-btn').forEach(btn => {
-                    if (btn.textContent === currentFilter) {
-                        btn.classList.add('filter-btn-active', 'border-blue-600');
-                        btn.classList.remove('bg-slate-100');
-                    } else {
-                        btn.classList.remove('filter-btn-active', 'border-blue-600');
+            function createAccordionItem(id, title, points, typeClass) {
+                const isFirst = id.endsWith('responsibilities');
+                const isOpen = isFirst ? 'open' : '';
+                const isShow = isFirst ? 'show' : '';
+                let listItems = points.map(point => `<li>${point}</li>`).join('');
+                return `<div class="content-section mb-4">
+                            <h3 id="${id}" class="accordion-header ${isOpen} flex justify-between items-center text-lg font-semibold text-slate-700 hover:text-blue-600">
+                                <span>${title}</span>
+                                <span class="accordion-arrow text-blue-600 text-2xl font-light transform transition-transform">▾</span>
+                            </h3>
+                            <div class="accordion-content ${isShow} mt-2 pl-2"><ul class="${typeClass}">${listItems}</ul></div>
+                        </div>`;
+            }
+
+            function displayContent(zoneKey) {
+                placeholder.style.display = 'none';
+                const zoneData = fireSafetyData[zoneKey];
+                let contentHTML = `<div class="flex justify-between items-start">
+                                      <h2 class="text-2xl font-bold mb-4 text-blue-700">${zoneData.icon} ${zoneData.title}</h2>
+                                      <button id="checklist-btn" data-zone="${zoneKey}" class="bg-amber-500 text-white px-4 py-2 rounded-md hover:bg-amber-600 font-semibold text-sm">✨ Tạo Checklist</button>
+                                   </div>
+                                   <div id="checklist-container-${zoneKey}" class="hidden"></div>`;
+
+                const sections = [
+                    { key: 'responsibilities', class: 'responsibility' },
+                    { key: 'safety', class: 'safety' },
+                    { key: 'prohibitions', class: 'prohibition' },
+                    { key: 'emergency', class: 'emergency' }
+                ];
+                
+                sections.forEach(section => {
+                    if(zoneData.content[section.key]) {
+                        contentHTML += createAccordionItem(`${zoneKey}-${section.key}`, zoneData.content[section.key].title, zoneData.content[section.key].points, section.class);
                     }
                 });
-            }
 
-            function filterAndRender() {
-                const searchTerm = searchInput.value.toLowerCase();
-                let filteredDocs = documentsData;
+                contentDisplay.innerHTML = contentHTML;
 
-                if (currentFilter !== 'Tất cả') {
-                    filteredDocs = filteredDocs.filter(d => d.category === currentFilter);
-                }
-
-                if (searchTerm) {
-                    filteredDocs = filteredDocs.filter(d =>
-                        d.title.toLowerCase().includes(searchTerm) ||
-                        d.number.toLowerCase().includes(searchTerm)
-                    );
-                }
-                
-                renderDocuments(filteredDocs);
-            }
-
-            function openModal(doc) {
-                modalTitle.textContent = doc.number;
-                modalContent.innerHTML = `<h4 class="font-semibold text-lg mb-2">${doc.title}</h4><div class="prose prose-sm max-w-none text-slate-600">${doc.details}</div>`;
-                modal.classList.remove('hidden');
-                setTimeout(() => {
-                    modalBox.classList.remove('scale-95', 'opacity-0');
-                }, 10);
-            }
-
-            function closeModal() {
-                 modalBox.classList.add('scale-95', 'opacity-0');
-                 setTimeout(() => {
-                    modal.classList.add('hidden');
-                 }, 300);
-            }
-
-            function setupChart() {
-                const effectiveDates = documentsData.map(d => {
-                    const parts = d.effectiveDate.split('/');
-                    return new Date(parts[2], parts[1] - 1, parts[0]);
+                document.querySelectorAll('.accordion-header').forEach(header => {
+                    header.addEventListener('click', function() {
+                        this.classList.toggle('open');
+                        this.nextElementSibling.classList.toggle('show');
+                    });
                 });
 
-                const monthCounts = effectiveDates.reduce((acc, date) => {
-                    const month = date.toLocaleString('vi-VN', { month: 'long', year: 'numeric' });
-                    acc[month] = (acc[month] || 0) + 1;
-                    return acc;
-                }, {});
-
-                const sortedMonths = Object.keys(monthCounts).sort((a, b) => {
-                    const [monthA, yearA] = a.replace('Tháng ', '').split(' năm ');
-                    const [monthB, yearB] = b.replace('Tháng ', '').split(' năm ');
-                    return new Date(yearA, monthA - 1) - new Date(yearB, monthB - 1);
-                });
+                document.getElementById('checklist-btn').addEventListener('click', handleChecklistGeneration);
+            }
+            
+            async function handleChecklistGeneration(event) {
+                const button = event.target;
+                const zoneKey = button.dataset.zone;
+                const container = document.getElementById(`checklist-container-${zoneKey}`);
                 
-                const chartLabels = sortedMonths;
-                const chartData = sortedMonths.map(month => monthCounts[month]);
+                button.disabled = true;
+                button.innerHTML = '<div class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mx-auto"></div>';
+                container.classList.remove('hidden');
+                container.innerHTML = `<div class="loader"></div><p class="text-center text-slate-500">AI đang tạo checklist, vui lòng chờ...</p>`;
 
-                const ctx = document.getElementById('effectiveDateChart').getContext('2d');
-                new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: chartLabels,
-                        datasets: [{
-                            label: 'Số lượng văn bản',
-                            data: chartData,
-                            backgroundColor: 'rgba(59, 130, 246, 0.7)',
-                            borderColor: 'rgba(37, 99, 235, 1)',
-                            borderWidth: 1,
-                            borderRadius: 4,
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                ticks: {
-                                    stepSize: 1
-                                }
-                            }
-                        },
-                        plugins: {
-                            legend: {
-                                display: false
-                            },
-                            tooltip: {
-                                callbacks: {
-                                    title: (context) => `Hiệu lực ${context[0].label}`
-                                }
+                const zoneRules = fireSafetyData[zoneKey].content;
+                const context = `Quy định an toàn: ${zoneRules.safety.points.join('. ')}. Hành vi cấm: ${zoneRules.prohibitions.points.join('. ')}`;
+                const prompt = `Dựa trên nội quy sau đây cho một khu vực tại sân bay, hãy tạo một checklist kiểm tra an toàn PCCC hàng ngày. Phân loại từng mục kiểm tra. Nội quy: "${context}"`;
+                const schema = {
+                    type: "OBJECT",
+                    properties: {
+                        checklist: {
+                            type: "ARRAY",
+                            items: {
+                                type: "OBJECT",
+                                properties: {
+                                    category: { type: "STRING" },
+                                    item: { type: "STRING" }
+                                },
+                                required: ["category", "item"]
                             }
                         }
+                    },
+                    required: ["checklist"]
+                };
+
+                const result = await callGemini(prompt, true, schema);
+                button.disabled = false;
+                button.innerHTML = '✨ Tạo lại Checklist';
+
+                try {
+                    const parsedResult = JSON.parse(result);
+                    if (parsedResult.checklist && parsedResult.checklist.length > 0) {
+                        const groupedByCategory = parsedResult.checklist.reduce((acc, current) => {
+                            (acc[current.category] = acc[current.category] || []).push(current.item);
+                            return acc;
+                        }, {});
+
+                        let checklistHtml = '<h4 class="text-lg font-semibold mb-2 text-slate-800">Checklist Kiểm tra An toàn Hàng ngày</h4>';
+                        for (const category in groupedByCategory) {
+                            checklistHtml += `<p class="font-semibold mt-3 mb-1 text-slate-600">${category}:</p><ul class="list-disc list-inside space-y-1">`;
+                            groupedByCategory[category].forEach(item => {
+                                checklistHtml += `<li class="text-slate-700">${item}</li>`;
+                            });
+                            checklistHtml += `</ul>`;
+                        }
+                        container.innerHTML = `<div class="checklist-container">${checklistHtml}</div>`;
+                    } else {
+                        container.innerHTML = `<p class="text-center text-red-500">Không thể tạo checklist từ thông tin được cung cấp.</p>`;
                     }
-                });
+                } catch (e) {
+                     container.innerHTML = `<p class="text-center text-red-500">Lỗi xử lý dữ liệu từ AI. Vui lòng thử lại.</p><p class="text-xs text-slate-400 mt-2">${result}</p>`;
+                }
             }
 
-            searchInput.addEventListener('keyup', filterAndRender);
-            closeModalBtn.addEventListener('click', closeModal);
-            modal.addEventListener('click', (e) => {
-                if (e.target === modal) closeModal();
-            });
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
-                    closeModal();
+            // --- Q&A Modal Logic ---
+            fab.addEventListener('click', () => modalOverlay.classList.add('show'));
+            closeModalBtn.addEventListener('click', () => modalOverlay.classList.remove('show'));
+            modalOverlay.addEventListener('click', (e) => {
+                if (e.target === modalOverlay) {
+                    modalOverlay.classList.remove('show');
                 }
             });
 
-            renderDocuments(documentsData);
-            setupFilters();
-            setupChart();
+            qaSubmitBtn.addEventListener('click', handleQASubmit);
+            qaInput.addEventListener('keyup', (e) => {
+                if (e.key === 'Enter') handleQASubmit();
+            });
+
+            async function handleQASubmit() {
+                const question = qaInput.value.trim();
+                if (!question) return;
+
+                qaResponseArea.innerHTML = '<div class="loader"></div><p class="text-center text-slate-500">AI đang suy nghĩ...</p>';
+                qaSubmitBtn.disabled = true;
+                qaInput.disabled = true;
+
+                const fullContext = JSON.stringify(fireSafetyData);
+                const prompt = `Bạn là một chuyên gia an toàn PCCC tại sân bay. Dựa vào toàn bộ nội quy PCCC sau đây: ${fullContext}. Hãy trả lời câu hỏi của người dùng một cách ngắn gọn, chính xác và chỉ dựa vào thông tin được cung cấp. Câu hỏi: "${question}"`;
+                
+                const answer = await callGemini(prompt);
+                
+                qaResponseArea.innerHTML = `<p>${answer.replace(/\n/g, '<br>')}</p>`;
+                qaSubmitBtn.disabled = false;
+                qaInput.disabled = false;
+                qaInput.value = '';
+            }
+
+            // --- Initial Page Load ---
+            Object.keys(fireSafetyData).forEach(key => {
+                const zone = fireSafetyData[key];
+                const card = document.createElement('div');
+                card.className = 'nav-card bg-white p-6 rounded-lg shadow-md border-2 border-transparent cursor-pointer text-left';
+                card.dataset.zoneKey = key;
+                card.innerHTML = `<div class="flex items-start gap-4">
+                                    <span class="text-4xl">${zone.icon}</span>
+                                    <div>
+                                        <h3 class="text-xl font-bold text-slate-800">${zone.title}</h3>
+                                        <p class="text-slate-500 mt-1">${zone.description}</p>
+                                    </div>
+                                  </div>`;
+                card.addEventListener('click', function() {
+                    document.querySelectorAll('.nav-card').forEach(c => c.classList.remove('active'));
+                    this.classList.add('active');
+                    displayContent(key);
+                });
+                navContainer.appendChild(card);
+            });
         });
     </script>
 </body>
