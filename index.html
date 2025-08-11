@@ -3,288 +3,486 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cổng Thông Tin Văn Bản Pháp Luật - ACV</title>
+    <title>Trắc Nghiệm RCR - Ôn Tập</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Chosen Palette: Corporate Blue and Slate -->
-    <!-- Application Structure Plan: A dashboard-style single-page application. The core is a filterable, searchable list of legal documents presented as interactive cards. The main navigation will be based on legal domains (Xây dựng, Tài chính, PCCC, etc.) derived from the source report, rather than the original chronological grouping. This task-oriented structure helps users from different departments quickly find relevant information. A timeline chart at the top provides a high-level overview of when regulations become effective. Users can filter the document list by clicking on category tags. Clicking on a document card reveals its detailed summary in a modal window. A search bar allows for keyword-based filtering. This structure transforms a static list into an exploratory tool, prioritizing user efficiency. -->
-    <!-- Visualization & Content Choices: 
-        1. Report Info: Number of documents and their effective dates. Goal: Show the volume/timing of new regulations. Viz: Bar Chart (Chart.js/Canvas) showing count per month. Interaction: Hover for details. Justification: Provides a quick visual summary of upcoming changes.
-        2. Report Info: List of all legal documents. Goal: Organize and present detailed information clearly. Viz: Interactive Cards (HTML/CSS/Tailwind). Interaction: Click card to open a modal with details. List is filterable by category tags and searchable. Justification: Progressive disclosure via modals prevents information overload. Domain-based filtering is highly usable for the target audience.
-    -->
-    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
     <style>
-        body { font-family: 'Inter', sans-serif; }
-        .chart-container { position: relative; width: 100%; max-width: 800px; margin-left: auto; margin-right: auto; height: 300px; max-height: 40vh; }
-        .modal-bg { transition: opacity 0.3s ease; }
-        .modal-box { transition: transform 0.3s ease, opacity 0.3s ease; }
-        .document-card { transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; }
-        .document-card:hover { transform: translateY(-4px); box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1); }
-        .filter-btn-active { background-color: #2563eb; color: white; }
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Custom scrollbar for better aesthetics */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+        /* Style for the correct answer */
+        .correct-answer {
+            color: #ef4444; /* Red-500 */
+            font-weight: 600; /* Semibold */
+        }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800">
+<body class="bg-gray-100 text-gray-800">
 
-    <div class="container mx-auto p-4 md:p-8">
+    <div class="container mx-auto p-4 md:p-8 max-w-4xl">
         
+        <!-- Header -->
         <header class="text-center mb-8">
-            <h1 class="text-3xl md:text-4xl font-bold text-slate-900">Cổng Thông Tin Văn Bản Pháp Luật</h1>
-            <p class="mt-2 text-lg text-slate-600">Cập nhật các quy định pháp luật mới liên quan đến hoạt động của ACV (T5-T6/2025)</p>
+            <h1 class="text-3xl md:text-4xl font-bold text-blue-600">Tài Liệu Ôn Tập RCR</h1>
+            <p class="text-gray-600 mt-2">Xem lại các câu hỏi và đáp án về an toàn đường cất hạ cánh (RCR).</p>
         </header>
 
-        <main>
-            <section id="overview" class="mb-10">
-                <h2 class="text-2xl font-semibold mb-4 text-slate-700 text-center">Tổng Quan Lộ Trình Hiệu Lực</h2>
-                <p class="text-center text-slate-500 mb-6 max-w-3xl mx-auto">Biểu đồ dưới đây thể hiện số lượng văn bản quy phạm pháp luật có hiệu lực theo từng tháng, giúp các đơn vị có cái nhìn tổng thể và chuẩn bị kế hoạch tuân thủ kịp thời.</p>
-                <div class="bg-white p-4 rounded-xl shadow-md">
-                    <div class="chart-container">
-                        <canvas id="effectiveDateChart"></canvas>
-                    </div>
-                </div>
-            </section>
-
-            <section id="documents-section">
-                <h2 class="text-2xl font-semibold mb-4 text-slate-700 text-center">Tra Cứu Văn Bản Chi Tiết</h2>
-                <p class="text-center text-slate-500 mb-6 max-w-3xl mx-auto">Sử dụng thanh tìm kiếm hoặc lọc theo lĩnh vực để nhanh chóng tìm thấy văn bản bạn quan tâm. Nhấp vào từng văn bản để xem nội dung chi tiết.</p>
-
-                <div class="flex flex-col md:flex-row gap-4 mb-6">
-                    <div class="relative flex-grow">
-                        <input type="text" id="searchInput" placeholder="Tìm theo số hiệu, tiêu đề..." class="w-full p-3 pl-10 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
-                        <svg class="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                    </div>
-                </div>
-
-                <div id="filters" class="flex flex-wrap justify-center gap-2 mb-8">
-                </div>
-
-                <div id="documents-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                </div>
-                 <p id="no-results" class="text-center text-slate-500 text-lg py-10 hidden">Không tìm thấy văn bản nào phù hợp.</p>
-            </section>
-        </main>
-
-    </div>
-
-    <div id="modal" class="fixed inset-0 bg-black bg-opacity-60 modal-bg flex items-center justify-center p-4 z-50 hidden" role="dialog" aria-modal="true">
-        <div id="modal-box" class="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col transform scale-95 opacity-0 modal-box">
-            <div class="flex items-center justify-between p-5 border-b border-slate-200">
-                <h3 id="modal-title" class="text-xl font-semibold text-slate-800"></h3>
-                <button id="close-modal" class="text-slate-400 hover:text-slate-700 transition" aria-label="Đóng">
-                    <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                </button>
-            </div>
-            <div id="modal-content" class="p-6 overflow-y-auto">
-            </div>
-            <div class="p-4 bg-slate-50 border-t border-slate-200 text-sm text-slate-500">
-                <p>Nội dung chỉ mang tính chất tham khảo, vui lòng xem văn bản gốc để có thông tin đầy đủ và chính xác nhất.</p>
+        <!-- Search and Controls -->
+        <div class="bg-white p-4 rounded-lg shadow-md mb-8 sticky top-0 z-10">
+            <div class="flex flex-col md:flex-row gap-4">
+                <input type="text" id="searchInput" placeholder="🔍 Tìm kiếm câu hỏi hoặc đáp án..." class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
             </div>
         </div>
+
+        <!-- Quiz Container -->
+        <main id="quizContainer" class="space-y-6">
+            <!-- Questions will be dynamically inserted here -->
+        </main>
+
+        <!-- Back to Top Button -->
+        <button id="backToTopBtn" class="fixed bottom-5 right-5 bg-blue-600 text-white p-3 rounded-full shadow-lg hover:bg-blue-700 transition-transform transform hover:scale-110" style="display: none;">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+            </svg>
+        </button>
+
     </div>
 
     <script>
-        const documentsData = [
-            { id: 1, category: 'Xây dựng', number: 'Thông tư 05/2025/TT-BXD', title: 'Ban hành định mức kinh tế - kỹ thuật trong bảo trì kết cấu hạ tầng hàng không thuộc khu bay tại các Cảng hàng không sân bay.', issuedDate: '12/05/2025', effectiveDate: '12/05/2025', details: '<ul><li class="mb-2">- Quy định định mức KT-KT trong bảo trì kết cấu hạ tầng hàng không thuộc khu bay sử dụng vốn NSNN.</li><li class="mb-2">- Định mức KT-KT đối với bảo trì công trình xây dựng.</li><li>- Định mức KT-KT đối với bảo dưỡng thiết bị.</li></ul>' },
-            { id: 2, category: 'Tài chính', number: 'Thông tư 27/2025/TT-BTC', title: 'Quy định về quyết toán vốn đầu tư dự án hoàn thành sử dụng vốn nhà nước ngoài vốn đầu tư công.', issuedDate: '22/05/2025', effectiveDate: '22/05/2025', details: '<ul><li>Quy định quyết toán vốn đầu tư đối với các dự án sử dụng vốn nhà nước ngoài vốn đầu tư công sau khi hoàn thành hoặc dừng thực hiện vĩnh viễn.</li></ul>' },
-            { id: 3, category: 'Chứng khoán', number: 'Thông tư 19/2025/TT-BTC', title: 'Quy định việc đăng ký công ty đại chúng, hủy tư cách công ty đại chúng, báo cáo về vốn điều lệ đã góp được kiểm toán.', issuedDate: '05/05/2025', effectiveDate: '05/05/2025', details: '<ul><li class="mb-2">- <strong>Đăng ký công ty đại chúng:</strong> Trình tự, thủ tục, hồ sơ.</li><li>- <strong>Hủy tư cách công ty đại chúng:</strong> Các trường hợp và trình tự, thủ tục.</li></ul>' },
-            { id: 4, category: 'Xây dựng', number: 'Nghị định 101/2025/NĐ-CP', title: 'Sửa đổi, bổ sung một số điều của NĐ 32/2016/NĐ-CP và NĐ 42/2016/NĐ-CP.', issuedDate: '09/05/2025', effectiveDate: '23/06/2025', details: '<ul><li class="mb-2">- Sửa đổi hình thức nộp hồ sơ chấp thuận độ cao công trình, thời hạn giải quyết.</li><li class="mb-2">- Bổ sung trách nhiệm của Bộ Xây dựng.</li><li>- Sửa đổi quy định về mở, đóng sân bay chuyên dùng.</li></ul>' },
-            { id: 5, category: 'Xây dựng', number: 'Thông tư 08/2025/TT-BXD', title: 'Sửa đổi, bổ sung một số định mức xây dựng ban hành tại TT 12/2021/TT-BXD.', issuedDate: '30/05/2025', effectiveDate: '15/07/2025', details: '<ul><li>Sửa đổi, bổ sung các định mức: dự toán xây dựng, sử dụng vật liệu, chi phí quản lý dự án.</li></ul>' },
-            { id: 6, category: 'PCCC & CNCH', number: 'Nghị định 105/2025/NĐ-CP', title: 'Quy định chi tiết Luật Phòng cháy, chữa cháy và cứu nạn, cứu hộ.', issuedDate: '15/05/2025', effectiveDate: '01/07/2025', details: '<ul><li class="mb-2">- Danh mục cơ sở, công trình thuộc diện quản lý, thẩm định PCCC.</li><li class="mb-2">- Quy định về nội quy, hồ sơ quản lý PCCC&CNCH.</li><li class="mb-2">- Yêu cầu kết nối thiết bị báo cháy (trước 01/07/2027).</li><li>- Quy định bảo hiểm cháy, nổ bắt buộc.</li></ul>' },
-            { id: 7, category: 'PCCC & CNCH', number: 'Nghị định 106/2025/NĐ-CP', title: 'Quy định xử phạt vi phạm hành chính trong lĩnh vực PCCC và CNCH.', issuedDate: '15/05/2025', effectiveDate: '01/07/2025', details: '<ul><li class="mb-2">- Hình thức xử phạt: Cảnh cáo, phạt tiền (tối đa 100 triệu cho tổ chức),...</li><li>- Thời hiệu xử phạt: 1 năm.</li></ul>' },
-            { id: 8, category: 'Lưu trữ', number: 'Thông tư 07/2025/TT-BXD', title: 'Quy định thời hạn lưu trữ hồ sơ, tài liệu thuộc phạm vi quản lý của Bộ Xây dựng.', issuedDate: '15/05/2025', effectiveDate: '01/07/2025', details: '<ul><li>Quy định thời hạn lưu trữ cho các lĩnh vực: quy hoạch, kiến trúc, đầu tư xây dựng, hạ tầng kỹ thuật, hàng không,...</li></ul>' },
-            { id: 9, category: 'Lưu trữ', number: 'TT 06/2025/TT-BNV & TT 05/2025/TT-BNV', title: 'Quy định chi tiết Luật Lưu trữ 2024 và nghiệp vụ lưu trữ tài liệu số.', issuedDate: '14-15/05/2025', effectiveDate: '01/07/2025', details: '<ul><li class="mb-2">- Quản lý, hủy, sử dụng tài liệu lưu trữ.</li><li>- Quy trình số hóa, bảo quản, sử dụng và hủy tài liệu lưu trữ số.</li></ul>' },
-            { id: 10, category: 'Tài chính', number: 'Nghị định 70/2025/NĐ-CP', title: 'Sửa đổi Nghị định 123/2020/NĐ-CP quy định về hóa đơn, chứng từ.', issuedDate: '20/03/2025', effectiveDate: '01/06/2025', details: '<ul><li class="mb-2">- Sửa đổi quy định về hóa đơn điện tử từ máy tính tiền.</li><li>- Bổ sung trách nhiệm của tổ chức cung cấp dịch vụ hóa đơn điện tử.</li></ul>' },
-            { id: 11, category: 'Lao động & Thi đua', number: 'Thông tư 003/2025/TT-BNV', title: 'Hướng dẫn thực hiện quản lý lao động, tiền lương, thù lao, tiền thưởng trong doanh nghiệp Nhà nước.', issuedDate: '28/04/2025', effectiveDate: '15/06/2025', details: '<ul><li>Nguyên tắc quản lý, xác định tiền lương, thù lao, tiền thưởng dựa trên lợi nhuận, năng suất lao động.</li></ul>' },
-            { id: 12, category: 'Chứng khoán', number: 'Thông tư 14/2025/TT-BTC', title: 'Sửa đổi TT 119/2020/TT-BTC và TT 58/2021/TT-BTC về giao dịch chứng khoán.', issuedDate: '04/04/2025', effectiveDate: '01/06/2025', details: '<ul><li class="mb-2">- Làm rõ tài liệu trong hồ sơ chuyển quyền sở hữu chứng khoán.</li><li class="mb-2">- Làm rõ thông tin khách hàng khi mở tài khoản lưu ký.</li><li>- Thay thế mẫu hợp đồng chứng khoán phái sinh.</li></ul>' },
-            { id: 13, category: 'Môi trường', number: 'Thông tư 01/2025/TT-BNNMT', title: 'Ban hành 03 Quy chuẩn Quốc gia về chất lượng môi trường xung quanh.', issuedDate: '15/05/2025', effectiveDate: '14/11/2025', details: '<ul><li class="mb-2">- QCVN 26:2025/BNNMT - Quy chuẩn kỹ thuật Quốc gia về tiếng ồn.</li><li class="mb-2">- QCVN 27:2025/BNNMT - Quy chuẩn kỹ thuật Quốc gia về độ rung.</li><li>- QCVN 28:2025/BNNMT - Quy chuẩn kỹ thuật Quốc gia về chất lượng trầm tích.</li></ul>' },
-            { id: 14, category: 'PCCC & CNCH', number: 'Thông tư 37/2025/TT-BCA', title: 'Quy định về nhiệm vụ công tác PCCC, CNCH của lực lượng Công an nhân dân.', issuedDate: '15/05/2025', effectiveDate: '01/07/2025', details: '<ul><li class="mb-2">- Quy trình thẩm định thiết kế về phòng cháy, chữa cháy.</li><li class="mb-2">- Quy trình kiểm tra công tác nghiệm thu về phòng cháy, chữa cháy.</li><li>- Quy trình kiểm tra về phòng cháy chữa cháy.</li></ul>' },
-            { id: 15, category: 'Lao động & Thi đua', number: 'Thông tư 28/2025/TT-BTC', title: 'Hướng dẫn mức chi tổ chức thực hiện công tác thi đua, khen thưởng.', issuedDate: '26/05/2025', effectiveDate: '15/07/2025', details: '<ul><li>Quy định chi tiết về mức chi cho công tác thi đua, khen thưởng, chi in ấn, làm hiện vật, chi tuyên truyền, phổ biến...</li></ul>' },
-            { id: 16, category: 'Tài chính', number: 'Thông tư 31/2025/TT-BTC', title: 'Sửa đổi Thông tư 23/2021/TT-BTC hướng dẫn việc in, phát hành, quản lý và sử dụng tem điện tử.', issuedDate: '31/05/2025', effectiveDate: '01/06/2025', details: '<ul><li class="mb-2">- Sửa đổi, bổ sung quy định về mẫu tem, dán tem điện tử.</li><li class="mb-2">- Sửa đổi quản lý, mua tem điện tử thuốc lá, rượu nhập khẩu và sản xuất trong nước.</li><li>- Lược bỏ một số giấy tờ khi mua tem tại cơ quan thuế.</li></ul>' },
-            { id: 17, category: 'Tài chính', number: 'Thông tư 32/2025/TT-BTC', title: 'Hướng dẫn thực hiện Luật Quản lý thuế, Nghị định 123/2020/NĐ-CP, Nghị định 70/2025/NĐ-CP.', issuedDate: '31/05/2025', effectiveDate: '01/06/2025', details: '<ul><li>Hướng dẫn việc chuyển đổi áp dụng hóa đơn điện tử có mã và không có mã của cơ quan thuế đối với các trường hợp, bao gồm cả các doanh nghiệp có rủi ro cao về thuế.</li></ul>' },
-        ];
-
-        document.addEventListener('DOMContentLoaded', () => {
-            const documentsList = document.getElementById('documents-list');
-            const filtersContainer = document.getElementById('filters');
+        // --- DATA ---
+        // Raw data parsed from the document
+        const rawData = `
+Lĩnh vực an toàn nào đang là thách thức lớn nhất của ngành hàng không thế giới?
+An toàn đường cất hạ cánh  (ĐÚNG)
+Va chạm giữa tàu bay với phương tiện hoạt động trong khu bay
+Va chạm chim tại cảng hàng không
+Tất cả đều sai
+Hiện tại, ưu tiên hàng đầu của ICAO là kiểm soát các sự cố nào trong lĩnh vực an toàn đường cất hạ cánh?
+Sự cố xâm nhập đường cất hạ cánh (Runway Incursion)
+Sự cố tàu bay xông ra ngoài đường cất hạ cánh (Runway Excursion)  (ĐÚNG)
+Sự cố tàu bay hạ cánh nhầm khu vực (Runway Confusion)
+Sự cố tàu bay va chạm chim
+Các yếu tố, nguyên nhân có thể gây ra sự cố tàu bay xông ra ngoài đường cất hạ cánh được ICAO chỉ ra là:
+Điều kiện thời tiết không thuận lợi: mưa lớn, gió cạnh, lốc xoáy…
+Tình trạng mặt đường CHC có chất bám, giảm hiệu suất phanh của tàu bay
+Tổ lái tiếp cận hạ cánh không ổn định nhưng không thực hiện bay lại (Go around)
+Tất cả các yếu trên  (ĐÚNG)
+Trong các yếu tố, nguyên nhân gây ra sự cố tàu bay xông ra ngoài đường cất hạ cánh, yếu tố, nguyên nhân nào chiếm phần lớn trong các yếu tố, nguyên nhân gây ra sự cố trên?
+Điều kiện thời tiết không thuận lợi: mưa lớn, gió cạnh, lốc xoáy…
+Tình trạng mặt đường CHC có chất bám, giảm hiệu suất phanh của tàu bay  (ĐÚNG)
+Tổ lái tiếp cận hạ cánh không ổn định nhưng không thực hiện bay lại (Go around)
+Tổ lái không tuân thủ quy trình trong quá trình cất hạ cánh
+Các tình huống tàu bay xông ra ngoài đường cất hạ cánh gồm những loại nào?
+Veer–off: Tàu bay hạ cánh và trượt ra ngoài đường CHC 
+Tàu bay xâm nhập đường cất hạ cánh khi không được phép của Đài kiểm soát tại sân
+Overrun:Tàu bay hạ cánh, chạy vượt ra khu vực dải hãm phanh đầu đường CHC
+Cả Tình huống a và c  (ĐÚNG)
+Để giảm thiểu sự cố xông ra ngoài đường cất hạ cánh, Tổ lái cần phải nắm được thông tin gì liên quan đến đường CHC khi cất hạ cánh?
+Hệ thống đường lăn kết nối với đường cất hạ cánh
+Kích thước khu vực bảo hiểm đầu đường cất hạ cánh
+Tình trạng mặt đường cất hạ cánh hiện tại  (ĐÚNG)
+Chướng ngại vật xung quanh cảng hàng không
+Chương trình báo cáo và đánh giá tình trạng mặt đường cất hạ cánh được đưa vào tiêu chuẩn khuyến cáo thực hành lĩnh vực Cảng hàng không sân bay (Annex 14) từ năm nào?
+2016  (ĐÚNG)
+2018
+2019
+2020
+Định nghĩa Chương trình báo cáo tình trạng mặt đường cất hạ cánh (GRF) là gì?
+Là các tiếp cận quản lý tình trạng mặt đường cất hạ cánh có hệ thống để thực hiện công tác bảo trì, bảo dưỡng đường CHC được kịp thời
+Là hệ thống các quy trình, hành động thực hiện bởi người khai thác cảng hàng không, cơ sở đảm bảo hoạt động bay, người khai thác tàu bay nhằm cung cấp thông tin, hướng dẫn cơ bản về hệ thống và mẫu báo cáo toàn cầu phục vụ đánh giá và báo cáo tình trạng mặt đường CHC   (ĐÚNG)
+Là Chương trình quy định công tác bảo dưỡng đường cất hạ cánh
+Là Chương trình báo cáo tình trạng mặt đường cất hạ cánh giữa người khai thác cảng trực tiếp với tổ lái tàu bay
+Ma trận đánh giá tình trạng mặt đường CHC (RCAM – Runway Condition Assessement matrix) là gì?
+Là mô tả về tình trạng mặt đường CHC được sử dụng trong Báo cáo tình trạng mặt đường CHC làm cơ sở cho việc xác định Mã tình trạng mặt đường CHC
+Là mô tả về các loại chất bám được sử dụng trong Báo cáo tình trạng mặt đường CHC của từng mã tình trạng mặt đường CHC
+Là ma trận cho phép đánh giá Mã tình trạng mặt đường CHC, sử dụng các quy trình liên quan, từ một tập hợp tình trạng mặt đường CHC và báo cáo từ phi công về hoạt động phanh  (ĐÚNG)
+Là số mô tả tình trạng mặt đường CHC được sử dụng trong Báo cáo tình trạng mặt đường CHC
+Yếu tố "Các tiêu chuẩn xác định Tình trạng mặt đường CHC" trong Chương trình báo cáo và đánh giá tình trạng mặt đường CHC (GRF) được định nghĩa như thế nào?
+Là mô tả về tình trạng mặt đường CHC được sử dụng trong Báo cáo tình trạng mặt đường CHC làm cơ sở cho việc xác định Mã tình trạng mặt đường CHC  (ĐÚNG)
+Là mô tả về các loại chất bám được sử dụng trong Báo cáo tình trạng mặt đường CHC của từng mã tình trạng mặt đường CHC
+Là ma trận cho phép đánh giá Mã tình trạng mặt đường CHC, sử dụng các quy trình liên quan, từ một tập hợp tình trạng mặt đường CHC và báo cáo từ phi công về hoạt động phanh
+Là số mô tả tình trạng mặt đường CHC được sử dụng trong Báo cáo tình trạng mặt đường CHC
+Yếu tố "Mã tình trạng mặt đường CHC (RWYCC- Runway Condition code)"  trong Chương trình báo cáo và đánh giá tình trạng mặt đường CHC (GRF) được định nghĩa như thế nào?
+Là mô tả về tình trạng mặt đường CHC được sử dụng trong Báo cáo tình trạng mặt đường CHC làm cơ sở cho việc xác định Mã tình trạng mặt đường CHC
+Là mô tả về các loại chất bám được sử dụng trong Báo cáo tình trạng mặt đường CHC của từng mã tình trạng mặt đường CHC
+Là ma trận cho phép đánh giá Mã tình trạng mặt đường CHC, sử dụng các quy trình liên quan, từ một tập hợp tình trạng mặt đường CHC và báo cáo từ phi công về hoạt động phanh
+Là số mô tả tình trạng mặt đường CHC được sử dụng trong Báo cáo tình trạng mặt đường CHC  (ĐÚNG)
+"Báo cáo tình trạng mặt đường CHC (RCR – Runway Condition Report)"  trong Chương trình báo cáo và đánh giá tình trạng mặt đường CHC (GRF) được định nghĩa như thế nào?
+Là mô tả về tình trạng mặt đường CHC được sử dụng trong Báo cáo tình trạng mặt đường CHC làm cơ sở cho việc xác định Mã tình trạng mặt đường CHC
+Là mô tả về các loại chất bám được sử dụng trong Báo cáo tình trạng mặt đường CHC của từng mã tình trạng mặt đường CHC
+Là ma trận cho phép đánh giá Mã tình trạng mặt đường CHC, sử dụng các quy trình liên quan, từ một tập hợp tình trạng mặt đường CHC và báo cáo từ phi công về hoạt động phanh
+Là báo cáo được chuẩn hóa toàn diện liên quan đến tình trạng mặt đường CHC và ảnh hưởng của nó đến hoạt động cất cánh và hạ cánh của tàu bay  (ĐÚNG)
+Trách nhiệm của người khai thác cảng thực hiện các nội dung công việc gì  trong Chương trình báo cáo và đánh giá tình trạng mặt đường CHC (GRF)?
+Đánh giá và xác định tình trạng bề mặt đường cất hạ cánh và hoàn thành bảng RCR, chuyển bản tin RCR cho cơ sở đảm bảo hoạt động bay  (ĐÚNG)
+Chuyển đổi thông tin tình trạng mặt đường cất hạ cánh  tới tổ lái thông qua ATS/AIS
+Sử dụng thông tin của RCR để thiết lập chế độ tính năng tàu bay phù hợp để cất cánh và hạ cánh an toàn.
+Tất cả đều đúng
+Trách nhiệm của cơ sở đảm bảo hoạt động bay thực hiện các nội dung công việc gì  trong Chương trình báo cáo và đánh giá tình trạng mặt đường CHC (GRF) ?
+Đánh giá và xác định tình trạng bề mặt đường cất hạ cánh và hoàn thành bảng RCR
+Chuyển đổi thông tin tình trạng mặt đường cất hạ cánh  tới tổ lái thông qua ATS/AIS và chuyển báo cáo tình trạng hoạt động phanh của tàu bay cho người khai thác cảng  (ĐÚNG)
+Sử dụng thông tin của RCR để thiết lập chế độ tính năng tàu bay phù hợp để cất cánh và hạ cánh an toàn.
+Tất cả đều đúng
+Trách nhiệm của tổ lái tàu bay  thực hiện các nội dung công việc gì  trong Chương trình báo cáo và đánh giá tình trạng mặt đường CHC (GRF)?
+Đánh giá và xác định tình trạng bề mặt đường cất hạ cánh và hoàn thành bảng RCR
+Chuyển đổi thông tin tình trạng mặt đường cất hạ cánh  tới tổ lái thông qua ATS/AIS
+Sử dụng thông tin của RCR để thiết lập chế độ tính năng tàu bay phù hợp để cất cánh và hạ cánh an toàn và chuyển thông tin tình trạng hoạt động phanh của tàu bay cho Đài kiểm soát tại sân  (ĐÚNG)
+Tất cả đều đúng
+Hoạt động tàu bay có thể được coi là bị ảnh hưởng khi phạm vi bao phủ của bất kỳ chất bám liên quan đến nước trên mỗi phần ba đường CHC vượt quá bao nhiêu?
+10%
+20%
+25%  (ĐÚNG)
+50%
+Cấu tạo của Chương trình báo cáo và đánh giá tình trạng mặt đường cất hạ cánh bao gồm các yếu tố nào?
+Báo cáo tình trạng mặt đường CHC (RCR); Mã tình trạng mặt đường CHC (RWYCC); Ma trận đánh giá tình trạng mặt đường CHC (RCAM); Tình trạng mặt đường CHC; Mô tả tình trạng mặt đường CHC  (ĐÚNG)
+Báo cáo tình trạng mặt đường CHC (RCR); Mã tình trạng mặt đường CHC (RWYCC); Ma trận đánh giá tình trạng mặt đường CHC (RCAM); Tình trạng mặt đường CHC.
+Báo cáo tình trạng mặt đường CHC (RCR); Mã tình trạng mặt đường CHC (RWYCC); Tình trạng mặt đường CHC; Mô tả tình trạng mặt đường CHC
+Mã tình trạng mặt đường CHC (RWYCC); Ma trận đánh giá tình trạng mặt đường CHC (RCAM); Tình trạng mặt đường CHC; Mô tả tình trạng mặt đường CHC
+Mã tình trạng mặt đường CHC (RWYCC) gồm bao nhiêu mã
+6
+5
+7  (ĐÚNG)
+4
+Mã tình trạng mặt đường CHC (RWYCC) có giá trị 6 tương ứng với tình trạng đường cất hạ cánh như thế nào?
+KHÔ  (ĐÚNG)
+ƯỚT
+TRƠN ƯỚT
+NƯỚC ĐỌNG
+Mã tình trạng mặt đường CHC (RWYCC) có giá trị 5 tương ứng với tình trạng đường cất hạ cánh như thế nào?
+KHÔ
+ƯỚT  (ĐÚNG)
+TRƠN ƯỚT
+NƯỚC ĐỌNG
+Mã tình trạng mặt đường CHC (RWYCC) có giá trị 3 tương ứng với tình trạng đường cất hạ cánh như thế nào?
+KHÔ
+ƯỚT
+TRƠN ƯỚT  (ĐÚNG)
+NƯỚC ĐỌNG
+Mã tình trạng mặt đường CHC (RWYCC) có giá trị 2 tương ứng với tình trạng đường cất hạ cánh như thế nào?
+KHÔ
+ƯỚT
+TRƠN ƯỚT
+NƯỚC ĐỌNG  (ĐÚNG)
+Mục đích của việc cung cấp Mã tình trạng mặt đường cất hạ cánh cho tổ lái tàu bay để thực hiện việc gì?
+Để tổ lái tính toán tính năng tàu bay phù hợp khi cất cánh và hạ cánh với điều kiện tương ứng với Mã tình trạng đường CHC  (ĐÚNG)
+Để tổ lái tính toán tính năng tàu bay phù hợp khi  hạ cánh với điều kiện tương ứng với Mã tình trạng đường CHC
+Để tổ lái tính toán tính năng tàu bay phù hợp khi cất cánh  với điều kiện tương ứng với Mã tình trạng đường CHC
+Để phục vụ công tác chuẩn bị các thông số khi tàu bay lấy độ cao (climb)
+Điều kiện khí hậu Việt Nam hiện tại, các cảng hàng không đang khai thác thì sẽ có khả năng áp dụng các Mã tình trạng mặt đường cất hạ cánh nào
+Các Mã RWYCC: 6, 5, 3, 2  (ĐÚNG)
+Các Mã RWYCC: 6, 5, 3
+Các Mã RWYCC: 5, 3
+Các Mã RWYCC: 5, 3, 2
+Tình trạng mặt đường cất hạ cánh được báo cáo với mã RYWCC 2 tại mỗi 1/3 đường cất hạ cánh thì tương ứng điều kiện tình trạng đường CHC  như thế nào?
+Tại mỗi 1/3 đường CHC có lớp nước bao phủ trên bề mặt đường cất hạ cánh, có độ sâu lớn hơn 3mm
+Tại mỗi 1/3 đường CHC có lớp nước bao phủ trên bề mặt đường cất hạ cánh, có độ sâu lớn hơn và bằng 3mm
+Tại mỗi 1/3 đường CHC có lớp nước bao phủ trên bề mặt đường cất hạ cánh lớn hơn tỷ lệ 25% và có độ sâu lớn hơn 3mm  (ĐÚNG)
+Tại mỗi 1/3 đường CH có lớp nước bao phủ trên bề mặt đường cất hạ cánh có tỷ lệ  lớn hơn 25%, có độ sâu nhỏ hơn 3mm
+Tình trạng mặt đường cất hạ cánh được báo cáo với mã RYWCC 3  tại mỗi 1/3 đường cất hạ cánh thì tương ứng với điều kiện tình trạng đường cất hạ cánh như thế nào?
+Tại mỗi 1/3 đường cất hạ cánh có lớp nước bao phủ trên bề mặt đường cất hạ cánh có tỷ lệ bao phủ lớn hơn 20%, có độ sâu lớn hơn và bằng 3mm
+Tại mỗi 1/3 đường cất hạ cánh có lớp nước bao phủ trên bề mặt đường cất hạ cánh có tỷ lệ bao phủ lớn hơn 20%, có độ sâu nhỏ hơn và bằng 3mm và có hệ số ma sát thấp hơn hệ số ma sát tối thiểu
+Tại mỗi 1/3 đường cất hạ cánh có lớp nước bao phủ trên bề mặt đường cất hạ cánh có tỷ lệ bao phủ lớn hơn 25%, có độ sâu nhỏ hơn và bằng 3mm và có hệ số ma sát thấp hơn hệ số ma sát tối thiểu  (ĐÚNG)
+Tại mỗi 1/3 đường cất hạ cánh có lớp nước bao phủ trên bề mặt đường cất hạ cánh có tỷ lệ bao phủ lớn hơn 25%, có độ sâu nhỏ hơn 3mm và có hệ số ma sát thấp hơn hệ số ma sát tối thiểu
+Đường cất hạ cánh được mô tả khô được định nghĩa như thế nào?
+Khi nước trên đường CHC có độ sâu lớn hơn 3mm
+Đường CHC được coi là khô nếu bề mặt của nó không có độ ẩm có thể nhìn thấy và không có chất bám trên bề mặt đường cất hạ cánh.  (ĐÚNG)
+Mặt đường CHC bị bao phủ bởi bất kỳ độ ẩm có thể nhìn thấy hoặc bị nước phủ dày lên đến 3 mm trong khu vực dự kiến khai thác
+Tất cả đều sai
+Theo định nghĩa, Ma trận đánh giá tình trạng mặt đường CHC bao gồm các tiêu chí nào?
+Tiêu chí đánh giá và Tiêu chí đánh giá hạ cấp tình trạng mặt đường cất hạ cánh  (ĐÚNG)
+Tiêu chí hạ cấp và nâng cấp tình trạng mặt đường cất hạ cánh
+Tiêu chí đánh giá tình trạngmặt đường cất hạ cánh khô
+Tiêu chí đánh giá tình trạng mặt đường cất hạ cánh đọng nước
+Mã tình trạng đường cất hạ cánh được sắp xếp từ mã (RWYCC) từ 6 đến 0 tương tứng với tình trạng mặt đường cất hạ cánh như thế nào?
+Tính trơn trượt của đường cất hạ cánh từ tương ứng giảm dần
+Tính trơn trượt của đường cất hạ cánh từ tương ứng tăng dần  (ĐÚNG)
+Tính trơn trượt của đường cất hạ cánh không được thể hiện qua mã tình trạng mặt đường CHC
+Tất cả đều sai
+Khi quan sát cách giảm tốc độ tàu bay nhận thấy "tàu bay giảm tốc độ phanh là bình thường đối với việc phanh bánh lốp và việc kiểm soát hướng là bình thường" thì tương ứng với tình trạng mặt đường cất hạ cánh nào khi sử dụng RCAM để đánh giá?.
+KHÔ
+ƯỚT  (ĐÚNG)
+TRƠN ƯỚT
+NƯỚC ĐỌNG
+Khi quan sát cách giảm tốc độ tàu bay nhận thấy "Giảm tốc độ phanh HOẶC kiểm soát hướng nằm giữa Trung bình và Kém" thì tương ứng với tình trạng mặt đường cất hạ cánh nào khi sử dụng RCAM để đánh giá?
+KHÔ
+ƯỚT
+TRƠN ƯỚT
+NƯỚC ĐỌNG  (ĐÚNG)
+Báo cáo của phi công về hoạt động phanh trên đường CHC thông qua AIREP bao gồm mấy mức?
+4
+5
+6  (ĐÚNG)
+7
+Báo cáo của phi công về hoạt động phanh trên đường CHC thông qua AIREP là TRUNG BÌNH ĐẾN KÉM tương ứng với mã tình trạng mặt đường cất hạ cánh nào (RWYCC)
+6
+5
+3
+2  (ĐÚNG)
+Các mã tình trạng đường cất hạ cánh (RWYCC) được gán 5, 4, 3 hoặc 2 được nâng cấp lên khi nào
+Khi được đánh giá kiểm tra lại tình trạng mặt đường CHC  (ĐÚNG)
+Khi nhận AIREP từ phi công
+Khi có khuyến cáo của phi công
+Khi có khuyến cáo của Đài kiểm soát tại sân
+Báo cáo của phi công về hoạt động phanh trên đường CHC được xem xét cho mục đích gì?
+Hạ cấp RYWCC
+Nâng cấp  RWYCC
+Nâng cấp  RYWCC khi được kiểm tra đánh giá lại và hạ cấp RWYCC  (ĐÚNG)
+Tất cả đều sai
+Theo quy trình thực hiện, Báo cáo tính trạng mặt đường cất hạ được tổ chức thực hiện khi nào?
+Báo cáo được thực hiện khi có sự thay đổi đáng kể về tình trạng mặt đường CHC xảy ra do nước, cho đến khi đường CHC trở lại trạng thái khô.  (ĐÚNG)
+Báo cáo được thực hiện 30 phút/lần về tình trạng mặt đường CHC xảy ra do nước,.
+Báo cáo được thực hiện 36 giờ/ lần về tình trạng mặt đường CHC
+Câu a, c đều đúng
+Thay đổi tình trạng mặt đường CHC được coi là đáng kể khi xảy ra các trường hợp nào?
+Bất cứ thay đổi nào về RWYCC; Bất cứ thay đổi nào về loại chất bám;
+Bất cứ thay đổi nào về độ bao phủ chất bám được báo cáo ; Bất cứ thay đổi nào về độ sâu chất bám 
+Bất cứ thông tin nào, ví dụ báo cáo của phi công về hoạt động phanh trên đường CHC, được coi là đáng kể
+Tất cả các trường hợp trên  (ĐÚNG)
+Các thông tin trong Báo cáo tình trạng mặt đường cất hạ cánh trong mẫu RCR chuyển cho cơ sở đảm bảo họt động bay yêu cầu bắt buộc phải có bao gồm:
+Mã sân bay; Ngày và thời điểm đánh giá; Ký hiệu Đường CHC đánh giá; RWYCC cho mỗi 1/3 đường CHC; Mô tả tình trạng mặt đường CHC  (ĐÚNG)
+Mã sân bay; Ngày và thời điểm đánh giá; Ký hiệu Đường CHC đánh giá
+Đường CHC đánh giá; RWYCC cho mỗi 1/3 đường CHC; Mô tả tình trạng mặt đường CHC
+Mã sân bay; Tên nhân sự thực hiện đánh giá; RWYCC cho mỗi 1/3 đường CHC
+Thời gian đánh giá tình trạng mặt đường cất hạ cánh là lúc 18h00 (giờ Hà Nội)  ngày 30 tháng 12 năm 2021, thì thời gian trên được ghi như thế nào trong  Báo cáo RCR
+12301100  (ĐÚNG)
+12301800
+30121100
+30111800
+Đường cất hạ cánh Cảng hàng không quốc tế Tân Sơn Nhất ký hiệu 07L -25R thì trong báo cáo RCR ghi ký hiệu nào của đường cất hạ cánh
+07R
+07L  (ĐÚNG)
+25L
+25R
+Một phần 3 thứ nhất đường cất hạ cánh có nước bao phủ 20%, Một phần 3 thứ 2 có nước bao phủ 55%, Một phần 3 thứ 3 có nước bao phủ là 33% thì tỷ lệ bao phủ được ghi trong báo cáo RCR ghi như thế nào đúng?
+25/75/50  (ĐÚNG)
+25/NR/50
+NR/25/50
+NR/75/50
+Một phần 3 thứ nhất đường cất hạ cánh có nước bao phủ 20%, Một phần 3 thứ 2 có nước bao phủ 65%, Một phần 3 thứ 3 có nước bao phủ là 45%, tất cả có độ sâu nước dưới 3mm thì mã tình trạng đường cất hạ cánh được ghi báo cáo RCR ghi như thế nào đúng?
+RWYCC tương ứng  6/6/6
+RWYCC tương ứng  6/5/6
+RWYCC tương ứng  6/5/5  (ĐÚNG)
+RWYCC tương ứng  5/5/5
+Một phần 3 thứ nhất đường cất hạ cánh có nước bao phủ 23%,, Một phần 3 thứ 2 có nước bao phủ 65%, Một phần 3 thứ 3 có nước bao phủ là 35%, tất cả có độ sâu nước dưới 3mm thì  tình trạng đường cất hạ cánh được ghi báo cáo RCR ghi như thế nào đúng?
+KHÔ/ ƯỚT/ KHÔ
+KHÔ/ ƯỚT/ ƯỚT  (ĐÚNG)
+KHÔ/ KHÔ/ KHÔ
+ƯỚT/ ƯỚT/ ƯỚC
+Một phần 3 thứ nhất đường cất hạ cánh có nước bao phủ 5%, Một phần 3 thứ 2 có nước bao phủ 70%, Một phần 3 thứ 3 có nước bao phủ là 30%, tất cả có độ sâu nước dưới 3mm. Nhưng thời điểm đánh giá nhận 02 báo cáo hoạt động phanh trên đường cất hạ cánh mức TỐT thì  tình trạng đường cất hạ cánh được ghi báo cáo RCR ghi như thế nào đúng?
+KHÔ/ ƯỚT/ KHÔ
+KHÔ/ ƯỚT/ ƯỚT  (ĐÚNG)
+KHÔ/ KHÔ/ KHÔ
+ƯỚT/ ƯỚT/ ƯỚC
+Một phần 3 thứ nhất đường cất hạ cánh có nước bao phủ 10%, Một phần 3 thứ 2 có nước bao phủ 55%, Một phần 3 thứ 3 có nước bao phủ là 33%, tất cả có độ sâu nước dưới 3mM. Nhưng thời điểm đánh giá nhận 02 báo cáo hoạt động phanh trên đường cất hạ cánh mức TRUNG BÌNH thì  tình trạng đường cất hạ cánh được ghi báo cáo RCR ghi như thế nào đúng?
+KHÔ/ ƯỚT/ KHÔ
+KHÔ/ ƯỚT/ ƯỚT
+TRƠN ƯỚT/ TRƠN ƯỚT/ TRƠN ƯỚT  (ĐÚNG)
+ƯỚT/ ƯỚT/ ƯỚC
+Một phần 3 thứ nhất đường cất hạ cánh có nước bao phủ 34% độ sâu lớp nước là 4mm, Một phần 3 thứ 2 có nước bao phủ 55% độ sâu lớp nước 5mm, Một phần 3 thứ 3 có nước bao phủ là 33% độ sau lớp nước 7mm  thì  tình trạng đường cất hạ cánh và độ sâu lớp nước  được ghi báo cáo RCR ghi như thế nào đúng?
+ĐỌNG NƯỚC/ ƯỚT/ KHÔ và 5/4/7
+ĐỌNG NƯỚC/ ĐỌNG NƯỚC/ ĐỌNG NƯỚC và 5/4/7
+ĐỌNG NƯỚC/ ĐỌNG NƯỚC/ ĐỌNG NƯỚC và 4/5/7  (ĐÚNG)
+ĐỌNG NƯỚC/ ĐỌNG NƯỚC/ ĐỌNG NƯỚC và 7/5/4
+Một phần 3 thứ nhất đường cất hạ cánh có nước bao phủ 34% độ sâu lớp nước là 4mm, Một phần 3 thứ 2 có nước bao phủ 55% độ sâu lớp nước 5mm, Một phần 3 thứ 3 có nước bao phủ là 33% độ sau lớp nước 7mm  thì mã  tình trạng đường cất hạ cánh và độ sâu lớp nước  được ghi báo cáo RCR ghi như thế nào đúng?
+RWYCC 2/ 2/ 2 và độ sâu  4/5/7  (ĐÚNG)
+RWYCC 2/ 3/ 2 và độ sâu  5/4/7
+RWYCC 2/ 2/ 5 và độ sâu  5/4/7
+RWYCC 2/ 2/ 2 và độ sâu  5/7/4
+Mẫu báo cáo RCR sau được hoàn thiện, người khai thác cảng chuyển đến cho bộ phận nào ?
+Đài kiểm soát tại sân (TWR)
+Phòng NOTAM quốc tế
+Tổ lái 
+Cả a và b  (ĐÚNG)
+Báo cáo RCR như sau:VNNB 08061200  3/3/3 100/100/100 NR/NR/NR TRƠN ƯỚT/ TRƠN ƯỚT/TRƠN ƯỚT xác định thời gian đánh giá tình trạng mặt đường cất hạ cánh (giờ UTC)?
+Lúc 12 giờ 00 phút ngày 06 tháng 8  (ĐÚNG)
+Lúc 19 giờ 00 phút ngày 06 tháng 8
+Lúc 19 giờ 00 phút ngày 08 tháng 06
+Lúc 12 giờ 00 phút ngày 08 tháng 06
+Báo cáo RCR như sau:VNNB 08061200  3/3/3 100/100/100 NR/NR/NR TRƠN ƯỚT/ TRƠN ƯỚT/TRƠN ƯỚT xác định mã tình trạng mặt đường cất hạ cánh?
+100/100/100
+3/3/3  (ĐÚNG)
+TRƠN ƯỚT/ TRƠN ƯỚT/TRƠN ƯỚT
+NR/NR/NR
+Một phần 3 thứ nhất đường cất hạ cánh có nước bao phủ 5%,, Một phần 3 thứ 2 có nước bao phủ 55%, Một phần 3 thứ 3 có nước bao phủ là 33%, tất cả có độ sâu nước dưới 3mm. Nhưng thời điểm đánh giá nhận 02 báo cáo hoạt động phanh trên   đường cất hạ cánh mức TỐT thì  Mã tình trạng đường cất hạ cánh được ghi báo cáo RCR ghi như thế nào đúng?
+Mã RWYCC 6/5/5   (ĐÚNG)
+Mã RWYCC 5/5/5
+Mã RWYCC 6/6/5
+Mã RWYCC 6/6/6
+Một phần 3 thứ nhất đường cất hạ cánh có nước bao phủ 20%,, Một phần 3 thứ 2 có nước bao phủ 55%, Một phần 3 thứ 3 có nước bao phủ là 33%, tất cả có độ sâu nước dưới 3mM. Nhưng thời điểm đánh giá nhận 02 báo cáo hoạt động phanh trên đường cất hạ cánh mức TRUNG BÌNH thì Mã  tình trạng đường cất hạ cánh được ghi báo cáo RCR ghi như thế nào đúng?
+Mã RWYCC 6/3/5 
+Mã RWYCC 3/3/3  (ĐÚNG)
+Mã RWYCC 5/3/3
+Mã RWYCC 2/2/2 
+Một phần 3 thứ nhất đường cất hạ cánh có nước bao phủ 8%, Một phần 3 thứ 2 có   nước bao phủ 26%, Một phần 3 thứ 3 có nước bao phủ là 5% thì tỷ lệ bao phủ được ghi trong báo cáo RCR ghi như thế nào đúng?
+NR/50/NR  (ĐÚNG)
+25/NR/NR
+NR/NR/NR
+NR/25/25
+Báo cáo RCR như sau:VNNB 08071300  6/5/5 25/100/100 NR/NR/NR  KHÔ/ ƯỚT/ƯỚT. Tỷ lệ bao phủ của nước trên mặt đường cất hạ cánh của  1/3 đường  thứ nhất (đầu tiên) là?
+100%
+8%
+Từ 10% - 25%  (ĐÚNG)
+50%
+Báo cáo RCR như sau:VNNB 08071300  6/5/6 25/100/25 NR/NR/NR  KHÔ/ ƯỚT/KHÔ. Khi nhận được 02 báo cáo liên tiếp tình trạng hoạt động phanh của tàu bay trên đường cất hạ cánh là TRUNG BÌNH, mã tình trạng đường cất hạ cách sẽ được báo cáo thay thế như thế nào?
+Mã RWYCC 6/5/5 
+Mã RWYCC 3/3/5
+Mã RWYCC 3/3/3  (ĐÚNG)
+Mã RWYCC 6/6/6
+Thời gian đánh giá tình trạng mặt đường cất hạ cánh là lúc 20h00 (giờ Hà Nội)  ngày 15 tháng 12 năm 2021, thì thời gian trên được ghi như thế nào trong  Báo cáo RCR
+12151300  (ĐÚNG)
+12152000
+15122000
+15121300
+Báo cáo RCR như sau:VNNB 08071300  6/5/6 25/100/NR NR/NR/NR  KHÔ/ ƯỚT/KHÔ. Báo cáo RCR này được thực hiện vào lúc nào theo giờ địa phương (Giờ Việt Nam UTC + 7)?
+Lúc 20 giờ 00 phút ngày 07 tháng 8  (ĐÚNG)
+Lúc 13 giờ 00 phút ngày 07 tháng 8
+Lúc 20 giờ 00 phút ngày 08 tháng 7
+Lúc 13 giờ 00 phút ngày 08 tháng 7
+Báo cáo RCR như sau:VNNB 08071300  6/5/6 25/50/25 NR/NR/NR  KHÔ/ ƯỚT/KHÔ. Khi tỷ lệ bao phủ của nước trên 1/3 thứ nhất thay đổi từ 20% lên 35%, khi đó Bản tin RCR có nội như thế nào là phù hợp?
+VNNB 08071300  6/5/6 25/50/25 NR/NR/NR  KHÔ/ ƯỚT/KHÔ
+VNNB 08071300  5/5/6 50/50/25 NR/NR/NR  KHÔ/ ƯỚT/KHÔ
+VNNB 08071300  5/5/6 50/50/25 NR/NR/NR  ƯỚT/ ƯỚT/KHÔ  (ĐÚNG)
+VNNB 08071300  6/5/6 50/50/100 NR/NR/NR  KHÔ/ ƯỚT/KHÔ
+Báo cáo RCR như sau:VNNB 08071300  6/5/6 25/50/25 NR/NR/NR  KHÔ/ ƯỚT/KHÔ. Khi tỷ lệ bao phủ của nước trên 1/3 thứ ba thay đổi từ 20% lên 24%, khi đó Bản tin RCR có nội như thế nào là phù hợp?
+VNNB 08071300  6/5/6 25/50/25 NR/NR/NR  KHÔ/ ƯỚT/KHÔ  (ĐÚNG)
+VNNB 08071300  5/5/6 50/50/25 NR/NR/NR  KHÔ/ ƯỚT/KHÔ
+VNNB 08071300  5/5/6 50/50/25 NR/NR/NR  ƯỚT/ ƯỚT/KHÔ
+VNNB 08071300  6/5/6 50/50/100 NR/NR/NR  KHÔ/ ƯỚT/KHÔ
+Báo cáo RCR như sau:VNNB 08071300  6/5/6 25/50/25 NR/NR/NR  KHÔ/ ƯỚT/KHÔ. Khi độ sâu lớp nước trên mặt đường cất hạ cánh tại 1/3 thứ 2 thay đổi từ 1mm lên 2mm, thì bản tin RCR như thế nào là phù hợp? Tỷ lệ bao phủ không thay đổi
+VNNB 08071300  6/5/6 25/50/25 NR/NR/NR  KHÔ/ ƯỚT/KHÔ  (ĐÚNG)
+VNNB 08071300  5/5/6 50/50/25 NR/NR/NR  KHÔ/ ƯỚT/KHÔ
+VNNB 08071300  5/5/6 50/50/25 NR/NR/NR  ƯỚT/ ƯỚT/KHÔ
+VNNB 08071300  6/5/6 50/50/100 NR/NR/NR  KHÔ/ ƯỚT/KHÔ
+Cảng HKQT Liên Khương, Đường CHC: 09/27, chiều dài 3250 m, Lúc 06h50 (giờ địa phương), ngày 25/01/2021, 1/3 đường CHC thứ nhất 81% mặt đường cất hạ cánh được bao phủ bởi nước có độ sâu 3mm, 1/3 đường CHC thứ hai 75% mặt đường cất hạ cánh được bao phủ bởi nước có độ sâu 2mm, 1/3 đường CHC thứ ba 57% mặt đường cất hạ cánh được bao phủ bởi nước có độ sâu 3mm, Nhận được 02 AIRREP mức TRUNG BÌNH, Nhiệt độ ngoài trời 25 độ C. Hãy chọn mẫu báo cáo RCR đúng.
+VVDL 01242350 09 3/3/3 100/75/75 3/2/3 TRƠN ƯỚT/TRƠN ƯỚT/TRƠN ƯỚT  (ĐÚNG)
+VVDL 01250650 09 3/3/3 100/75/75 3/2/3 TRƠN ƯỚT/TRƠN ƯỚT/TRƠN ƯỚT
+VVDL 01242350 09 3/3/3 100/75/75 3/2/3 Trơn ướt/Trơn ướt/Trơn ướt
+VVDL 01252350 09 3/3/3 100/75/75 3/2/3 TRƠN ƯỚT/TRƠN ƯỚT/TRƠN ƯỚT
+`;
+        
+        // --- LOGIC ---
+        document.addEventListener('DOMContentLoaded', function() {
+            const quizContainer = document.getElementById('quizContainer');
             const searchInput = document.getElementById('searchInput');
-            const noResults = document.getElementById('no-results');
+            const backToTopBtn = document.getElementById('backToTopBtn');
 
-            const modal = document.getElementById('modal');
-            const modalBox = document.getElementById('modal-box');
-            const closeModalBtn = document.getElementById('close-modal');
-            const modalTitle = document.getElementById('modal-title');
-            const modalContent = document.getElementById('modal-content');
+            let questions = [];
 
-            let currentFilter = 'Tất cả';
-
-            function renderDocuments(docs) {
-                documentsList.innerHTML = '';
-                if (docs.length === 0) {
-                    noResults.classList.remove('hidden');
-                } else {
-                    noResults.classList.add('hidden');
-                }
-                docs.forEach(doc => {
-                    const card = document.createElement('div');
-                    card.className = 'document-card bg-white rounded-xl shadow-md p-5 flex flex-col cursor-pointer';
-                    card.dataset.id = doc.id;
-                    card.innerHTML = `
-                        <div class="flex-grow">
-                            <span class="inline-block bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded-full mb-3">${doc.category}</span>
-                            <h3 class="text-base font-semibold text-slate-800 mb-2">${doc.number}</h3>
-                            <p class="text-slate-600 text-sm">${doc.title}</p>
-                        </div>
-                        <div class="mt-4 pt-4 border-t border-slate-100 text-xs text-slate-500 flex justify-between">
-                            <span>Hiệu lực: <strong>${doc.effectiveDate}</strong></span>
-                            <span>Ban hành: <strong>${doc.issuedDate}</strong></span>
-                        </div>
-                    `;
-                    card.addEventListener('click', () => openModal(doc));
-                    documentsList.appendChild(card);
-                });
-            }
-
-            function setupFilters() {
-                const categories = ['Tất cả', ...new Set(documentsData.map(d => d.category))];
-                filtersContainer.innerHTML = '';
-                categories.forEach(category => {
-                    const button = document.createElement('button');
-                    button.textContent = category;
-                    button.className = 'filter-btn px-4 py-2 text-sm font-medium border border-slate-300 rounded-full transition hover:bg-slate-100';
-                    if (category === currentFilter) {
-                        button.classList.add('filter-btn-active', 'border-blue-600');
-                    }
-                    button.addEventListener('click', () => {
-                        currentFilter = category;
-                        filterAndRender();
-                        updateActiveFilterButton();
-                    });
-                    filtersContainer.appendChild(button);
-                });
-            }
-
-            function updateActiveFilterButton() {
-                document.querySelectorAll('.filter-btn').forEach(btn => {
-                    if (btn.textContent === currentFilter) {
-                        btn.classList.add('filter-btn-active', 'border-blue-600');
-                        btn.classList.remove('bg-slate-100');
-                    } else {
-                        btn.classList.remove('filter-btn-active', 'border-blue-600');
-                    }
-                });
-            }
-
-            function filterAndRender() {
-                const searchTerm = searchInput.value.toLowerCase();
-                let filteredDocs = documentsData;
-
-                if (currentFilter !== 'Tất cả') {
-                    filteredDocs = filteredDocs.filter(d => d.category === currentFilter);
-                }
-
-                if (searchTerm) {
-                    filteredDocs = filteredDocs.filter(d =>
-                        d.title.toLowerCase().includes(searchTerm) ||
-                        d.number.toLowerCase().includes(searchTerm)
-                    );
-                }
-                
-                renderDocuments(filteredDocs);
-            }
-
-            function openModal(doc) {
-                modalTitle.textContent = doc.number;
-                modalContent.innerHTML = `<h4 class="font-semibold text-lg mb-2">${doc.title}</h4><div class="prose prose-sm max-w-none text-slate-600">${doc.details}</div>`;
-                modal.classList.remove('hidden');
-                setTimeout(() => {
-                    modalBox.classList.remove('scale-95', 'opacity-0');
-                }, 10);
-            }
-
-            function closeModal() {
-                 modalBox.classList.add('scale-95', 'opacity-0');
-                 setTimeout(() => {
-                    modal.classList.add('hidden');
-                 }, 300);
-            }
-
-            function setupChart() {
-                const effectiveDates = documentsData.map(d => {
-                    const parts = d.effectiveDate.split('/');
-                    return new Date(parts[2], parts[1] - 1, parts[0]);
-                });
-
-                const monthCounts = effectiveDates.reduce((acc, date) => {
-                    const month = date.toLocaleString('vi-VN', { month: 'long', year: 'numeric' });
-                    acc[month] = (acc[month] || 0) + 1;
-                    return acc;
-                }, {});
-
-                const sortedMonths = Object.keys(monthCounts).sort((a, b) => {
-                    const [monthA, yearA] = a.replace('Tháng ', '').split(' năm ');
-                    const [monthB, yearB] = b.replace('Tháng ', '').split(' năm ');
-                    return new Date(yearA, monthA - 1) - new Date(yearB, monthB - 1);
-                });
-                
-                const chartLabels = sortedMonths;
-                const chartData = sortedMonths.map(month => monthCounts[month]);
-
-                const ctx = document.getElementById('effectiveDateChart').getContext('2d');
-                new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: chartLabels,
-                        datasets: [{
-                            label: 'Số lượng văn bản',
-                            data: chartData,
-                            backgroundColor: 'rgba(59, 130, 246, 0.7)',
-                            borderColor: 'rgba(37, 99, 235, 1)',
-                            borderWidth: 1,
-                            borderRadius: 4,
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                ticks: {
-                                    stepSize: 1
-                                }
+            // Function to parse the raw data into a structured format
+            function parseQuestions(data) {
+                const lines = data.trim().split('\n').filter(line => line.trim() !== '');
+                const parsedQuestions = [];
+                let i = 0;
+                while (i < lines.length) {
+                    const lineText = lines[i].trim();
+                    // Heuristic: A line is considered a question if it ends with '?' or ':'
+                    if (lineText.endsWith('?') || lineText.endsWith(':')) {
+                        const currentQuestion = {
+                            question: lineText,
+                            options: [],
+                            answer: ''
+                        };
+                        i++;
+                        // Collect options until the next question or end of file
+                        while (i < lines.length && !lines[i].trim().endsWith('?') && !lines[i].trim().endsWith(':')) {
+                            let option = lines[i].trim();
+                            if (option.includes('(ĐÚNG)')) {
+                                option = option.replace(/\s*\(ĐÚNG\)\s*/, '').trim();
+                                currentQuestion.answer = option;
                             }
-                        },
-                        plugins: {
-                            legend: {
-                                display: false
-                            },
-                            tooltip: {
-                                callbacks: {
-                                    title: (context) => `Hiệu lực ${context[0].label}`
-                                }
-                            }
+                            currentQuestion.options.push(option);
+                            i++;
                         }
+                        // Only add if it's a valid question with options and an answer
+                        if (currentQuestion.options.length > 0 && currentQuestion.answer) {
+                            parsedQuestions.push(currentQuestion);
+                        }
+                    } else {
+                        // If the line is not identified as a question, skip it.
+                        i++;
                     }
+                }
+                return parsedQuestions;
+            }
+
+            // Function to render the quiz questions as a review sheet
+            function renderReview(questionsToRender) {
+                quizContainer.innerHTML = '';
+                questionsToRender.forEach((q, index) => {
+                    const questionBlock = document.createElement('div');
+                    questionBlock.className = 'bg-white p-6 rounded-lg shadow-md question-block';
+
+                    const questionText = document.createElement('p');
+                    questionText.className = 'font-semibold text-lg mb-4';
+                    // Use innerHTML to correctly render the question text
+                    questionText.innerHTML = `<span class="text-blue-600">${quizContainer.children.length + 1}.</span> ${q.question}`;
+                    
+                    const optionsContainer = document.createElement('ul');
+                    optionsContainer.className = 'space-y-2 pl-5';
+
+                    q.options.forEach(option => {
+                        const optionItem = document.createElement('li');
+                        optionItem.className = 'text-gray-700';
+                        
+                        // Highlight the correct answer in red
+                        if (option === q.answer) {
+                            optionItem.classList.add('correct-answer');
+                        }
+                        
+                        optionItem.textContent = option;
+                        optionsContainer.appendChild(optionItem);
+                    });
+
+                    questionBlock.appendChild(questionText);
+                    questionBlock.appendChild(optionsContainer);
+                    quizContainer.appendChild(questionBlock);
                 });
             }
 
-            searchInput.addEventListener('keyup', filterAndRender);
-            closeModalBtn.addEventListener('click', closeModal);
-            modal.addEventListener('click', (e) => {
-                if (e.target === modal) closeModal();
-            });
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
-                    closeModal();
+            // Function to handle search/filtering
+            function filterQuestions() {
+                const searchTerm = searchInput.value.toLowerCase().trim();
+                const filteredQuestions = questions.filter(q => 
+                    q.question.toLowerCase().includes(searchTerm) || 
+                    q.options.some(opt => opt.toLowerCase().includes(searchTerm))
+                );
+                renderReview(filteredQuestions);
+            }
+            
+            // Event Listeners
+            searchInput.addEventListener('input', filterQuestions);
+
+            // Back to Top button logic
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 200) {
+                    backToTopBtn.style.display = 'block';
+                } else {
+                    backToTopBtn.style.display = 'none';
                 }
             });
 
-            renderDocuments(documentsData);
-            setupFilters();
-            setupChart();
+            backToTopBtn.addEventListener('click', () => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+
+            // Initial Load
+            questions = parseQuestions(rawData);
+            renderReview(questions);
         });
     </script>
 </body>
 </html>
+
