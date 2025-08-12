@@ -3,486 +3,751 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trắc Nghiệm RCR - Ôn Tập</title>
+    <title>Trắc Nghiệm An Toàn Đường Cất Hạ Cánh (RCR)</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Inter', sans-serif;
+        }
+        .correct-answer {
+            color: #EF4444; /* red-500 */
+            font-weight: 700;
         }
         /* Custom scrollbar for better aesthetics */
         ::-webkit-scrollbar {
             width: 8px;
         }
         ::-webkit-scrollbar-track {
-            background: #f1f1f1;
+            background: #1F2937; /* gray-800 */
         }
         ::-webkit-scrollbar-thumb {
-            background: #888;
-            border-radius: 4px;
+            background: #4B5563; /* gray-600 */
+            border-radius: 10px;
         }
         ::-webkit-scrollbar-thumb:hover {
-            background: #555;
-        }
-        /* Style for the correct answer */
-        .correct-answer {
-            color: #ef4444; /* Red-500 */
-            font-weight: 600; /* Semibold */
+            background: #6B7280; /* gray-500 */
         }
     </style>
 </head>
-<body class="bg-gray-100 text-gray-800">
+<body class="bg-gray-900 text-gray-200">
 
     <div class="container mx-auto p-4 md:p-8 max-w-4xl">
-        
         <!-- Header -->
         <header class="text-center mb-8">
-            <h1 class="text-3xl md:text-4xl font-bold text-blue-600">Tài Liệu Ôn Tập RCR</h1>
-            <p class="text-gray-600 mt-2">Xem lại các câu hỏi và đáp án về an toàn đường cất hạ cánh (RCR).</p>
+            <h1 class="text-3xl md:text-4xl font-bold text-white mb-2">Ôn tập An Toàn Đường Cất Hạ Cánh (RCR)</h1>
+            <p class="text-gray-400">Tổng hợp 61 câu hỏi trắc nghiệm quan trọng.</p>
         </header>
 
-        <!-- Search and Controls -->
-        <div class="bg-white p-4 rounded-lg shadow-md mb-8 sticky top-0 z-10">
-            <div class="flex flex-col md:flex-row gap-4">
-                <input type="text" id="searchInput" placeholder="🔍 Tìm kiếm câu hỏi hoặc đáp án..." class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
-            </div>
+        <!-- Search Input -->
+        <div class="mb-8 sticky top-4 z-10">
+            <input type="text" id="searchInput" placeholder="🔍 Tìm kiếm câu hỏi..." class="w-full p-4 bg-gray-800 border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 transition duration-300">
         </div>
 
-        <!-- Quiz Container -->
-        <main id="quizContainer" class="space-y-6">
-            <!-- Questions will be dynamically inserted here -->
-        </main>
+        <!-- Questions List -->
+        <div id="questions-container" class="space-y-6">
+            <!-- Question 1 -->
+            <div class="question-card bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-lg transition-transform transform hover:scale-105">
+                <p class="font-semibold text-lg mb-4 text-white">1. Lĩnh vực an toàn nào đang là thách thức lớn nhất của ngành hàng không thế giới?</p>
+                <ul class="space-y-3 text-gray-300">
+                    <li class="correct-answer">An toàn đường cất hạ cánh</li>
+                    <li>Va chạm giữa tàu bay với phương tiện hoạt động trong khu bay</li>
+                    <li>Va chạm chim tại cảng hàng không</li>
+                    <li>Tất cả đều sai</li>
+                </ul>
+            </div>
 
-        <!-- Back to Top Button -->
-        <button id="backToTopBtn" class="fixed bottom-5 right-5 bg-blue-600 text-white p-3 rounded-full shadow-lg hover:bg-blue-700 transition-transform transform hover:scale-110" style="display: none;">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
-            </svg>
-        </button>
+            <!-- Question 2 -->
+            <div class="question-card bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-lg transition-transform transform hover:scale-105">
+                <p class="font-semibold text-lg mb-4 text-white">2. Hiện tại, ưu tiên hàng đầu của ICAO là kiểm soát các sự cố nào trong lĩnh vực an toàn đường cất hạ cánh?</p>
+                <ul class="space-y-3 text-gray-300">
+                    <li>Sự cố xâm nhập đường cất hạ cánh (Runway Incursion)</li>
+                    <li class="correct-answer">Sự cố tàu bay xông ra ngoài đường cất hạ cánh (Runway Excursion)</li>
+                    <li>Sự cố tàu bay hạ cánh nhầm khu vực (Runway Confusion)</li>
+                    <li>Sự cố tàu bay va chạm chim</li>
+                </ul>
+            </div>
 
+            <!-- Question 3 -->
+            <div class="question-card bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-lg transition-transform transform hover:scale-105">
+                <p class="font-semibold text-lg mb-4 text-white">3. Các yếu tố, nguyên nhân có thể gây ra sự cố tàu bay xông ra ngoài đường cất hạ cánh được ICAO chỉ ra là:</p>
+                <ul class="space-y-3 text-gray-300">
+                    <li>Điều kiện thời tiết không thuận lợi: mưa lớn, gió cạnh, lốc xoáy...</li>
+                    <li>Tình trạng mặt đường CHC có chất bám, giảm hiệu suất phanh của tàu bay</li>
+                    <li>Tổ lái tiếp cận hạ cánh không ổn định nhưng không thực hiện bay lại (Go around)</li>
+                    <li class="correct-answer">Tất cả các yếu trên</li>
+                </ul>
+            </div>
+
+            <!-- Question 4 -->
+            <div class="question-card bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-lg transition-transform transform hover:scale-105">
+                <p class="font-semibold text-lg mb-4 text-white">4. Trong các yếu tố, nguyên nhân gây ra sự cố tàu bay xông ra ngoài đường cất hạ cánh, yếu tố, nguyên nhân nào chiếm phần lớn trong các yếu tố, nguyên nhân gây ra sự cố trên?</p>
+                <ul class="space-y-3 text-gray-300">
+                    <li>Điều kiện thời tiết không thuận lợi: mưa lớn, gió cạnh, lốc xoáy...</li>
+                    <li class="correct-answer">Tình trạng mặt đường CHC có chất bám, giảm hiệu suất phanh của tàu bay</li>
+                    <li>Tổ lái tiếp cận hạ cánh không ổn định nhưng không thực hiện bay lại (Go around)</li>
+                    <li>Tổ lái không tuân thủ quy trình trong quá trình cất hạ cánh</li>
+                </ul>
+            </div>
+
+            <!-- Question 5 -->
+            <div class="question-card bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-lg transition-transform transform hover:scale-105">
+                <p class="font-semibold text-lg mb-4 text-white">5. Các tình huống tàu bay xông ra ngoài đường cất hạ cánh gồm những loại nào?</p>
+                <ul class="space-y-3 text-gray-300">
+                    <li>Veer-off: Tàu bay hạ cánh và trượt ra ngoài đường CHC</li>
+                    <li>Tàu bay xâm nhập đường cất hạ cánh khi không được phép của Đài kiểm soát tại sân</li>
+                    <li>Overrun: Tàu bay hạ cánh, chạy vượt ra khu vực dải hãm phanh đầu đường CHC</li>
+                    <li class="correct-answer">Cả Tình huống a và c</li>
+                </ul>
+            </div>
+
+            <!-- Question 6 -->
+            <div class="question-card bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-lg transition-transform transform hover:scale-105">
+                <p class="font-semibold text-lg mb-4 text-white">6. Để giảm thiểu sự cố xông ra ngoài đường cất hạ cánh, Tổ lái cần phải nắm được thông tin gì liên quan đến đường CHC khi cất hạ cánh?</p>
+                <ul class="space-y-3 text-gray-300">
+                    <li>Hệ thống đường lăn kết nối với đường cất hạ cánh</li>
+                    <li>Kích thước khu vực bảo hiểm đầu đường cất hạ cánh</li>
+                    <li class="correct-answer">Tình trạng mặt đường cất hạ cánh hiện tại</li>
+                    <li>Chướng ngại vật xung quanh cảng hàng không</li>
+                </ul>
+            </div>
+
+            <!-- Question 7 -->
+            <div class="question-card bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-lg transition-transform transform hover:scale-105">
+                <p class="font-semibold text-lg mb-4 text-white">7. Chương trình báo cáo và đánh giá tình trạng mặt đường cất hạ cánh được đưa vào tiêu chuẩn khuyến cáo thực hành lĩnh vực Cảng hàng không sân bay (Annex 14) từ năm nào?</p>
+                <ul class="space-y-3 text-gray-300">
+                    <li class="correct-answer">2016</li>
+                    <li>2018</li>
+                    <li>2019</li>
+                    <li>2020</li>
+                </ul>
+            </div>
+
+            <!-- Question 8 -->
+            <div class="question-card bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-lg transition-transform transform hover:scale-105">
+                <p class="font-semibold text-lg mb-4 text-white">8. Định nghĩa Chương trình báo cáo tình trạng mặt đường cất hạ cánh (GRF) là gì?</p>
+                <ul class="space-y-3 text-gray-300">
+                    <li>Là các tiếp cận quản lý tình trạng mặt đường cất hạ cánh có hệ thống để thực hiện công tác bảo trì, bảo dưỡng đường CHC được kịp thời</li>
+                    <li class="correct-answer">Là hệ thống các quy trình, hành động thực hiện bởi người khai thác cảng hàng không, cơ sở đảm bảo hoạt động bay, người khai thác tàu bay nhằm cung cấp thông tin, hướng dẫn cơ bản về hệ thống và mẫu báo cáo toàn cầu phục vụ đánh giá và báo cáo tình trạng mặt đường CHC</li>
+                    <li>Là Chương trình quy định công tác bảo dưỡng đường cất hạ cánh</li>
+                    <li>Là Chương trình báo cáo tình trạng mặt đường cất hạ cánh giữa người khai thác cảng trực tiếp với tổ lái tàu bay</li>
+                </ul>
+            </div>
+
+            <!-- Question 9 -->
+            <div class="question-card bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-lg transition-transform transform hover:scale-105">
+                <p class="font-semibold text-lg mb-4 text-white">9. Ma trận đánh giá tình trạng mặt đường CHC (RCAM - Runway Condition Assessement matrix) là gì?</p>
+                <ul class="space-y-3 text-gray-300">
+                    <li>Là mô tả về tình trạng mặt đường CHC được sử dụng trong Báo cáo tình trạng mặt đường CHC làm cơ sở cho việc xác định Mã tình trạng mặt đường CHC</li>
+                    <li>Là mô tả về các loại chất bám được sử dụng trong Báo cáo tình trạng mặt đường CHC của từng mã tình trạng mặt đường CHC</li>
+                    <li class="correct-answer">Là ma trận cho phép đánh giá Mã tình trạng mặt đường CHC, sử dụng các quy trình liên quan, từ một tập hợp tình trạng mặt đường CHC và báo cáo từ phi công về hoạt động phanh</li>
+                    <li>Là số mô tả tình trạng mặt đường CHC được sử dụng trong Báo cáo tình trạng mặt đường CHC</li>
+                </ul>
+            </div>
+
+            <!-- Question 10 -->
+            <div class="question-card bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-lg transition-transform transform hover:scale-105">
+                <p class="font-semibold text-lg mb-4 text-white">10. Yếu tố "Các tiêu chuẩn xác định Tình trạng mặt đường CHC" trong Chương trình báo cáo và đánh giá tình trạng mặt đường CHC (GRF) được định nghĩa như thế nào?</p>
+                <ul class="space-y-3 text-gray-300">
+                    <li class="correct-answer">Là mô tả về tình trạng mặt đường CHC được sử dụng trong Báo cáo tình trạng mặt đường CHC làm cơ sở cho việc xác định Mã tình trạng mặt đường CHC</li>
+                    <li>Là mô tả về các loại chất bám được sử dụng trong Báo cáo tình trạng mặt đường CHC của từng mã tình trạng mặt đường CHC</li>
+                    <li>Là ma trận cho phép đánh giá Mã tình trạng mặt đường CHC, sử dụng các quy trình liên quan, từ một tập hợp tình trạng mặt đường CHC và báo cáo từ phi công về hoạt động phanh</li>
+                    <li>Là số mô tả tình trạng mặt đường CHC được sử dụng trong Báo cáo tình trạng mặt đường CHC</li>
+                </ul>
+            </div>
+
+            <!-- Question 11 -->
+            <div class="question-card bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-lg transition-transform transform hover:scale-105">
+                <p class="font-semibold text-lg mb-4 text-white">11. Yếu tố "Mã tình trạng mặt đường CHC (RWYCC- Runway Condition code)" trong Chương trình báo cáo và đánh giá tình trạng mặt đường CHC (GRF) được định nghĩa như thế nào?</p>
+                <ul class="space-y-3 text-gray-300">
+                    <li>Là mô tả về tình trạng mặt đường CHC được sử dụng trong Báo cáo tình trạng mặt đường CHC làm cơ sở cho việc xác định Mã tình trạng mặt đường CHC</li>
+                    <li>Là mô tả về các loại chất bám được sử dụng trong Báo cáo tình trạng mặt đường CHC của từng mã tình trạng mặt đường CHC</li>
+                    <li>Là ma trận cho phép đánh giá Mã tình trạng mặt đường CHC, sử dụng các quy trình liên quan, từ một tập hợp tình trạng mặt đường CHC và báo cáo từ phi công về hoạt động phanh</li>
+                    <li class="correct-answer">Là số mô tả tình trạng mặt đường CHC được sử dụng trong Báo cáo tình trạng mặt đường CHC</li>
+                </ul>
+            </div>
+
+            <!-- Question 12 -->
+            <div class="question-card bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-lg transition-transform transform hover:scale-105">
+                <p class="font-semibold text-lg mb-4 text-white">12. "Báo cáo tình trạng mặt đường CHC (RCR - Runway Condition Report)" trong Chương trình báo cáo và đánh giá tình trạng mặt đường CHC (GRF) được định nghĩa như thế nào?</p>
+                <ul class="space-y-3 text-gray-300">
+                    <li>Là mô tả về tình trạng mặt đường CHC được sử dụng trong Báo cáo tình trạng mặt đường CHC làm cơ sở cho việc xác định Mã tình trạng mặt đường CHC</li>
+                    <li>Là mô tả về các loại chất bám được sử dụng trong Báo cáo tình trạng mặt đường CHC của từng mã tình trạng mặt đường CHC</li>
+                    <li>Là ma trận cho phép đánh giá Mã tình trạng mặt đường CHC, sử dụng các quy trình liên quan, từ một tập hợp tình trạng mặt đường CHC và báo cáo từ phi công về hoạt động phanh</li>
+                    <li class="correct-answer">Là báo cáo được chuẩn hóa toàn diện liên quan đến tình trạng mặt đường CHC và ảnh hưởng của nó đến hoạt động cất cánh và hạ cánh của tàu bay</li>
+                </ul>
+            </div>
+
+            <!-- Question 13 -->
+            <div class="question-card bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-lg transition-transform transform hover:scale-105">
+                <p class="font-semibold text-lg mb-4 text-white">13. Trách nhiệm của người khai thác cảng thực hiện các nội dung công việc gì trong Chương trình báo cáo và đánh giá tình trạng mặt đường CHC (GRF)?</p>
+                <ul class="space-y-3 text-gray-300">
+                    <li class="correct-answer">Đánh giá và xác định tình trạng bề mặt đường cất hạ cánh và hoàn thành bảng RCR, chuyển bản tin RCR cho cơ sở đảm bảo hoạt động bay</li>
+                    <li>Chuyển đổi thông tin tình trạng mặt đường cất hạ cánh tới tổ lái thông qua ATS/AIS</li>
+                    <li>Sử dụng thông tin của RCR để thiết lập chế độ tính năng tàu bay phù hợp để cất cánh và hạ cánh an toàn.</li>
+                    <li>Tất cả đều đúng</li>
+                </ul>
+            </div>
+
+            <!-- Question 14 -->
+            <div class="question-card bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-lg transition-transform transform hover:scale-105">
+                <p class="font-semibold text-lg mb-4 text-white">14. Trách nhiệm của cơ sở đảm bảo hoạt động bay thực hiện các nội dung công việc gì trong Chương trình báo cáo và đánh giá tình trạng mặt đường CHC (GRF)?</p>
+                <ul class="space-y-3 text-gray-300">
+                    <li>Đánh giá và xác định tình trạng bề mặt đường cất hạ cánh và hoàn thành bảng RCR</li>
+                    <li class="correct-answer">Chuyển đổi thông tin tình trạng mặt đường cất hạ cánh tới tổ lái thông qua ATS/AIS và chuyển báo cáo tình trạng hoạt động phanh của tàu bay cho người khai thác cảng</li>
+                    <li>Sử dụng thông tin của RCR để thiết lập chế độ tính năng tàu bay phù hợp để cất cánh và hạ cánh an toàn.</li>
+                    <li>Tất cả đều đúng</li>
+                </ul>
+            </div>
+
+            <!-- Question 15 -->
+            <div class="question-card bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-lg transition-transform transform hover:scale-105">
+                <p class="font-semibold text-lg mb-4 text-white">15. Trách nhiệm của tổ lái tàu bay thực hiện các nội dung công việc gì trong Chương trình báo cáo và đánh giá tình trạng mặt đường CHC (GRF)?</p>
+                <ul class="space-y-3 text-gray-300">
+                    <li>Đánh giá và xác định tình trạng bề mặt đường cất hạ cánh và hoàn thành bảng RCR</li>
+                    <li>Chuyển đổi thông tin tình trạng mặt đường cất hạ cánh tới tổ lái thông qua ATS/AIS</li>
+                    <li class="correct-answer">Sử dụng thông tin của RCR để thiết lập chế độ tính năng tàu bay phù hợp để cất cánh và hạ cánh an toàn và chuyển thông tin tình trạng hoạt động phanh của tàu bay cho Đài kiểm soát tại sân</li>
+                    <li>Tất cả đều đúng</li>
+                </ul>
+            </div>
+
+            <!-- Question 16 -->
+            <div class="question-card bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-lg transition-transform transform hover:scale-105">
+                <p class="font-semibold text-lg mb-4 text-white">16. Hoạt động tàu bay có thể được coi là bị ảnh hưởng khi phạm vi bao phủ của bất kỳ chất bám liên quan đến nước trên mỗi phần ba đường CHC vượt quá bao nhiêu?</p>
+                <ul class="space-y-3 text-gray-300">
+                    <li>10%</li>
+                    <li>20%</li>
+                    <li class="correct-answer">25%</li>
+                    <li>50%</li>
+                </ul>
+            </div>
+
+            <!-- Question 17 -->
+            <div class="question-card bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-lg transition-transform transform hover:scale-105">
+                <p class="font-semibold text-lg mb-4 text-white">17. Cấu tạo của Chương trình báo cáo và đánh giá tình trạng mặt đường cất hạ cánh bao gồm các yếu tố nào?</p>
+                <ul class="space-y-3 text-gray-300">
+                    <li class="correct-answer">Báo cáo tình trạng mặt đường CHC (RCR); Mã tình trạng mặt đường CHC (RWYCC); Ma trận đánh giá tình trạng mặt đường CHC (RCAM); Tình trạng mặt đường CHC; Mô tả tình trạng mặt đường CHC</li>
+                    <li>Báo cáo tình trạng mặt đường CHC (RCR); Mã tình trạng mặt đường CHC (RWYCC); Ma trận đánh giá tình trạng mặt đường CHC (RCAM); Tình trạng mặt đường CHC.</li>
+                    <li>Báo cáo tình trạng mặt đường CHC (RCR); Mã tình trạng mặt đường CHC (RWYCC); Tình trạng mặt đường CHC; Mô tả tình trạng mặt đường CHC</li>
+                    <li>Mã tình trạng mặt đường CHC (RWYCC); Ma trận đánh giá tình trạng mặt đường CHC (RCAM); Tình trạng mặt đường CHC; Mô tả tình trạng mặt đường CHC</li>
+                </ul>
+            </div>
+
+            <!-- Question 18 -->
+            <div class="question-card bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-lg transition-transform transform hover:scale-105">
+                <p class="font-semibold text-lg mb-4 text-white">18. Mã tình trạng mặt đường CHC (RWYCC) gồm bao nhiêu mã</p>
+                <ul class="space-y-3 text-gray-300">
+                    <li>6</li>
+                    <li>5</li>
+                    <li class="correct-answer">7</li>
+                    <li>4</li>
+                </ul>
+            </div>
+
+            <!-- Question 19 -->
+            <div class="question-card bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-lg transition-transform transform hover:scale-105">
+                <p class="font-semibold text-lg mb-4 text-white">19. Mã tình trạng mặt đường CHC (RWYCC) có giá trị 6 tương ứng với tình trạng đường cất hạ cánh như thế nào?</p>
+                <ul class="space-y-3 text-gray-300">
+                    <li class="correct-answer">KHÔ</li>
+                    <li>ƯỚT</li>
+                    <li>TRƠN ƯỚT</li>
+                    <li>NƯỚC ĐỌNG</li>
+                </ul>
+            </div>
+
+            <!-- Question 20 -->
+            <div class="question-card bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-lg transition-transform transform hover:scale-105">
+                <p class="font-semibold text-lg mb-4 text-white">20. Mã tình trạng mặt đường CHC (RWYCC) có giá trị 5 tương ứng với tình trạng đường cất hạ cánh như thế nào?</p>
+                <ul class="space-y-3 text-gray-300">
+                    <li>KHÔ</li>
+                    <li class="correct-answer">ƯỚT</li>
+                    <li>TRƠN ƯỚT</li>
+                    <li>NƯỚC ĐỌNG</li>
+                </ul>
+            </div>
+
+            <!-- Question 21 -->
+            <div class="question-card bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-lg transition-transform transform hover:scale-105">
+                <p class="font-semibold text-lg mb-4 text-white">21. Mã tình trạng mặt đường CHC (RWYCC) có giá trị 3 tương ứng với tình trạng đường cất hạ cánh như thế nào?</p>
+                <ul class="space-y-3 text-gray-300">
+                    <li>KHÔ</li>
+                    <li>ƯỚT</li>
+                    <li class="correct-answer">TRƠN ƯỚT</li>
+                    <li>NƯỚC ĐỌNG</li>
+                </ul>
+            </div>
+
+            <!-- Question 22 -->
+            <div class="question-card bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-lg transition-transform transform hover:scale-105">
+                <p class="font-semibold text-lg mb-4 text-white">22. Mã tình trạng mặt đường CHC (RWYCC) có giá trị 2 tương ứng với tình trạng đường cất hạ cánh như thế nào?</p>
+                <ul class="space-y-3 text-gray-300">
+                    <li>KHÔ</li>
+                    <li>ƯỚT</li>
+                    <li>TRƠN ƯỚT</li>
+                    <li class="correct-answer">NƯỚC ĐỌNG</li>
+                </ul>
+            </div>
+
+            <!-- Question 23 -->
+            <div class="question-card bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-lg transition-transform transform hover:scale-105">
+                <p class="font-semibold text-lg mb-4 text-white">23. Mục đích của việc cung cấp Mã tình trạng mặt đường cất hạ cánh cho tổ lái tàu bay để thực hiện việc gì?</p>
+                <ul class="space-y-3 text-gray-300">
+                    <li class="correct-answer">Để tổ lái tính toán tính năng tàu bay phù hợp khi cất cánh và hạ cánh với điều kiện tương ứng với Mã tình trạng đường CHC</li>
+                    <li>Để tổ lái tính toán tính năng tàu bay phù hợp khi hạ cánh với điều kiện tương ứng với Mã tình trạng đường CHC</li>
+                    <li>Để tổ lái tính toán tính năng tàu bay phù hợp khi cất cánh với điều kiện tương ứng với Mã tình trạng đường CHC</li>
+                    <li>Để phục vụ công tác chuẩn bị các thông số khi tàu bay lấy độ cao (climb)</li>
+                </ul>
+            </div>
+
+            <!-- Question 24 -->
+            <div class="question-card bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-lg transition-transform transform hover:scale-105">
+                <p class="font-semibold text-lg mb-4 text-white">24. Điều kiện khí hậu Việt Nam hiện tại, các cảng hàng không đang khai thác thì sẽ có khả năng áp dụng các Mã tình trạng mặt đường cất hạ cánh nào</p>
+                <ul class="space-y-3 text-gray-300">
+                    <li class="correct-answer">Các Mã RWYCC: 6, 5, 3, 2</li>
+                    <li>Các Mã RWYCC: 6, 5, 3</li>
+                    <li>Các Mã RWYCC: 5, 3</li>
+                    <li>Các Mã RWYCC: 5, 3, 2</li>
+                </ul>
+            </div>
+
+            <!-- Question 25 -->
+            <div class="question-card bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-lg transition-transform transform hover:scale-105">
+                <p class="font-semibold text-lg mb-4 text-white">25. Tình trạng mặt đường cất hạ cánh được báo cáo với mã RYWCC 2 tại mỗi 1/3 đường cất hạ cánh thì tương ứng điều kiện tình trạng đường CHC như thế nào?</p>
+                <ul class="space-y-3 text-gray-300">
+                    <li>Tại mỗi 1/3 đường CHC có lớp nước bao phủ trên bề mặt đường cất hạ cánh, có độ sâu lớn hơn 3mm</li>
+                    <li>Tại mỗi 1/3 đường CHC có lớp nước bao phủ trên bề mặt đường cất hạ cánh, có độ sâu lớn hơn và bằng 3mm</li>
+                    <li class="correct-answer">Tại mỗi 1/3 đường CHC có lớp nước bao phủ trên bề mặt đường cất hạ cánh lớn hơn tỷ lệ 25% và có độ sâu lớn hơn 3mm</li>
+                    <li>Tại mỗi 1/3 đường CH có lớp nước bao phủ trên bề mặt đường cất hạ cánh có tỷ lệ lớn hơn 25%, có độ sâu nhỏ hơn 3mm</li>
+                </ul>
+            </div>
+
+            <!-- Question 26 -->
+            <div class="question-card bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-lg transition-transform transform hover:scale-105">
+                <p class="font-semibold text-lg mb-4 text-white">26. Tình trạng mặt đường cất hạ cánh được báo cáo với mã RYWCC 3 tại mỗi 1/3 đường cất hạ cánh thì tương ứng với điều kiện tình trạng đường cất hạ cánh như thế nào?</p>
+                <ul class="space-y-3 text-gray-300">
+                    <li>Tại mỗi 1/3 đường cất hạ cánh có lớp nước bao phủ trên bề mặt đường cất hạ cánh có tỷ lệ bao phủ lớn hơn 20%, có độ sâu lớn hơn và bằng 3mm</li>
+                    <li>Tại mỗi 1/3 đường cất hạ cánh có lớp nước bao phủ trên bề mặt đường cất hạ cánh có tỷ lệ bao phủ lớn hơn 20%, có độ sâu nhỏ hơn và bằng 3mm và có hệ số ma sát thấp hơn hệ số ma sát tối thiểu</li>
+                    <li class="correct-answer">Tại mỗi 1/3 đường cất hạ cánh có lớp nước bao phủ trên bề mặt đường cất hạ cánh có tỷ lệ bao phủ lớn hơn 25%, có độ sâu nhỏ hơn và bằng 3mm và có hệ số ma sát thấp hơn hệ số ma sát tối thiểu</li>
+                    <li>Tại mỗi 1/3 đường cất hạ cánh có lớp nước bao phủ trên bề mặt đường cất hạ cánh có tỷ lệ bao phủ lớn hơn 25%, có độ sâu nhỏ hơn 3mm và có hệ số ma sát thấp hơn hệ số ma sát tối thiểu</li>
+                </ul>
+            </div>
+
+            <!-- Question 27 -->
+            <div class="question-card bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-lg transition-transform transform hover:scale-105">
+                <p class="font-semibold text-lg mb-4 text-white">27. Đường cất hạ cánh được mô tả khô được định nghĩa như thế nào?</p>
+                <ul class="space-y-3 text-gray-300">
+                    <li>Khi nước trên đường CHC có độ sâu lớn hơn 3mm</li>
+                    <li class="correct-answer">Đường CHC được coi là khô nếu bề mặt của nó không có độ ẩm có thể nhìn thấy và không có chất bám trên bề mặt đường cất hạ cánh.</li>
+                    <li>Mặt đường CHC bị bao phủ bởi bất kỳ độ ẩm có thể nhìn thấy hoặc bị nước phủ dày lên đến 3 mm trong khu vực dự kiến khai thác</li>
+                    <li>Tất cả đều sai</li>
+                </ul>
+            </div>
+
+            <!-- Question 28 -->
+            <div class="question-card bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-lg transition-transform transform hover:scale-105">
+                <p class="font-semibold text-lg mb-4 text-white">28. Theo định nghĩa, Ma trận đánh giá tình trạng mặt đường CHC bao gồm các tiêu chí nào?</p>
+                <ul class="space-y-3 text-gray-300">
+                    <li class="correct-answer">Tiêu chí đánh giá và Tiêu chí đánh giá hạ cấp tình trạng mặt đường cất hạ cánh</li>
+                    <li>Tiêu chí hạ cấp và nâng cấp tình trạng mặt đường cất hạ cánh</li>
+                    <li>Tiêu chí đánh giá tình trạngmặt đường cất hạ cánh khô</li>
+                    <li>Tiêu chí đánh giá tình trạng mặt đường cất hạ cánh đọng nước</li>
+                </ul>
+            </div>
+
+            <!-- Question 29 -->
+            <div class="question-card bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-lg transition-transform transform hover:scale-105">
+                <p class="font-semibold text-lg mb-4 text-white">29. Mã tình trạng đường cất hạ cánh được sắp xếp từ mã (RWYCC) từ 6 đến 0 tương tứng với tình trạng mặt đường cất hạ cánh như thế nào?</p>
+                <ul class="space-y-3 text-gray-300">
+                    <li>Tính trơn trượt của đường cất hạ cánh từ tương ứng giảm dần</li>
+                    <li class="correct-answer">Tính trơn trượt của đường cất hạ cánh từ tương ứng tăng dần</li>
+                    <li>Tính trơn trượt của đường cất hạ cánh không được thể hiện qua mã tình trạng mặt đường CHC</li>
+                    <li>Tất cả đều sai</li>
+                </ul>
+            </div>
+
+            <!-- Question 30 -->
+            <div class="question-card bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-lg transition-transform transform hover:scale-105">
+                <p class="font-semibold text-lg mb-4 text-white">30. Khi quan sát cách giảm tốc độ tàu bay nhận thấy "tàu bay giảm tốc độ phanh là bình thường đối với việc phanh bánh lốp và việc kiểm soát hướng là bình thường" thì tương ứng với tình trạng mặt đường cất hạ cánh nào khi sử dụng RCAM để đánh giá?.</p>
+                <ul class="space-y-3 text-gray-300">
+                    <li>KHÔ</li>
+                    <li class="correct-answer">ƯỚT</li>
+                    <li>TRƠN ƯỚT</li>
+                    <li>NƯỚC ĐỌNG</li>
+                </ul>
+            </div>
+
+            <!-- Question 31 -->
+            <div class="question-card bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-lg transition-transform transform hover:scale-105">
+                <p class="font-semibold text-lg mb-4 text-white">31. Khi quan sát cách giảm tốc độ tàu bay nhận thấy "Giảm tốc độ phanh HOẶC kiểm soát hướng nằm giữa Trung bình và Kém" thì tương ứng với tình trạng mặt đường cất hạ cánh nào khi sử dụng RCAM để đánh giá?</p>
+                <ul class="space-y-3 text-gray-300">
+                    <li>KHÔ</li>
+                    <li>ƯỚT</li>
+                    <li>TRƠN ƯỚT</li>
+                    <li class="correct-answer">NƯỚC ĐỌNG</li>
+                </ul>
+            </div>
+
+            <!-- Question 32 -->
+            <div class="question-card bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-lg transition-transform transform hover:scale-105">
+                <p class="font-semibold text-lg mb-4 text-white">32. Báo cáo của phi công về hoạt động phanh trên đường CHC thông qua AIREP bao gồm mấy mức?</p>
+                <ul class="space-y-3 text-gray-300">
+                    <li>4</li>
+                    <li>5</li>
+                    <li class="correct-answer">6</li>
+                    <li>7</li>
+                </ul>
+            </div>
+
+            <!-- Question 33 -->
+            <div class="question-card bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-lg transition-transform transform hover:scale-105">
+                <p class="font-semibold text-lg mb-4 text-white">33. Báo cáo của phi công về hoạt động phanh trên đường CHC thông qua AIREP là TRUNG BÌNH ĐẾN KÉM tương ứng với mã tình trạng mặt đường cất hạ cánh nào (RWYCC)</p>
+                <ul class="space-y-3 text-gray-300">
+                    <li>6</li>
+                    <li>5</li>
+                    <li>3</li>
+                    <li class="correct-answer">2</li>
+                </ul>
+            </div>
+
+            <!-- Question 34 -->
+            <div class="question-card bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-lg transition-transform transform hover:scale-105">
+                <p class="font-semibold text-lg mb-4 text-white">34. Các mã tình trạng đường cất hạ cánh (RWYCC) được gán 5, 4, 3 hoặc 2 được nâng cấp lên khi nào</p>
+                <ul class="space-y-3 text-gray-300">
+                    <li class="correct-answer">Khi được đánh giá kiểm tra lại tình trạng mặt đường CHC</li>
+                    <li>Khi nhận AIREP từ phi công</li>
+                    <li>Khi có khuyến cáo của phi công</li>
+                    <li>Khi có khuyến cáo của Đài kiểm soát tại sân</li>
+                </ul>
+            </div>
+
+            <!-- Question 35 -->
+            <div class="question-card bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-lg transition-transform transform hover:scale-105">
+                <p class="font-semibold text-lg mb-4 text-white">35. Báo cáo của phi công về hoạt động phanh trên đường CHC được xem xét cho mục đích gì?</p>
+                <ul class="space-y-3 text-gray-300">
+                    <li>Hạ cấp RYWCC</li>
+                    <li>Nâng cấp RWYCC</li>
+                    <li class="correct-answer">Nâng cấp RYWCC khi được kiểm tra đánh giá lại và hạ cấp RWYCC</li>
+                    <li>Tất cả đều sai</li>
+                </ul>
+            </div>
+
+            <!-- Question 36 -->
+            <div class="question-card bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-lg transition-transform transform hover:scale-105">
+                <p class="font-semibold text-lg mb-4 text-white">36. Theo quy trình thực hiện, Báo cáo tính trạng mặt đường cất hạ được tổ chức thực hiện khi nào?</p>
+                <ul class="space-y-3 text-gray-300">
+                    <li class="correct-answer">Báo cáo được thực hiện khi có sự thay đổi đáng kể về tình trạng mặt đường CHC xảy ra do nước, cho đến khi đường CHC trở lại trạng thái khô.</li>
+                    <li>Báo cáo được thực hiện 30 phút/lần về tình trạng mặt đường CHC xảy ra do nước,.</li>
+                    <li>Báo cáo được thực hiện 36 giờ/ lần về tình trạng mặt đường CHC</li>
+                    <li>Câu a, c đều đúng</li>
+                </ul>
+            </div>
+
+            <!-- Question 37 -->
+            <div class="question-card bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-lg transition-transform transform hover:scale-105">
+                <p class="font-semibold text-lg mb-4 text-white">37. Thay đổi tình trạng mặt đường CHC được coi là đáng kể khi xảy ra các trường hợp nào?</p>
+                <ul class="space-y-3 text-gray-300">
+                    <li>Bất cứ thay đổi nào về RWYCC; Bất cứ thay đổi nào về loại chất bám;</li>
+                    <li>Bất cứ thay đổi nào về độ bao phủ chất bám được báo cáo; Bất cứ thay đổi nào về độ sâu chất bám</li>
+                    <li>Bất cứ thông tin nào, ví dụ báo cáo của phi công về hoạt động phanh trên đường CHC, được coi là đáng kể</li>
+                    <li class="correct-answer">Tất cả các trường hợp trên</li>
+                </ul>
+            </div>
+
+            <!-- Question 38 -->
+            <div class="question-card bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-lg transition-transform transform hover:scale-105">
+                <p class="font-semibold text-lg mb-4 text-white">38. Các thông tin trong Báo cáo tình trạng mặt đường cất hạ cánh trong mẫu RCR chuyển cho cơ sở đảm bảo họt động bay yêu cầu bắt buộc phải có bao gồm:</p>
+                <ul class="space-y-3 text-gray-300">
+                    <li class="correct-answer">Mã sân bay; Ngày và thời điểm đánh giá; Ký hiệu Đường CHC đánh giá; RWYCC cho mỗi 1/3 đường CHC; Mô tả tình trạng mặt đường CHC</li>
+                    <li>Mã sân bay; Ngày và thời điểm đánh giá; Ký hiệu Đường CHC đánh giá</li>
+                    <li>Đường CHC đánh giá; RWYCC cho mỗi 1/3 đường CHC; Mô tả tình trạng mặt đường CHC</li>
+                    <li>Mã sân bay; Tên nhân sự thực hiện đánh giá; RWYCC cho mỗi 1/3 đường CHC</li>
+                </ul>
+            </div>
+
+            <!-- Question 39 -->
+            <div class="question-card bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-lg transition-transform transform hover:scale-105">
+                <p class="font-semibold text-lg mb-4 text-white">39. Thời gian đánh giá tình trạng mặt đường cất hạ cánh là lúc 18h00 (giờ Hà Nội) ngày 30 tháng 12 năm 2021, thì thời gian trên được ghi như thế nào trong Báo cáo RCR</p>
+                <ul class="space-y-3 text-gray-300">
+                    <li class="correct-answer">12301100</li>
+                    <li>12301800</li>
+                    <li>30121100</li>
+                    <li>30111800</li>
+                </ul>
+            </div>
+
+            <!-- Question 40 -->
+            <div class="question-card bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-lg transition-transform transform hover:scale-105">
+                <p class="font-semibold text-lg mb-4 text-white">40. Đường cất hạ cánh Cảng hàng không quốc tế Tân Sơn Nhất ký hiệu 07L -25R thì trong báo cáo RCR ghi ký hiệu nào của đường cất hạ cánh</p>
+                <ul class="space-y-3 text-gray-300">
+                    <li>07R</li>
+                    <li class="correct-answer">07L</li>
+                    <li>25L</li>
+                    <li>25R</li>
+                </ul>
+            </div>
+
+            <!-- Question 41 -->
+            <div class="question-card bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-lg transition-transform transform hover:scale-105">
+                <p class="font-semibold text-lg mb-4 text-white">41. Một phần 3 thứ nhất đường cất hạ cánh có nước bao phủ 20%, Một phần 3 thứ 2 có nước bao phủ 55%, Một phần 3 thứ 3 có nước bao phủ là 33% thì tỷ lệ bao phủ được ghi trong báo cáo RCR ghi như thế nào đúng?</p>
+                <ul class="space-y-3 text-gray-300">
+                    <li class="correct-answer">25/75/50</li>
+                    <li>25/NR/50</li>
+                    <li>NR/25/50</li>
+                    <li>NR/75/50</li>
+                </ul>
+            </div>
+
+            <!-- Question 42 -->
+            <div class="question-card bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-lg transition-transform transform hover:scale-105">
+                <p class="font-semibold text-lg mb-4 text-white">42. Một phần 3 thứ nhất đường cất hạ cánh có nước bao phủ 20%, Một phần 3 thứ 2 có nước bao phủ 65%, Một phần 3 thứ 3 có nước bao phủ là 45%, tất cả có độ sâu nước dưới 3mm thì mã tình trạng đường cất hạ cánh được ghi báo cáo RCR ghi như thế nào đúng?</p>
+                <ul class="space-y-3 text-gray-300">
+                    <li>RWYCC tương ứng 6/6</li>
+                    <li>RWYCC tương ứng 6/5/6</li>
+                    <li class="correct-answer">RWYCC tương ứng 6/5/5</li>
+                    <li>RWYCC tương ứng 5/5/5</li>
+                </ul>
+            </div>
+
+            <!-- Question 43 -->
+            <div class="question-card bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-lg transition-transform transform hover:scale-105">
+                <p class="font-semibold text-lg mb-4 text-white">43. Một phần 3 thứ nhất đường cất hạ cánh có nước bao phủ 23%, Một phần 3 thứ 2 có nước bao phủ 65%, Một phần 3 thứ 3 có nước bao phủ là 35%, tất cả có độ sâu nước dưới 3mm thì tình trạng đường cất hạ cánh được ghi báo cáo RCR ghi như thế nào đúng?</p>
+                <ul class="space-y-3 text-gray-300">
+                    <li>KHÔ/ ƯỚT/ KHÔ</li>
+                    <li class="correct-answer">KHÔ/ ƯỚT/ ƯỚT</li>
+                    <li>KHÔ/ KHÔ/ KHÔ</li>
+                    <li>ƯỚT/ ƯỚT/ ƯỚC</li>
+                </ul>
+            </div>
+
+            <!-- Question 44 -->
+            <div class="question-card bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-lg transition-transform transform hover:scale-105">
+                <p class="font-semibold text-lg mb-4 text-white">44. Một phần 3 thứ nhất đường cất hạ cánh có nước bao phủ 5%, Một phần 3 thứ 2 có nước bao phủ 70%, Một phần 3 thứ 3 có nước bao phủ là 30%, tất cả có độ sâu nước dưới 3mm. Nhưng thời điểm đánh giá nhận 02 báo cáo hoạt động phanh trên đường cất hạ cánh mức TỐT thì tình trạng đường cất hạ cánh được ghi báo cáo RCR ghi như thế nào đúng?</p>
+                <ul class="space-y-3 text-gray-300">
+                    <li>KHÔ/ ƯỚT/ KHÔ</li>
+                    <li class="correct-answer">KHÔ/ ƯỚT/ ƯỚT</li>
+                    <li>KHÔ/ KHÔ/ KHÔ</li>
+                    <li>ƯỚT/ ƯỚT/ ƯỚC</li>
+                </ul>
+            </div>
+
+            <!-- Question 45 -->
+            <div class="question-card bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-lg transition-transform transform hover:scale-105">
+                <p class="font-semibold text-lg mb-4 text-white">45. Một phần 3 thứ nhất đường cất hạ cánh có nước bao phủ 10%, Một phần 3 thứ 2 có nước bao phủ 55%, Một phần 3 thứ 3 có nước bao phủ là 33%, tất cả có độ sâu nước dưới 3mM. Nhưng thời điểm đánh giá nhận 02 báo cáo hoạt động phanh trên đường cất hạ cánh mức TRUNG BÌNH thì tình trạng đường cất hạ cánh được ghi báo cáo RCR ghi như thế nào đúng?</p>
+                <ul class="space-y-3 text-gray-300">
+                    <li>KHÔ/ ƯỚT/ KHÔ</li>
+                    <li>KHÔ/ ƯỚT/ ƯỚT</li>
+                    <li class="correct-answer">TRƠN ƯỚT/ TRƠN ƯỚT/ TRƠN ƯỚT</li>
+                    <li>ƯỚT/ ƯỚT/ ƯỚC</li>
+                </ul>
+            </div>
+
+            <!-- Question 46 -->
+            <div class="question-card bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-lg transition-transform transform hover:scale-105">
+                <p class="font-semibold text-lg mb-4 text-white">46. Một phần 3 thứ nhất đường cất hạ cánh có nước bao phủ 34% độ sâu lớp nước là 4mm, Một phần 3 thứ 2 có nước bao phủ 55% độ sâu lớp nước 5mm, Một phần 3 thứ 3 có nước bao phủ là 33% độ sau lớp nước 7mm thì tình trạng đường cất hạ cánh và độ sâu lớp nước được ghi báo cáo RCR ghi như thế nào đúng?</p>
+                <ul class="space-y-3 text-gray-300">
+                    <li>ĐỌNG NƯỚC/ ƯỚT/ KHÔ và 5/4/7</li>
+                    <li>ĐỌNG NƯỚC/ ĐỌNG NƯỚC/ ĐỌNG NƯỚC và 5/4/7</li>
+                    <li class="correct-answer">ĐỌNG NƯỚC/ ĐỌNG NƯỚC/ ĐỌNG NƯỚC và 4/5/7</li>
+                    <li>ĐỌNG NƯỚC/ ĐỌNG NƯỚC/ ĐỌNG NƯỚC và 7/5/4</li>
+                </ul>
+            </div>
+
+            <!-- Question 47 -->
+            <div class="question-card bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-lg transition-transform transform hover:scale-105">
+                <p class="font-semibold text-lg mb-4 text-white">47. Một phần 3 thứ nhất đường cất hạ cánh có nước bao phủ 34% độ sâu lớp nước là 4mm, Một phần 3 thứ 2 có nước bao phủ 55% độ sâu lớp nước 5mm, Một phần 3 thứ 3 có nước bao phủ là 33% độ sau lớp nước 7mm thì mã tình trạng đường cất hạ cánh và độ sâu lớp nước được ghi báo cáo RCR ghi như thế nào đúng?</p>
+                <ul class="space-y-3 text-gray-300">
+                    <li class="correct-answer">RWYCC 2/2/2 và độ sâu 4/5/7</li>
+                    <li>RWYCC 3/2 và độ sâu 5/4/7</li>
+                    <li>RWYCC 2/5 và độ sâu 5/4/7</li>
+                    <li>RWYCC 2/2 và độ sâu 5/7/4</li>
+                </ul>
+            </div>
+
+            <!-- Question 48 -->
+            <div class="question-card bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-lg transition-transform transform hover:scale-105">
+                <p class="font-semibold text-lg mb-4 text-white">48. Mẫu báo cáo RCR sau được hoàn thiện, người khai thác cảng chuyển đến cho bộ phận nào ?</p>
+                <ul class="space-y-3 text-gray-300">
+                    <li>Đài kiểm soát tại sân (TWR)</li>
+                    <li>Phòng NOTAM quốc tế</li>
+                    <li>Tổ lái</li>
+                    <li class="correct-answer">Cả a và b</li>
+                </ul>
+            </div>
+
+            <!-- Question 49 -->
+            <div class="question-card bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-lg transition-transform transform hover:scale-105">
+                <p class="font-semibold text-lg mb-4 text-white">49. Báo cáo RCR như sau: VNNB 08061200 3/3/3 100/100/100 NR/NR/NR TRON ƯỚT/ TRƠN ƯỚT/TRƠN ƯỚT xác định thời gian đánh giá tình trạng mặt đường cất hạ cánh (giờ UTC)?</p>
+                <ul class="space-y-3 text-gray-300">
+                    <li class="correct-answer">Lúc 12 giờ 00 phút ngày 06 tháng 8</li>
+                    <li>Lúc 19 giờ 00 phút ngày 06 tháng 8</li>
+                    <li>Lúc 19 giờ 00 phút ngày 08 tháng 06</li>
+                    <li>Lúc 12 giờ 00 phút ngày 08 tháng 06</li>
+                </ul>
+            </div>
+
+            <!-- Question 50 -->
+            <div class="question-card bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-lg transition-transform transform hover:scale-105">
+                <p class="font-semibold text-lg mb-4 text-white">50. Báo cáo RCR như sau: VNNB 08061200 3/3/3 100/100/100 NR/NR/NR TRON ƯỚT/ TRƠN ƯỚT/TRƠN ƯỚT xác định mã tình trạng mặt đường cất hạ cánh?</p>
+                <ul class="space-y-3 text-gray-300">
+                    <li>100/100/100</li>
+                    <li class="correct-answer">3/3/3</li>
+                    <li>TRƠN ƯỚT/ TRƠN ƯỚT/TRƠN ƯỚT</li>
+                    <li>NR/NR/NR</li>
+                </ul>
+            </div>
+
+            <!-- Question 51 -->
+            <div class="question-card bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-lg transition-transform transform hover:scale-105">
+                <p class="font-semibold text-lg mb-4 text-white">51. Một phần 3 thứ nhất đường cất hạ cánh có nước bao phủ 5%, Một phần 3 thứ 2 có nước bao phủ 55%, Một phần 3 thứ 3 có nước bao phủ là 33%, tất cả có độ sâu nước dưới 3mm. Nhưng thời điểm đánh giá nhận 02 báo cáo hoạt động phanh trên đường cất hạ cánh mức TỐT thì Mã tình trạng đường cất hạ cánh được ghi báo cáo RCR ghi như thế nào đúng?</p>
+                <ul class="space-y-3 text-gray-300">
+                    <li class="correct-answer">Mã RWYCC 6/5/5</li>
+                    <li>Mã RWYCC 5/5/5</li>
+                    <li>Mã RWYCC 6/6/5</li>
+                    <li>Mã RWYCC 6/6/6</li>
+                </ul>
+            </div>
+
+            <!-- Question 52 -->
+            <div class="question-card bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-lg transition-transform transform hover:scale-105">
+                <p class="font-semibold text-lg mb-4 text-white">52. Một phần 3 thứ nhất đường cất hạ cánh có nước bao phủ 20%,, Một phần 3 thứ 2 có nước bao phủ 55%, Một phần 3 thứ 3 có nước bao phủ là 33%, tất cả có độ sâu nước dưới 3mM. Nhưng thời điểm đánh giá nhận 02 báo cáo hoạt động phanh trên đường cất hạ cánh mức TRUNG BÌNH thì Mã tình trạng đường cất hạ cánh được ghi báo cáo RCR ghi như thế nào đúng?</p>
+                <ul class="space-y-3 text-gray-300">
+                    <li>Mã RWYCC 6/3/5</li>
+                    <li class="correct-answer">Mã RWYCC 3/3/3</li>
+                    <li>Mã RWYCC 5/3/3</li>
+                    <li>Mã RWYCC 2/2/2</li>
+                </ul>
+            </div>
+
+            <!-- Question 53 -->
+            <div class="question-card bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-lg transition-transform transform hover:scale-105">
+                <p class="font-semibold text-lg mb-4 text-white">53. Một phần 3 thứ nhất đường cất hạ cánh có nước bao phủ 8%, Một phần 3 thứ 2 có nước bao phủ 26%, Một phần 3 thứ 3 có nước bao phủ là 5% thì tỷ lệ bao phủ được ghi trong báo cáo RCR ghi như thế nào đúng?</p>
+                <ul class="space-y-3 text-gray-300">
+                    <li class="correct-answer">NR/50/NR</li>
+                    <li>25/NR/NR</li>
+                    <li>NR/NR/NR</li>
+                    <li>NR/25/25</li>
+                </ul>
+            </div>
+
+            <!-- Question 54 -->
+            <div class="question-card bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-lg transition-transform transform hover:scale-105">
+                <p class="font-semibold text-lg mb-4 text-white">54. Báo cáo RCR như sau: VNNB 08071300 6/5/5 25/100/100 NR/NR/NR KHÔ/ ƯỚT ƯỚT. Tỷ lệ bao phủ của nước trên mặt đường cất hạ cánh của 1/3 đường thứ nhất (đầu tiên) là?</p>
+                <ul class="space-y-3 text-gray-300">
+                    <li>100%</li>
+                    <li>8%</li>
+                    <li class="correct-answer">Từ 10% - 25%</li>
+                    <li>50%</li>
+                </ul>
+            </div>
+
+            <!-- Question 55 -->
+            <div class="question-card bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-lg transition-transform transform hover:scale-105">
+                <p class="font-semibold text-lg mb-4 text-white">55. Báo cáo RCR như sau: VNNB 08071300 6/5/6 25/100/25 NR/NR/NR KHÔ/ ƯỚT/KHÔ. Khi nhận được 02 báo cáo liên tiếp tình trạng hoạt động phanh của tàu bay trên đường cất hạ cánh là TRUNG BÌNH, mã tình trạng đường cất hạ cách sẽ được báo cáo thay thế như thế nào?</p>
+                <ul class="space-y-3 text-gray-300">
+                    <li>Mã RWYCC 6/5/5</li>
+                    <li>Mã RWYCC 3/3/5</li>
+                    <li class="correct-answer">Mã RWYCC 3/3/3</li>
+                    <li>Mã RWYCC 6/6/6</li>
+                </ul>
+            </div>
+
+            <!-- Question 56 -->
+            <div class="question-card bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-lg transition-transform transform hover:scale-105">
+                <p class="font-semibold text-lg mb-4 text-white">56. Thời gian đánh giá tình trạng mặt đường cất hạ cánh là lúc 20h00 (giờ Hà Nội) ngày 15 tháng 12 năm 2021, thì thời gian trên được ghi như thế nào trong Báo cáo RCR</p>
+                <ul class="space-y-3 text-gray-300">
+                    <li class="correct-answer">12151300</li>
+                    <li>12152000</li>
+                    <li>15122000</li>
+                    <li>15121300</li>
+                </ul>
+            </div>
+
+            <!-- Question 57 -->
+            <div class="question-card bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-lg transition-transform transform hover:scale-105">
+                <p class="font-semibold text-lg mb-4 text-white">57. Báo cáo RCR như sau: VNNB 08071300 6/5/6 25/100/NR NR/NR/NR KHÔ/ ƯỚT/KHÔ. Báo cáo RCR này được thực hiện vào lúc nào theo giờ địa phương (Giờ Việt Nam UTC + 7)?</p>
+                <ul class="space-y-3 text-gray-300">
+                    <li class="correct-answer">Lúc 20 giờ 00 phút ngày 07 tháng 8</li>
+                    <li>Lúc 13 giờ 00 phút ngày 07 tháng 8</li>
+                    <li>Lúc 20 giờ 00 phút ngày 08 tháng 7</li>
+                    <li>Lúc 13 giờ 00 phút ngày 08 tháng 7</li>
+                </ul>
+            </div>
+
+            <!-- Question 58 -->
+            <div class="question-card bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-lg transition-transform transform hover:scale-105">
+                <p class="font-semibold text-lg mb-4 text-white">58. Báo cáo RCR như sau: VNNB 08071300 6/5/6 25/50/25 NR/NR/NR KHÔ/ ƯỚT KHÔ. Khi tỷ lệ bao phủ của nước trên 1/3 thứ nhất thay đổi từ 20% lên 35%, khi đó Bản tin RCR có nội như thế nào là phù hợp?</p>
+                <ul class="space-y-3 text-gray-300">
+                    <li>VNNB 08071300 6/5/6 25/50/25 NR/NR/NR KHÔ/ ƯỚT KHÔ</li>
+                    <li>VNNB 08071300 5/5/6 50/50/25 NR/NR/NR KHÔ/ ƯỚT KHÔ</li>
+                    <li class="correct-answer">VNNB 08071300 5/5/6 50/50/25 NR/NR/NR ƯỚT/ ƯỚT KHÔ</li>
+                    <li>VNNB 08071300 6/5/6 50/50/100 NR/NR/NR KHÔ/ ƯỚT KHÔ</li>
+                </ul>
+            </div>
+
+            <!-- Question 59 -->
+            <div class="question-card bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-lg transition-transform transform hover:scale-105">
+                <p class="font-semibold text-lg mb-4 text-white">59. Báo cáo RCR như sau: VNNB 08071300 6/5/6 25/50/25 NR/NR/NR KHÔ/ ƯỚT KHÔ. Khi tỷ lệ bao phủ của nước trên 1/3 thứ ba thay đổi từ 20% lên 24%, khi đó Bản tin RCR có nội như thế nào là phù hợp?</p>
+                <ul class="space-y-3 text-gray-300">
+                    <li class="correct-answer">VNNB 08071300 6/5/6 25/50/25 NR/NR/NR KHÔ/ ƯỚT KHÔ</li>
+                    <li>VNNB 08071300 5/5/6 50/50/25 NR/NR/NR KHÔ/ ƯỚT KHÔ</li>
+                    <li>VNNB 08071300 5/5/6 50/50/25 NR/NR/NR ƯỚT/ ƯỚT KHÔ</li>
+                    <li>VNNB 08071300 6/5/6 50/50/100 NR/NR/NR KHÔ/ ƯỚT KHÔ</li>
+                </ul>
+            </div>
+
+            <!-- Question 60 -->
+            <div class="question-card bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-lg transition-transform transform hover:scale-105">
+                <p class="font-semibold text-lg mb-4 text-white">60. Báo cáo RCR như sau: VNNB 08071300 6/5/6 25/50/25 NR/NR/NR KHÔ/ ƯỚT KHÔ. Khi độ sâu lớp nước trên mặt đường cất hạ cánh tại 1/3 thứ 2 thay đổi từ 1mm lên 2mm, thì bản tin RCR như thế nào là phù hợp? Tỷ lệ bao phủ không thay đổi</p>
+                <ul class="space-y-3 text-gray-300">
+                    <li class="correct-answer">VNNB 08071300 6/5/6 25/50/25 NR/NR/NR KHÔ/ ƯỚT KHÔ</li>
+                    <li>VNNB 08071300 5/5/6 50/50/25 NR/NR/NR KHÔ/ ƯỚT KHÔ</li>
+                    <li>VNNB 08071300 5/5/6 50/50/25 NR/NR/NR ƯỚT ƯỚT KHÔ</li>
+                    <li>VNNB 08071300 6/5/6 50/50/100 NR/NR/NR KHÔ/ ƯỚT KHÔ</li>
+                </ul>
+            </div>
+
+            <!-- Question 61 -->
+            <div class="question-card bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-lg transition-transform transform hover:scale-105">
+                <p class="font-semibold text-lg mb-4 text-white">61. Cảng HKQT Liên Khương, Đường CHC: 09/27, chiều dài 3250 m, Lúc 06h50 (giờ địa phương), ngày 25/01/2021, 1/3 đường CHC thứ nhất 81% mặt đường cất hạ cánh được bao phủ bởi nước có độ sâu 3mm, 1/3 đường CHC thứ hai 75% mặt đường cất hạ cánh được bao phủ bởi nước có độ sâu 2mm, 1/3 đường CHC thứ ba 57% mặt đường cất hạ cánh được bao phủ bởi nước có độ sâu 3mm, Nhận được 02 AIRREP mức TRUNG BÌNH, Nhiệt độ ngoài trời 25 độ C. Hãy chọn mẫu báo cáo RCR đúng.</p>
+                <ul class="space-y-3 text-gray-300">
+                    <li class="correct-answer">VVDL 01242350 09 3/3/3 100/75/75 3/2/3 TRƠN ƯỚT/TRƠN ƯỚT TRƠN ƯỚT</li>
+                    <li>VVDL 01250650 09 3/3/3 100/75/75 3/2/3 TRƠN ƯỚT TRƠN ƯỚT/TRƠN ƯỚT</li>
+                    <li>VVDL 01242350 09 3/3/3 100/75/75 3/2/3 Trơn ướt/Trơn ướt/Trơn ướt</li>
+                    <li>VVDL 01252350 09 3/3/3 100/75/75 3/2/3 TRƠN ƯỚT TRƠN ƯỚT/TRƠN ƯỚT</li>
+                </ul>
+            </div>
+
+        </div>
     </div>
 
     <script>
-        // --- DATA ---
-        // Raw data parsed from the document
-        const rawData = `
-Lĩnh vực an toàn nào đang là thách thức lớn nhất của ngành hàng không thế giới?
-An toàn đường cất hạ cánh  (ĐÚNG)
-Va chạm giữa tàu bay với phương tiện hoạt động trong khu bay
-Va chạm chim tại cảng hàng không
-Tất cả đều sai
-Hiện tại, ưu tiên hàng đầu của ICAO là kiểm soát các sự cố nào trong lĩnh vực an toàn đường cất hạ cánh?
-Sự cố xâm nhập đường cất hạ cánh (Runway Incursion)
-Sự cố tàu bay xông ra ngoài đường cất hạ cánh (Runway Excursion)  (ĐÚNG)
-Sự cố tàu bay hạ cánh nhầm khu vực (Runway Confusion)
-Sự cố tàu bay va chạm chim
-Các yếu tố, nguyên nhân có thể gây ra sự cố tàu bay xông ra ngoài đường cất hạ cánh được ICAO chỉ ra là:
-Điều kiện thời tiết không thuận lợi: mưa lớn, gió cạnh, lốc xoáy…
-Tình trạng mặt đường CHC có chất bám, giảm hiệu suất phanh của tàu bay
-Tổ lái tiếp cận hạ cánh không ổn định nhưng không thực hiện bay lại (Go around)
-Tất cả các yếu trên  (ĐÚNG)
-Trong các yếu tố, nguyên nhân gây ra sự cố tàu bay xông ra ngoài đường cất hạ cánh, yếu tố, nguyên nhân nào chiếm phần lớn trong các yếu tố, nguyên nhân gây ra sự cố trên?
-Điều kiện thời tiết không thuận lợi: mưa lớn, gió cạnh, lốc xoáy…
-Tình trạng mặt đường CHC có chất bám, giảm hiệu suất phanh của tàu bay  (ĐÚNG)
-Tổ lái tiếp cận hạ cánh không ổn định nhưng không thực hiện bay lại (Go around)
-Tổ lái không tuân thủ quy trình trong quá trình cất hạ cánh
-Các tình huống tàu bay xông ra ngoài đường cất hạ cánh gồm những loại nào?
-Veer–off: Tàu bay hạ cánh và trượt ra ngoài đường CHC 
-Tàu bay xâm nhập đường cất hạ cánh khi không được phép của Đài kiểm soát tại sân
-Overrun:Tàu bay hạ cánh, chạy vượt ra khu vực dải hãm phanh đầu đường CHC
-Cả Tình huống a và c  (ĐÚNG)
-Để giảm thiểu sự cố xông ra ngoài đường cất hạ cánh, Tổ lái cần phải nắm được thông tin gì liên quan đến đường CHC khi cất hạ cánh?
-Hệ thống đường lăn kết nối với đường cất hạ cánh
-Kích thước khu vực bảo hiểm đầu đường cất hạ cánh
-Tình trạng mặt đường cất hạ cánh hiện tại  (ĐÚNG)
-Chướng ngại vật xung quanh cảng hàng không
-Chương trình báo cáo và đánh giá tình trạng mặt đường cất hạ cánh được đưa vào tiêu chuẩn khuyến cáo thực hành lĩnh vực Cảng hàng không sân bay (Annex 14) từ năm nào?
-2016  (ĐÚNG)
-2018
-2019
-2020
-Định nghĩa Chương trình báo cáo tình trạng mặt đường cất hạ cánh (GRF) là gì?
-Là các tiếp cận quản lý tình trạng mặt đường cất hạ cánh có hệ thống để thực hiện công tác bảo trì, bảo dưỡng đường CHC được kịp thời
-Là hệ thống các quy trình, hành động thực hiện bởi người khai thác cảng hàng không, cơ sở đảm bảo hoạt động bay, người khai thác tàu bay nhằm cung cấp thông tin, hướng dẫn cơ bản về hệ thống và mẫu báo cáo toàn cầu phục vụ đánh giá và báo cáo tình trạng mặt đường CHC   (ĐÚNG)
-Là Chương trình quy định công tác bảo dưỡng đường cất hạ cánh
-Là Chương trình báo cáo tình trạng mặt đường cất hạ cánh giữa người khai thác cảng trực tiếp với tổ lái tàu bay
-Ma trận đánh giá tình trạng mặt đường CHC (RCAM – Runway Condition Assessement matrix) là gì?
-Là mô tả về tình trạng mặt đường CHC được sử dụng trong Báo cáo tình trạng mặt đường CHC làm cơ sở cho việc xác định Mã tình trạng mặt đường CHC
-Là mô tả về các loại chất bám được sử dụng trong Báo cáo tình trạng mặt đường CHC của từng mã tình trạng mặt đường CHC
-Là ma trận cho phép đánh giá Mã tình trạng mặt đường CHC, sử dụng các quy trình liên quan, từ một tập hợp tình trạng mặt đường CHC và báo cáo từ phi công về hoạt động phanh  (ĐÚNG)
-Là số mô tả tình trạng mặt đường CHC được sử dụng trong Báo cáo tình trạng mặt đường CHC
-Yếu tố "Các tiêu chuẩn xác định Tình trạng mặt đường CHC" trong Chương trình báo cáo và đánh giá tình trạng mặt đường CHC (GRF) được định nghĩa như thế nào?
-Là mô tả về tình trạng mặt đường CHC được sử dụng trong Báo cáo tình trạng mặt đường CHC làm cơ sở cho việc xác định Mã tình trạng mặt đường CHC  (ĐÚNG)
-Là mô tả về các loại chất bám được sử dụng trong Báo cáo tình trạng mặt đường CHC của từng mã tình trạng mặt đường CHC
-Là ma trận cho phép đánh giá Mã tình trạng mặt đường CHC, sử dụng các quy trình liên quan, từ một tập hợp tình trạng mặt đường CHC và báo cáo từ phi công về hoạt động phanh
-Là số mô tả tình trạng mặt đường CHC được sử dụng trong Báo cáo tình trạng mặt đường CHC
-Yếu tố "Mã tình trạng mặt đường CHC (RWYCC- Runway Condition code)"  trong Chương trình báo cáo và đánh giá tình trạng mặt đường CHC (GRF) được định nghĩa như thế nào?
-Là mô tả về tình trạng mặt đường CHC được sử dụng trong Báo cáo tình trạng mặt đường CHC làm cơ sở cho việc xác định Mã tình trạng mặt đường CHC
-Là mô tả về các loại chất bám được sử dụng trong Báo cáo tình trạng mặt đường CHC của từng mã tình trạng mặt đường CHC
-Là ma trận cho phép đánh giá Mã tình trạng mặt đường CHC, sử dụng các quy trình liên quan, từ một tập hợp tình trạng mặt đường CHC và báo cáo từ phi công về hoạt động phanh
-Là số mô tả tình trạng mặt đường CHC được sử dụng trong Báo cáo tình trạng mặt đường CHC  (ĐÚNG)
-"Báo cáo tình trạng mặt đường CHC (RCR – Runway Condition Report)"  trong Chương trình báo cáo và đánh giá tình trạng mặt đường CHC (GRF) được định nghĩa như thế nào?
-Là mô tả về tình trạng mặt đường CHC được sử dụng trong Báo cáo tình trạng mặt đường CHC làm cơ sở cho việc xác định Mã tình trạng mặt đường CHC
-Là mô tả về các loại chất bám được sử dụng trong Báo cáo tình trạng mặt đường CHC của từng mã tình trạng mặt đường CHC
-Là ma trận cho phép đánh giá Mã tình trạng mặt đường CHC, sử dụng các quy trình liên quan, từ một tập hợp tình trạng mặt đường CHC và báo cáo từ phi công về hoạt động phanh
-Là báo cáo được chuẩn hóa toàn diện liên quan đến tình trạng mặt đường CHC và ảnh hưởng của nó đến hoạt động cất cánh và hạ cánh của tàu bay  (ĐÚNG)
-Trách nhiệm của người khai thác cảng thực hiện các nội dung công việc gì  trong Chương trình báo cáo và đánh giá tình trạng mặt đường CHC (GRF)?
-Đánh giá và xác định tình trạng bề mặt đường cất hạ cánh và hoàn thành bảng RCR, chuyển bản tin RCR cho cơ sở đảm bảo hoạt động bay  (ĐÚNG)
-Chuyển đổi thông tin tình trạng mặt đường cất hạ cánh  tới tổ lái thông qua ATS/AIS
-Sử dụng thông tin của RCR để thiết lập chế độ tính năng tàu bay phù hợp để cất cánh và hạ cánh an toàn.
-Tất cả đều đúng
-Trách nhiệm của cơ sở đảm bảo hoạt động bay thực hiện các nội dung công việc gì  trong Chương trình báo cáo và đánh giá tình trạng mặt đường CHC (GRF) ?
-Đánh giá và xác định tình trạng bề mặt đường cất hạ cánh và hoàn thành bảng RCR
-Chuyển đổi thông tin tình trạng mặt đường cất hạ cánh  tới tổ lái thông qua ATS/AIS và chuyển báo cáo tình trạng hoạt động phanh của tàu bay cho người khai thác cảng  (ĐÚNG)
-Sử dụng thông tin của RCR để thiết lập chế độ tính năng tàu bay phù hợp để cất cánh và hạ cánh an toàn.
-Tất cả đều đúng
-Trách nhiệm của tổ lái tàu bay  thực hiện các nội dung công việc gì  trong Chương trình báo cáo và đánh giá tình trạng mặt đường CHC (GRF)?
-Đánh giá và xác định tình trạng bề mặt đường cất hạ cánh và hoàn thành bảng RCR
-Chuyển đổi thông tin tình trạng mặt đường cất hạ cánh  tới tổ lái thông qua ATS/AIS
-Sử dụng thông tin của RCR để thiết lập chế độ tính năng tàu bay phù hợp để cất cánh và hạ cánh an toàn và chuyển thông tin tình trạng hoạt động phanh của tàu bay cho Đài kiểm soát tại sân  (ĐÚNG)
-Tất cả đều đúng
-Hoạt động tàu bay có thể được coi là bị ảnh hưởng khi phạm vi bao phủ của bất kỳ chất bám liên quan đến nước trên mỗi phần ba đường CHC vượt quá bao nhiêu?
-10%
-20%
-25%  (ĐÚNG)
-50%
-Cấu tạo của Chương trình báo cáo và đánh giá tình trạng mặt đường cất hạ cánh bao gồm các yếu tố nào?
-Báo cáo tình trạng mặt đường CHC (RCR); Mã tình trạng mặt đường CHC (RWYCC); Ma trận đánh giá tình trạng mặt đường CHC (RCAM); Tình trạng mặt đường CHC; Mô tả tình trạng mặt đường CHC  (ĐÚNG)
-Báo cáo tình trạng mặt đường CHC (RCR); Mã tình trạng mặt đường CHC (RWYCC); Ma trận đánh giá tình trạng mặt đường CHC (RCAM); Tình trạng mặt đường CHC.
-Báo cáo tình trạng mặt đường CHC (RCR); Mã tình trạng mặt đường CHC (RWYCC); Tình trạng mặt đường CHC; Mô tả tình trạng mặt đường CHC
-Mã tình trạng mặt đường CHC (RWYCC); Ma trận đánh giá tình trạng mặt đường CHC (RCAM); Tình trạng mặt đường CHC; Mô tả tình trạng mặt đường CHC
-Mã tình trạng mặt đường CHC (RWYCC) gồm bao nhiêu mã
-6
-5
-7  (ĐÚNG)
-4
-Mã tình trạng mặt đường CHC (RWYCC) có giá trị 6 tương ứng với tình trạng đường cất hạ cánh như thế nào?
-KHÔ  (ĐÚNG)
-ƯỚT
-TRƠN ƯỚT
-NƯỚC ĐỌNG
-Mã tình trạng mặt đường CHC (RWYCC) có giá trị 5 tương ứng với tình trạng đường cất hạ cánh như thế nào?
-KHÔ
-ƯỚT  (ĐÚNG)
-TRƠN ƯỚT
-NƯỚC ĐỌNG
-Mã tình trạng mặt đường CHC (RWYCC) có giá trị 3 tương ứng với tình trạng đường cất hạ cánh như thế nào?
-KHÔ
-ƯỚT
-TRƠN ƯỚT  (ĐÚNG)
-NƯỚC ĐỌNG
-Mã tình trạng mặt đường CHC (RWYCC) có giá trị 2 tương ứng với tình trạng đường cất hạ cánh như thế nào?
-KHÔ
-ƯỚT
-TRƠN ƯỚT
-NƯỚC ĐỌNG  (ĐÚNG)
-Mục đích của việc cung cấp Mã tình trạng mặt đường cất hạ cánh cho tổ lái tàu bay để thực hiện việc gì?
-Để tổ lái tính toán tính năng tàu bay phù hợp khi cất cánh và hạ cánh với điều kiện tương ứng với Mã tình trạng đường CHC  (ĐÚNG)
-Để tổ lái tính toán tính năng tàu bay phù hợp khi  hạ cánh với điều kiện tương ứng với Mã tình trạng đường CHC
-Để tổ lái tính toán tính năng tàu bay phù hợp khi cất cánh  với điều kiện tương ứng với Mã tình trạng đường CHC
-Để phục vụ công tác chuẩn bị các thông số khi tàu bay lấy độ cao (climb)
-Điều kiện khí hậu Việt Nam hiện tại, các cảng hàng không đang khai thác thì sẽ có khả năng áp dụng các Mã tình trạng mặt đường cất hạ cánh nào
-Các Mã RWYCC: 6, 5, 3, 2  (ĐÚNG)
-Các Mã RWYCC: 6, 5, 3
-Các Mã RWYCC: 5, 3
-Các Mã RWYCC: 5, 3, 2
-Tình trạng mặt đường cất hạ cánh được báo cáo với mã RYWCC 2 tại mỗi 1/3 đường cất hạ cánh thì tương ứng điều kiện tình trạng đường CHC  như thế nào?
-Tại mỗi 1/3 đường CHC có lớp nước bao phủ trên bề mặt đường cất hạ cánh, có độ sâu lớn hơn 3mm
-Tại mỗi 1/3 đường CHC có lớp nước bao phủ trên bề mặt đường cất hạ cánh, có độ sâu lớn hơn và bằng 3mm
-Tại mỗi 1/3 đường CHC có lớp nước bao phủ trên bề mặt đường cất hạ cánh lớn hơn tỷ lệ 25% và có độ sâu lớn hơn 3mm  (ĐÚNG)
-Tại mỗi 1/3 đường CH có lớp nước bao phủ trên bề mặt đường cất hạ cánh có tỷ lệ  lớn hơn 25%, có độ sâu nhỏ hơn 3mm
-Tình trạng mặt đường cất hạ cánh được báo cáo với mã RYWCC 3  tại mỗi 1/3 đường cất hạ cánh thì tương ứng với điều kiện tình trạng đường cất hạ cánh như thế nào?
-Tại mỗi 1/3 đường cất hạ cánh có lớp nước bao phủ trên bề mặt đường cất hạ cánh có tỷ lệ bao phủ lớn hơn 20%, có độ sâu lớn hơn và bằng 3mm
-Tại mỗi 1/3 đường cất hạ cánh có lớp nước bao phủ trên bề mặt đường cất hạ cánh có tỷ lệ bao phủ lớn hơn 20%, có độ sâu nhỏ hơn và bằng 3mm và có hệ số ma sát thấp hơn hệ số ma sát tối thiểu
-Tại mỗi 1/3 đường cất hạ cánh có lớp nước bao phủ trên bề mặt đường cất hạ cánh có tỷ lệ bao phủ lớn hơn 25%, có độ sâu nhỏ hơn và bằng 3mm và có hệ số ma sát thấp hơn hệ số ma sát tối thiểu  (ĐÚNG)
-Tại mỗi 1/3 đường cất hạ cánh có lớp nước bao phủ trên bề mặt đường cất hạ cánh có tỷ lệ bao phủ lớn hơn 25%, có độ sâu nhỏ hơn 3mm và có hệ số ma sát thấp hơn hệ số ma sát tối thiểu
-Đường cất hạ cánh được mô tả khô được định nghĩa như thế nào?
-Khi nước trên đường CHC có độ sâu lớn hơn 3mm
-Đường CHC được coi là khô nếu bề mặt của nó không có độ ẩm có thể nhìn thấy và không có chất bám trên bề mặt đường cất hạ cánh.  (ĐÚNG)
-Mặt đường CHC bị bao phủ bởi bất kỳ độ ẩm có thể nhìn thấy hoặc bị nước phủ dày lên đến 3 mm trong khu vực dự kiến khai thác
-Tất cả đều sai
-Theo định nghĩa, Ma trận đánh giá tình trạng mặt đường CHC bao gồm các tiêu chí nào?
-Tiêu chí đánh giá và Tiêu chí đánh giá hạ cấp tình trạng mặt đường cất hạ cánh  (ĐÚNG)
-Tiêu chí hạ cấp và nâng cấp tình trạng mặt đường cất hạ cánh
-Tiêu chí đánh giá tình trạngmặt đường cất hạ cánh khô
-Tiêu chí đánh giá tình trạng mặt đường cất hạ cánh đọng nước
-Mã tình trạng đường cất hạ cánh được sắp xếp từ mã (RWYCC) từ 6 đến 0 tương tứng với tình trạng mặt đường cất hạ cánh như thế nào?
-Tính trơn trượt của đường cất hạ cánh từ tương ứng giảm dần
-Tính trơn trượt của đường cất hạ cánh từ tương ứng tăng dần  (ĐÚNG)
-Tính trơn trượt của đường cất hạ cánh không được thể hiện qua mã tình trạng mặt đường CHC
-Tất cả đều sai
-Khi quan sát cách giảm tốc độ tàu bay nhận thấy "tàu bay giảm tốc độ phanh là bình thường đối với việc phanh bánh lốp và việc kiểm soát hướng là bình thường" thì tương ứng với tình trạng mặt đường cất hạ cánh nào khi sử dụng RCAM để đánh giá?.
-KHÔ
-ƯỚT  (ĐÚNG)
-TRƠN ƯỚT
-NƯỚC ĐỌNG
-Khi quan sát cách giảm tốc độ tàu bay nhận thấy "Giảm tốc độ phanh HOẶC kiểm soát hướng nằm giữa Trung bình và Kém" thì tương ứng với tình trạng mặt đường cất hạ cánh nào khi sử dụng RCAM để đánh giá?
-KHÔ
-ƯỚT
-TRƠN ƯỚT
-NƯỚC ĐỌNG  (ĐÚNG)
-Báo cáo của phi công về hoạt động phanh trên đường CHC thông qua AIREP bao gồm mấy mức?
-4
-5
-6  (ĐÚNG)
-7
-Báo cáo của phi công về hoạt động phanh trên đường CHC thông qua AIREP là TRUNG BÌNH ĐẾN KÉM tương ứng với mã tình trạng mặt đường cất hạ cánh nào (RWYCC)
-6
-5
-3
-2  (ĐÚNG)
-Các mã tình trạng đường cất hạ cánh (RWYCC) được gán 5, 4, 3 hoặc 2 được nâng cấp lên khi nào
-Khi được đánh giá kiểm tra lại tình trạng mặt đường CHC  (ĐÚNG)
-Khi nhận AIREP từ phi công
-Khi có khuyến cáo của phi công
-Khi có khuyến cáo của Đài kiểm soát tại sân
-Báo cáo của phi công về hoạt động phanh trên đường CHC được xem xét cho mục đích gì?
-Hạ cấp RYWCC
-Nâng cấp  RWYCC
-Nâng cấp  RYWCC khi được kiểm tra đánh giá lại và hạ cấp RWYCC  (ĐÚNG)
-Tất cả đều sai
-Theo quy trình thực hiện, Báo cáo tính trạng mặt đường cất hạ được tổ chức thực hiện khi nào?
-Báo cáo được thực hiện khi có sự thay đổi đáng kể về tình trạng mặt đường CHC xảy ra do nước, cho đến khi đường CHC trở lại trạng thái khô.  (ĐÚNG)
-Báo cáo được thực hiện 30 phút/lần về tình trạng mặt đường CHC xảy ra do nước,.
-Báo cáo được thực hiện 36 giờ/ lần về tình trạng mặt đường CHC
-Câu a, c đều đúng
-Thay đổi tình trạng mặt đường CHC được coi là đáng kể khi xảy ra các trường hợp nào?
-Bất cứ thay đổi nào về RWYCC; Bất cứ thay đổi nào về loại chất bám;
-Bất cứ thay đổi nào về độ bao phủ chất bám được báo cáo ; Bất cứ thay đổi nào về độ sâu chất bám 
-Bất cứ thông tin nào, ví dụ báo cáo của phi công về hoạt động phanh trên đường CHC, được coi là đáng kể
-Tất cả các trường hợp trên  (ĐÚNG)
-Các thông tin trong Báo cáo tình trạng mặt đường cất hạ cánh trong mẫu RCR chuyển cho cơ sở đảm bảo họt động bay yêu cầu bắt buộc phải có bao gồm:
-Mã sân bay; Ngày và thời điểm đánh giá; Ký hiệu Đường CHC đánh giá; RWYCC cho mỗi 1/3 đường CHC; Mô tả tình trạng mặt đường CHC  (ĐÚNG)
-Mã sân bay; Ngày và thời điểm đánh giá; Ký hiệu Đường CHC đánh giá
-Đường CHC đánh giá; RWYCC cho mỗi 1/3 đường CHC; Mô tả tình trạng mặt đường CHC
-Mã sân bay; Tên nhân sự thực hiện đánh giá; RWYCC cho mỗi 1/3 đường CHC
-Thời gian đánh giá tình trạng mặt đường cất hạ cánh là lúc 18h00 (giờ Hà Nội)  ngày 30 tháng 12 năm 2021, thì thời gian trên được ghi như thế nào trong  Báo cáo RCR
-12301100  (ĐÚNG)
-12301800
-30121100
-30111800
-Đường cất hạ cánh Cảng hàng không quốc tế Tân Sơn Nhất ký hiệu 07L -25R thì trong báo cáo RCR ghi ký hiệu nào của đường cất hạ cánh
-07R
-07L  (ĐÚNG)
-25L
-25R
-Một phần 3 thứ nhất đường cất hạ cánh có nước bao phủ 20%, Một phần 3 thứ 2 có nước bao phủ 55%, Một phần 3 thứ 3 có nước bao phủ là 33% thì tỷ lệ bao phủ được ghi trong báo cáo RCR ghi như thế nào đúng?
-25/75/50  (ĐÚNG)
-25/NR/50
-NR/25/50
-NR/75/50
-Một phần 3 thứ nhất đường cất hạ cánh có nước bao phủ 20%, Một phần 3 thứ 2 có nước bao phủ 65%, Một phần 3 thứ 3 có nước bao phủ là 45%, tất cả có độ sâu nước dưới 3mm thì mã tình trạng đường cất hạ cánh được ghi báo cáo RCR ghi như thế nào đúng?
-RWYCC tương ứng  6/6/6
-RWYCC tương ứng  6/5/6
-RWYCC tương ứng  6/5/5  (ĐÚNG)
-RWYCC tương ứng  5/5/5
-Một phần 3 thứ nhất đường cất hạ cánh có nước bao phủ 23%,, Một phần 3 thứ 2 có nước bao phủ 65%, Một phần 3 thứ 3 có nước bao phủ là 35%, tất cả có độ sâu nước dưới 3mm thì  tình trạng đường cất hạ cánh được ghi báo cáo RCR ghi như thế nào đúng?
-KHÔ/ ƯỚT/ KHÔ
-KHÔ/ ƯỚT/ ƯỚT  (ĐÚNG)
-KHÔ/ KHÔ/ KHÔ
-ƯỚT/ ƯỚT/ ƯỚC
-Một phần 3 thứ nhất đường cất hạ cánh có nước bao phủ 5%, Một phần 3 thứ 2 có nước bao phủ 70%, Một phần 3 thứ 3 có nước bao phủ là 30%, tất cả có độ sâu nước dưới 3mm. Nhưng thời điểm đánh giá nhận 02 báo cáo hoạt động phanh trên đường cất hạ cánh mức TỐT thì  tình trạng đường cất hạ cánh được ghi báo cáo RCR ghi như thế nào đúng?
-KHÔ/ ƯỚT/ KHÔ
-KHÔ/ ƯỚT/ ƯỚT  (ĐÚNG)
-KHÔ/ KHÔ/ KHÔ
-ƯỚT/ ƯỚT/ ƯỚC
-Một phần 3 thứ nhất đường cất hạ cánh có nước bao phủ 10%, Một phần 3 thứ 2 có nước bao phủ 55%, Một phần 3 thứ 3 có nước bao phủ là 33%, tất cả có độ sâu nước dưới 3mM. Nhưng thời điểm đánh giá nhận 02 báo cáo hoạt động phanh trên đường cất hạ cánh mức TRUNG BÌNH thì  tình trạng đường cất hạ cánh được ghi báo cáo RCR ghi như thế nào đúng?
-KHÔ/ ƯỚT/ KHÔ
-KHÔ/ ƯỚT/ ƯỚT
-TRƠN ƯỚT/ TRƠN ƯỚT/ TRƠN ƯỚT  (ĐÚNG)
-ƯỚT/ ƯỚT/ ƯỚC
-Một phần 3 thứ nhất đường cất hạ cánh có nước bao phủ 34% độ sâu lớp nước là 4mm, Một phần 3 thứ 2 có nước bao phủ 55% độ sâu lớp nước 5mm, Một phần 3 thứ 3 có nước bao phủ là 33% độ sau lớp nước 7mm  thì  tình trạng đường cất hạ cánh và độ sâu lớp nước  được ghi báo cáo RCR ghi như thế nào đúng?
-ĐỌNG NƯỚC/ ƯỚT/ KHÔ và 5/4/7
-ĐỌNG NƯỚC/ ĐỌNG NƯỚC/ ĐỌNG NƯỚC và 5/4/7
-ĐỌNG NƯỚC/ ĐỌNG NƯỚC/ ĐỌNG NƯỚC và 4/5/7  (ĐÚNG)
-ĐỌNG NƯỚC/ ĐỌNG NƯỚC/ ĐỌNG NƯỚC và 7/5/4
-Một phần 3 thứ nhất đường cất hạ cánh có nước bao phủ 34% độ sâu lớp nước là 4mm, Một phần 3 thứ 2 có nước bao phủ 55% độ sâu lớp nước 5mm, Một phần 3 thứ 3 có nước bao phủ là 33% độ sau lớp nước 7mm  thì mã  tình trạng đường cất hạ cánh và độ sâu lớp nước  được ghi báo cáo RCR ghi như thế nào đúng?
-RWYCC 2/ 2/ 2 và độ sâu  4/5/7  (ĐÚNG)
-RWYCC 2/ 3/ 2 và độ sâu  5/4/7
-RWYCC 2/ 2/ 5 và độ sâu  5/4/7
-RWYCC 2/ 2/ 2 và độ sâu  5/7/4
-Mẫu báo cáo RCR sau được hoàn thiện, người khai thác cảng chuyển đến cho bộ phận nào ?
-Đài kiểm soát tại sân (TWR)
-Phòng NOTAM quốc tế
-Tổ lái 
-Cả a và b  (ĐÚNG)
-Báo cáo RCR như sau:VNNB 08061200  3/3/3 100/100/100 NR/NR/NR TRƠN ƯỚT/ TRƠN ƯỚT/TRƠN ƯỚT xác định thời gian đánh giá tình trạng mặt đường cất hạ cánh (giờ UTC)?
-Lúc 12 giờ 00 phút ngày 06 tháng 8  (ĐÚNG)
-Lúc 19 giờ 00 phút ngày 06 tháng 8
-Lúc 19 giờ 00 phút ngày 08 tháng 06
-Lúc 12 giờ 00 phút ngày 08 tháng 06
-Báo cáo RCR như sau:VNNB 08061200  3/3/3 100/100/100 NR/NR/NR TRƠN ƯỚT/ TRƠN ƯỚT/TRƠN ƯỚT xác định mã tình trạng mặt đường cất hạ cánh?
-100/100/100
-3/3/3  (ĐÚNG)
-TRƠN ƯỚT/ TRƠN ƯỚT/TRƠN ƯỚT
-NR/NR/NR
-Một phần 3 thứ nhất đường cất hạ cánh có nước bao phủ 5%,, Một phần 3 thứ 2 có nước bao phủ 55%, Một phần 3 thứ 3 có nước bao phủ là 33%, tất cả có độ sâu nước dưới 3mm. Nhưng thời điểm đánh giá nhận 02 báo cáo hoạt động phanh trên   đường cất hạ cánh mức TỐT thì  Mã tình trạng đường cất hạ cánh được ghi báo cáo RCR ghi như thế nào đúng?
-Mã RWYCC 6/5/5   (ĐÚNG)
-Mã RWYCC 5/5/5
-Mã RWYCC 6/6/5
-Mã RWYCC 6/6/6
-Một phần 3 thứ nhất đường cất hạ cánh có nước bao phủ 20%,, Một phần 3 thứ 2 có nước bao phủ 55%, Một phần 3 thứ 3 có nước bao phủ là 33%, tất cả có độ sâu nước dưới 3mM. Nhưng thời điểm đánh giá nhận 02 báo cáo hoạt động phanh trên đường cất hạ cánh mức TRUNG BÌNH thì Mã  tình trạng đường cất hạ cánh được ghi báo cáo RCR ghi như thế nào đúng?
-Mã RWYCC 6/3/5 
-Mã RWYCC 3/3/3  (ĐÚNG)
-Mã RWYCC 5/3/3
-Mã RWYCC 2/2/2 
-Một phần 3 thứ nhất đường cất hạ cánh có nước bao phủ 8%, Một phần 3 thứ 2 có   nước bao phủ 26%, Một phần 3 thứ 3 có nước bao phủ là 5% thì tỷ lệ bao phủ được ghi trong báo cáo RCR ghi như thế nào đúng?
-NR/50/NR  (ĐÚNG)
-25/NR/NR
-NR/NR/NR
-NR/25/25
-Báo cáo RCR như sau:VNNB 08071300  6/5/5 25/100/100 NR/NR/NR  KHÔ/ ƯỚT/ƯỚT. Tỷ lệ bao phủ của nước trên mặt đường cất hạ cánh của  1/3 đường  thứ nhất (đầu tiên) là?
-100%
-8%
-Từ 10% - 25%  (ĐÚNG)
-50%
-Báo cáo RCR như sau:VNNB 08071300  6/5/6 25/100/25 NR/NR/NR  KHÔ/ ƯỚT/KHÔ. Khi nhận được 02 báo cáo liên tiếp tình trạng hoạt động phanh của tàu bay trên đường cất hạ cánh là TRUNG BÌNH, mã tình trạng đường cất hạ cách sẽ được báo cáo thay thế như thế nào?
-Mã RWYCC 6/5/5 
-Mã RWYCC 3/3/5
-Mã RWYCC 3/3/3  (ĐÚNG)
-Mã RWYCC 6/6/6
-Thời gian đánh giá tình trạng mặt đường cất hạ cánh là lúc 20h00 (giờ Hà Nội)  ngày 15 tháng 12 năm 2021, thì thời gian trên được ghi như thế nào trong  Báo cáo RCR
-12151300  (ĐÚNG)
-12152000
-15122000
-15121300
-Báo cáo RCR như sau:VNNB 08071300  6/5/6 25/100/NR NR/NR/NR  KHÔ/ ƯỚT/KHÔ. Báo cáo RCR này được thực hiện vào lúc nào theo giờ địa phương (Giờ Việt Nam UTC + 7)?
-Lúc 20 giờ 00 phút ngày 07 tháng 8  (ĐÚNG)
-Lúc 13 giờ 00 phút ngày 07 tháng 8
-Lúc 20 giờ 00 phút ngày 08 tháng 7
-Lúc 13 giờ 00 phút ngày 08 tháng 7
-Báo cáo RCR như sau:VNNB 08071300  6/5/6 25/50/25 NR/NR/NR  KHÔ/ ƯỚT/KHÔ. Khi tỷ lệ bao phủ của nước trên 1/3 thứ nhất thay đổi từ 20% lên 35%, khi đó Bản tin RCR có nội như thế nào là phù hợp?
-VNNB 08071300  6/5/6 25/50/25 NR/NR/NR  KHÔ/ ƯỚT/KHÔ
-VNNB 08071300  5/5/6 50/50/25 NR/NR/NR  KHÔ/ ƯỚT/KHÔ
-VNNB 08071300  5/5/6 50/50/25 NR/NR/NR  ƯỚT/ ƯỚT/KHÔ  (ĐÚNG)
-VNNB 08071300  6/5/6 50/50/100 NR/NR/NR  KHÔ/ ƯỚT/KHÔ
-Báo cáo RCR như sau:VNNB 08071300  6/5/6 25/50/25 NR/NR/NR  KHÔ/ ƯỚT/KHÔ. Khi tỷ lệ bao phủ của nước trên 1/3 thứ ba thay đổi từ 20% lên 24%, khi đó Bản tin RCR có nội như thế nào là phù hợp?
-VNNB 08071300  6/5/6 25/50/25 NR/NR/NR  KHÔ/ ƯỚT/KHÔ  (ĐÚNG)
-VNNB 08071300  5/5/6 50/50/25 NR/NR/NR  KHÔ/ ƯỚT/KHÔ
-VNNB 08071300  5/5/6 50/50/25 NR/NR/NR  ƯỚT/ ƯỚT/KHÔ
-VNNB 08071300  6/5/6 50/50/100 NR/NR/NR  KHÔ/ ƯỚT/KHÔ
-Báo cáo RCR như sau:VNNB 08071300  6/5/6 25/50/25 NR/NR/NR  KHÔ/ ƯỚT/KHÔ. Khi độ sâu lớp nước trên mặt đường cất hạ cánh tại 1/3 thứ 2 thay đổi từ 1mm lên 2mm, thì bản tin RCR như thế nào là phù hợp? Tỷ lệ bao phủ không thay đổi
-VNNB 08071300  6/5/6 25/50/25 NR/NR/NR  KHÔ/ ƯỚT/KHÔ  (ĐÚNG)
-VNNB 08071300  5/5/6 50/50/25 NR/NR/NR  KHÔ/ ƯỚT/KHÔ
-VNNB 08071300  5/5/6 50/50/25 NR/NR/NR  ƯỚT/ ƯỚT/KHÔ
-VNNB 08071300  6/5/6 50/50/100 NR/NR/NR  KHÔ/ ƯỚT/KHÔ
-Cảng HKQT Liên Khương, Đường CHC: 09/27, chiều dài 3250 m, Lúc 06h50 (giờ địa phương), ngày 25/01/2021, 1/3 đường CHC thứ nhất 81% mặt đường cất hạ cánh được bao phủ bởi nước có độ sâu 3mm, 1/3 đường CHC thứ hai 75% mặt đường cất hạ cánh được bao phủ bởi nước có độ sâu 2mm, 1/3 đường CHC thứ ba 57% mặt đường cất hạ cánh được bao phủ bởi nước có độ sâu 3mm, Nhận được 02 AIRREP mức TRUNG BÌNH, Nhiệt độ ngoài trời 25 độ C. Hãy chọn mẫu báo cáo RCR đúng.
-VVDL 01242350 09 3/3/3 100/75/75 3/2/3 TRƠN ƯỚT/TRƠN ƯỚT/TRƠN ƯỚT  (ĐÚNG)
-VVDL 01250650 09 3/3/3 100/75/75 3/2/3 TRƠN ƯỚT/TRƠN ƯỚT/TRƠN ƯỚT
-VVDL 01242350 09 3/3/3 100/75/75 3/2/3 Trơn ướt/Trơn ướt/Trơn ướt
-VVDL 01252350 09 3/3/3 100/75/75 3/2/3 TRƠN ƯỚT/TRƠN ƯỚT/TRƠN ƯỚT
-`;
-        
-        // --- LOGIC ---
-        document.addEventListener('DOMContentLoaded', function() {
-            const quizContainer = document.getElementById('quizContainer');
+        // JavaScript for search functionality
+        document.addEventListener('DOMContentLoaded', () => {
             const searchInput = document.getElementById('searchInput');
-            const backToTopBtn = document.getElementById('backToTopBtn');
+            const questionCards = document.querySelectorAll('.question-card');
 
-            let questions = [];
+            searchInput.addEventListener('input', (e) => {
+                const searchTerm = e.target.value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
-            // Function to parse the raw data into a structured format
-            function parseQuestions(data) {
-                const lines = data.trim().split('\n').filter(line => line.trim() !== '');
-                const parsedQuestions = [];
-                let i = 0;
-                while (i < lines.length) {
-                    const lineText = lines[i].trim();
-                    // Heuristic: A line is considered a question if it ends with '?' or ':'
-                    if (lineText.endsWith('?') || lineText.endsWith(':')) {
-                        const currentQuestion = {
-                            question: lineText,
-                            options: [],
-                            answer: ''
-                        };
-                        i++;
-                        // Collect options until the next question or end of file
-                        while (i < lines.length && !lines[i].trim().endsWith('?') && !lines[i].trim().endsWith(':')) {
-                            let option = lines[i].trim();
-                            if (option.includes('(ĐÚNG)')) {
-                                option = option.replace(/\s*\(ĐÚNG\)\s*/, '').trim();
-                                currentQuestion.answer = option;
-                            }
-                            currentQuestion.options.push(option);
-                            i++;
-                        }
-                        // Only add if it's a valid question with options and an answer
-                        if (currentQuestion.options.length > 0 && currentQuestion.answer) {
-                            parsedQuestions.push(currentQuestion);
-                        }
-                    } else {
-                        // If the line is not identified as a question, skip it.
-                        i++;
-                    }
-                }
-                return parsedQuestions;
-            }
-
-            // Function to render the quiz questions as a review sheet
-            function renderReview(questionsToRender) {
-                quizContainer.innerHTML = '';
-                questionsToRender.forEach((q, index) => {
-                    const questionBlock = document.createElement('div');
-                    questionBlock.className = 'bg-white p-6 rounded-lg shadow-md question-block';
-
-                    const questionText = document.createElement('p');
-                    questionText.className = 'font-semibold text-lg mb-4';
-                    // Use innerHTML to correctly render the question text
-                    questionText.innerHTML = `<span class="text-blue-600">${quizContainer.children.length + 1}.</span> ${q.question}`;
+                questionCards.forEach(card => {
+                    const questionText = card.querySelector('p').textContent.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                    const answersText = Array.from(card.querySelectorAll('li')).map(li => li.textContent.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")).join(' ');
                     
-                    const optionsContainer = document.createElement('ul');
-                    optionsContainer.className = 'space-y-2 pl-5';
+                    const fullText = questionText + ' ' + answersText;
 
-                    q.options.forEach(option => {
-                        const optionItem = document.createElement('li');
-                        optionItem.className = 'text-gray-700';
-                        
-                        // Highlight the correct answer in red
-                        if (option === q.answer) {
-                            optionItem.classList.add('correct-answer');
-                        }
-                        
-                        optionItem.textContent = option;
-                        optionsContainer.appendChild(optionItem);
-                    });
-
-                    questionBlock.appendChild(questionText);
-                    questionBlock.appendChild(optionsContainer);
-                    quizContainer.appendChild(questionBlock);
+                    if (fullText.includes(searchTerm)) {
+                        card.style.display = 'block';
+                    } else {
+                        card.style.display = 'none';
+                    }
                 });
-            }
-
-            // Function to handle search/filtering
-            function filterQuestions() {
-                const searchTerm = searchInput.value.toLowerCase().trim();
-                const filteredQuestions = questions.filter(q => 
-                    q.question.toLowerCase().includes(searchTerm) || 
-                    q.options.some(opt => opt.toLowerCase().includes(searchTerm))
-                );
-                renderReview(filteredQuestions);
-            }
-            
-            // Event Listeners
-            searchInput.addEventListener('input', filterQuestions);
-
-            // Back to Top button logic
-            window.addEventListener('scroll', () => {
-                if (window.scrollY > 200) {
-                    backToTopBtn.style.display = 'block';
-                } else {
-                    backToTopBtn.style.display = 'none';
-                }
             });
-
-            backToTopBtn.addEventListener('click', () => {
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            });
-
-            // Initial Load
-            questions = parseQuestions(rawData);
-            renderReview(questions);
         });
     </script>
+
 </body>
 </html>
+
 
