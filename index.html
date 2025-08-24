@@ -3,287 +3,495 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cổng Thông Tin Văn Bản Pháp Luật - ACV</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Chosen Palette: Corporate Blue and Slate -->
-    <!-- Application Structure Plan: A dashboard-style single-page application. The core is a filterable, searchable list of legal documents presented as interactive cards. The main navigation will be based on legal domains (Xây dựng, Tài chính, PCCC, etc.) derived from the source report, rather than the original chronological grouping. This task-oriented structure helps users from different departments quickly find relevant information. A timeline chart at the top provides a high-level overview of when regulations become effective. Users can filter the document list by clicking on category tags. Clicking on a document card reveals its detailed summary in a modal window. A search bar allows for keyword-based filtering. This structure transforms a static list into an exploratory tool, prioritizing user efficiency. -->
-    <!-- Visualization & Content Choices: 
-        1. Report Info: Number of documents and their effective dates. Goal: Show the volume/timing of new regulations. Viz: Bar Chart (Chart.js/Canvas) showing count per month. Interaction: Hover for details. Justification: Provides a quick visual summary of upcoming changes.
-        2. Report Info: List of all legal documents. Goal: Organize and present detailed information clearly. Viz: Interactive Cards (HTML/CSS/Tailwind). Interaction: Click card to open a modal with details. List is filterable by category tags and searchable. Justification: Progressive disclosure via modals prevents information overload. Domain-based filtering is highly usable for the target audience.
-    -->
-    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <title>Ngân Hàng Câu Hỏi SMS-003 (2023)</title>
     <style>
-        body { font-family: 'Inter', sans-serif; }
-        .chart-container { position: relative; width: 100%; max-width: 800px; margin-left: auto; margin-right: auto; height: 300px; max-height: 40vh; }
-        .modal-bg { transition: opacity 0.3s ease; }
-        .modal-box { transition: transform 0.3s ease, opacity 0.3s ease; }
-        .document-card { transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; }
-        .document-card:hover { transform: translateY(-4px); box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1); }
-        .filter-btn-active { background-color: #2563eb; color: white; }
+        /* Sử dụng font chữ dễ đọc và hiện đại */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
+        /* Thiết lập các biến màu sắc và font chữ chung */
+        :root {
+            --background-color: #f8f9fa;
+            --card-background: #ffffff;
+            --text-color: #212529;
+            --primary-color: #007bff;
+            --border-color: #dee2e6;
+            --shadow-color: rgba(0, 0, 0, 0.05);
+            --answer-color: #d9534f; /* Màu đỏ cho đáp án */
+            --font-family: 'Inter', sans-serif;
+        }
+
+        /* Reset và thiết lập cơ bản cho body */
+        body {
+            font-family: var(--font-family);
+            background-color: var(--background-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+            display: flex;
+            justify-content: center;
+        }
+
+        /* Container chính của ứng dụng */
+        .container {
+            width: 100%;
+            max-width: 800px;
+        }
+
+        /* Tiêu đề trang */
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            color: var(--primary-color);
+            font-size: 2.2rem;
+            margin-bottom: 5px;
+        }
+
+        header p {
+            color: #6c757d;
+            font-size: 1rem;
+        }
+
+        /* Thanh tìm kiếm */
+        .search-container {
+            margin-bottom: 30px;
+            position: sticky;
+            top: 20px;
+            background: var(--background-color);
+            padding: 10px 0;
+            z-index: 10;
+        }
+
+        #searchInput {
+            width: 100%;
+            padding: 15px 20px;
+            font-size: 1rem;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 12px var(--shadow-color);
+            transition: border-color 0.3s, box-shadow 0.3s;
+            box-sizing: border-box; /* Đảm bảo padding không làm thay đổi width */
+        }
+
+        #searchInput:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+        }
+
+        /* Danh sách câu hỏi */
+        #question-container {
+            display: grid;
+            gap: 20px;
+        }
+
+        /* Thẻ chứa từng câu hỏi */
+        .question-card {
+            background-color: var(--card-background);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 12px var(--shadow-color);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .question-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+        }
+
+        /* Phần câu hỏi trong thẻ */
+        .question-card .question {
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #343a40;
+        }
+
+        /* Phần các lựa chọn a, b, c, d */
+        .question-card .options {
+            padding-left: 20px;
+            margin-bottom: 15px;
+        }
+        
+        .question-card .options div {
+             margin-bottom: 5px;
+        }
+
+        /* Phần đáp án được tô đỏ */
+        .answer {
+            color: var(--answer-color);
+            font-weight: 600;
+            background-color: rgba(217, 83, 79, 0.05);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        
+        /* Thông báo khi không tìm thấy kết quả */
+        #no-results {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+            display: none; /* Ẩn mặc định */
+        }
+
+        /* Responsive design cho thiết bị di động */
+        @media (max-width: 600px) {
+            body {
+                padding: 15px;
+            }
+            header h1 {
+                font-size: 1.8rem;
+            }
+            .search-container {
+                top: 10px;
+            }
+        }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800">
+<body>
 
-    <div class="container mx-auto p-4 md:p-8">
-        
-        <header class="text-center mb-8">
-            <h1 class="text-3xl md:text-4xl font-bold text-slate-900">Cổng Thông Tin Văn Bản Pháp Luật</h1>
-            <p class="mt-2 text-lg text-slate-600">Cập nhật các quy định pháp luật mới liên quan đến hoạt động của ACV (T5-T6/2025)</p>
+    <div class="container">
+        <header>
+            <h1>Ngân Hàng Câu Hỏi</h1>
+            <p>Định kỳ Hệ thống Quản lý An toàn SMS-003 – Năm 2023</p>
         </header>
 
-        <main>
-            <section id="overview" class="mb-10">
-                <h2 class="text-2xl font-semibold mb-4 text-slate-700 text-center">Tổng Quan Lộ Trình Hiệu Lực</h2>
-                <p class="text-center text-slate-500 mb-6 max-w-3xl mx-auto">Biểu đồ dưới đây thể hiện số lượng văn bản quy phạm pháp luật có hiệu lực theo từng tháng, giúp các đơn vị có cái nhìn tổng thể và chuẩn bị kế hoạch tuân thủ kịp thời.</p>
-                <div class="bg-white p-4 rounded-xl shadow-md">
-                    <div class="chart-container">
-                        <canvas id="effectiveDateChart"></canvas>
-                    </div>
-                </div>
-            </section>
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Nhập từ khóa để tìm kiếm câu hỏi hoặc đáp án...">
+        </div>
 
-            <section id="documents-section">
-                <h2 class="text-2xl font-semibold mb-4 text-slate-700 text-center">Tra Cứu Văn Bản Chi Tiết</h2>
-                <p class="text-center text-slate-500 mb-6 max-w-3xl mx-auto">Sử dụng thanh tìm kiếm hoặc lọc theo lĩnh vực để nhanh chóng tìm thấy văn bản bạn quan tâm. Nhấp vào từng văn bản để xem nội dung chi tiết.</p>
-
-                <div class="flex flex-col md:flex-row gap-4 mb-6">
-                    <div class="relative flex-grow">
-                        <input type="text" id="searchInput" placeholder="Tìm theo số hiệu, tiêu đề..." class="w-full p-3 pl-10 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
-                        <svg class="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                    </div>
-                </div>
-
-                <div id="filters" class="flex flex-wrap justify-center gap-2 mb-8">
-                </div>
-
-                <div id="documents-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                </div>
-                 <p id="no-results" class="text-center text-slate-500 text-lg py-10 hidden">Không tìm thấy văn bản nào phù hợp.</p>
-            </section>
-        </main>
-
-    </div>
-
-    <div id="modal" class="fixed inset-0 bg-black bg-opacity-60 modal-bg flex items-center justify-center p-4 z-50 hidden" role="dialog" aria-modal="true">
-        <div id="modal-box" class="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col transform scale-95 opacity-0 modal-box">
-            <div class="flex items-center justify-between p-5 border-b border-slate-200">
-                <h3 id="modal-title" class="text-xl font-semibold text-slate-800"></h3>
-                <button id="close-modal" class="text-slate-400 hover:text-slate-700 transition" aria-label="Đóng">
-                    <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                </button>
-            </div>
-            <div id="modal-content" class="p-6 overflow-y-auto">
-            </div>
-            <div class="p-4 bg-slate-50 border-t border-slate-200 text-sm text-slate-500">
-                <p>Nội dung chỉ mang tính chất tham khảo, vui lòng xem văn bản gốc để có thông tin đầy đủ và chính xác nhất.</p>
-            </div>
+        <div id="question-container">
+            <!-- Dữ liệu câu hỏi sẽ được chèn vào đây bằng JavaScript -->
+        </div>
+        
+        <div id="no-results">
+            <h2>Không tìm thấy kết quả nào</h2>
+            <p>Vui lòng thử lại với một từ khóa khác.</p>
         </div>
     </div>
 
     <script>
-        const documentsData = [
-            { id: 1, category: 'Xây dựng', number: 'Thông tư 05/2025/TT-BXD', title: 'Ban hành định mức kinh tế - kỹ thuật trong bảo trì kết cấu hạ tầng hàng không thuộc khu bay tại các Cảng hàng không sân bay.', issuedDate: '12/05/2025', effectiveDate: '12/05/2025', details: '<ul><li class="mb-2">- Quy định định mức KT-KT trong bảo trì kết cấu hạ tầng hàng không thuộc khu bay sử dụng vốn NSNN.</li><li class="mb-2">- Định mức KT-KT đối với bảo trì công trình xây dựng.</li><li>- Định mức KT-KT đối với bảo dưỡng thiết bị.</li></ul>' },
-            { id: 2, category: 'Tài chính', number: 'Thông tư 27/2025/TT-BTC', title: 'Quy định về quyết toán vốn đầu tư dự án hoàn thành sử dụng vốn nhà nước ngoài vốn đầu tư công.', issuedDate: '22/05/2025', effectiveDate: '22/05/2025', details: '<ul><li>Quy định quyết toán vốn đầu tư đối với các dự án sử dụng vốn nhà nước ngoài vốn đầu tư công sau khi hoàn thành hoặc dừng thực hiện vĩnh viễn.</li></ul>' },
-            { id: 3, category: 'Chứng khoán', number: 'Thông tư 19/2025/TT-BTC', title: 'Quy định việc đăng ký công ty đại chúng, hủy tư cách công ty đại chúng, báo cáo về vốn điều lệ đã góp được kiểm toán.', issuedDate: '05/05/2025', effectiveDate: '05/05/2025', details: '<ul><li class="mb-2">- <strong>Đăng ký công ty đại chúng:</strong> Trình tự, thủ tục, hồ sơ.</li><li>- <strong>Hủy tư cách công ty đại chúng:</strong> Các trường hợp và trình tự, thủ tục.</li></ul>' },
-            { id: 4, category: 'Xây dựng', number: 'Nghị định 101/2025/NĐ-CP', title: 'Sửa đổi, bổ sung một số điều của NĐ 32/2016/NĐ-CP và NĐ 42/2016/NĐ-CP.', issuedDate: '09/05/2025', effectiveDate: '23/06/2025', details: '<ul><li class="mb-2">- Sửa đổi hình thức nộp hồ sơ chấp thuận độ cao công trình, thời hạn giải quyết.</li><li class="mb-2">- Bổ sung trách nhiệm của Bộ Xây dựng.</li><li>- Sửa đổi quy định về mở, đóng sân bay chuyên dùng.</li></ul>' },
-            { id: 5, category: 'Xây dựng', number: 'Thông tư 08/2025/TT-BXD', title: 'Sửa đổi, bổ sung một số định mức xây dựng ban hành tại TT 12/2021/TT-BXD.', issuedDate: '30/05/2025', effectiveDate: '15/07/2025', details: '<ul><li>Sửa đổi, bổ sung các định mức: dự toán xây dựng, sử dụng vật liệu, chi phí quản lý dự án.</li></ul>' },
-            { id: 6, category: 'PCCC & CNCH', number: 'Nghị định 105/2025/NĐ-CP', title: 'Quy định chi tiết Luật Phòng cháy, chữa cháy và cứu nạn, cứu hộ.', issuedDate: '15/05/2025', effectiveDate: '01/07/2025', details: '<ul><li class="mb-2">- Danh mục cơ sở, công trình thuộc diện quản lý, thẩm định PCCC.</li><li class="mb-2">- Quy định về nội quy, hồ sơ quản lý PCCC&CNCH.</li><li class="mb-2">- Yêu cầu kết nối thiết bị báo cháy (trước 01/07/2027).</li><li>- Quy định bảo hiểm cháy, nổ bắt buộc.</li></ul>' },
-            { id: 7, category: 'PCCC & CNCH', number: 'Nghị định 106/2025/NĐ-CP', title: 'Quy định xử phạt vi phạm hành chính trong lĩnh vực PCCC và CNCH.', issuedDate: '15/05/2025', effectiveDate: '01/07/2025', details: '<ul><li class="mb-2">- Hình thức xử phạt: Cảnh cáo, phạt tiền (tối đa 100 triệu cho tổ chức),...</li><li>- Thời hiệu xử phạt: 1 năm.</li></ul>' },
-            { id: 8, category: 'Lưu trữ', number: 'Thông tư 07/2025/TT-BXD', title: 'Quy định thời hạn lưu trữ hồ sơ, tài liệu thuộc phạm vi quản lý của Bộ Xây dựng.', issuedDate: '15/05/2025', effectiveDate: '01/07/2025', details: '<ul><li>Quy định thời hạn lưu trữ cho các lĩnh vực: quy hoạch, kiến trúc, đầu tư xây dựng, hạ tầng kỹ thuật, hàng không,...</li></ul>' },
-            { id: 9, category: 'Lưu trữ', number: 'TT 06/2025/TT-BNV & TT 05/2025/TT-BNV', title: 'Quy định chi tiết Luật Lưu trữ 2024 và nghiệp vụ lưu trữ tài liệu số.', issuedDate: '14-15/05/2025', effectiveDate: '01/07/2025', details: '<ul><li class="mb-2">- Quản lý, hủy, sử dụng tài liệu lưu trữ.</li><li>- Quy trình số hóa, bảo quản, sử dụng và hủy tài liệu lưu trữ số.</li></ul>' },
-            { id: 10, category: 'Tài chính', number: 'Nghị định 70/2025/NĐ-CP', title: 'Sửa đổi Nghị định 123/2020/NĐ-CP quy định về hóa đơn, chứng từ.', issuedDate: '20/03/2025', effectiveDate: '01/06/2025', details: '<ul><li class="mb-2">- Sửa đổi quy định về hóa đơn điện tử từ máy tính tiền.</li><li>- Bổ sung trách nhiệm của tổ chức cung cấp dịch vụ hóa đơn điện tử.</li></ul>' },
-            { id: 11, category: 'Lao động & Thi đua', number: 'Thông tư 003/2025/TT-BNV', title: 'Hướng dẫn thực hiện quản lý lao động, tiền lương, thù lao, tiền thưởng trong doanh nghiệp Nhà nước.', issuedDate: '28/04/2025', effectiveDate: '15/06/2025', details: '<ul><li>Nguyên tắc quản lý, xác định tiền lương, thù lao, tiền thưởng dựa trên lợi nhuận, năng suất lao động.</li></ul>' },
-            { id: 12, category: 'Chứng khoán', number: 'Thông tư 14/2025/TT-BTC', title: 'Sửa đổi TT 119/2020/TT-BTC và TT 58/2021/TT-BTC về giao dịch chứng khoán.', issuedDate: '04/04/2025', effectiveDate: '01/06/2025', details: '<ul><li class="mb-2">- Làm rõ tài liệu trong hồ sơ chuyển quyền sở hữu chứng khoán.</li><li class="mb-2">- Làm rõ thông tin khách hàng khi mở tài khoản lưu ký.</li><li>- Thay thế mẫu hợp đồng chứng khoán phái sinh.</li></ul>' },
-            { id: 13, category: 'Môi trường', number: 'Thông tư 01/2025/TT-BNNMT', title: 'Ban hành 03 Quy chuẩn Quốc gia về chất lượng môi trường xung quanh.', issuedDate: '15/05/2025', effectiveDate: '14/11/2025', details: '<ul><li class="mb-2">- QCVN 26:2025/BNNMT - Quy chuẩn kỹ thuật Quốc gia về tiếng ồn.</li><li class="mb-2">- QCVN 27:2025/BNNMT - Quy chuẩn kỹ thuật Quốc gia về độ rung.</li><li>- QCVN 28:2025/BNNMT - Quy chuẩn kỹ thuật Quốc gia về chất lượng trầm tích.</li></ul>' },
-            { id: 14, category: 'PCCC & CNCH', number: 'Thông tư 37/2025/TT-BCA', title: 'Quy định về nhiệm vụ công tác PCCC, CNCH của lực lượng Công an nhân dân.', issuedDate: '15/05/2025', effectiveDate: '01/07/2025', details: '<ul><li class="mb-2">- Quy trình thẩm định thiết kế về phòng cháy, chữa cháy.</li><li class="mb-2">- Quy trình kiểm tra công tác nghiệm thu về phòng cháy, chữa cháy.</li><li>- Quy trình kiểm tra về phòng cháy chữa cháy.</li></ul>' },
-            { id: 15, category: 'Lao động & Thi đua', number: 'Thông tư 28/2025/TT-BTC', title: 'Hướng dẫn mức chi tổ chức thực hiện công tác thi đua, khen thưởng.', issuedDate: '26/05/2025', effectiveDate: '15/07/2025', details: '<ul><li>Quy định chi tiết về mức chi cho công tác thi đua, khen thưởng, chi in ấn, làm hiện vật, chi tuyên truyền, phổ biến...</li></ul>' },
-            { id: 16, category: 'Tài chính', number: 'Thông tư 31/2025/TT-BTC', title: 'Sửa đổi Thông tư 23/2021/TT-BTC hướng dẫn việc in, phát hành, quản lý và sử dụng tem điện tử.', issuedDate: '31/05/2025', effectiveDate: '01/06/2025', details: '<ul><li class="mb-2">- Sửa đổi, bổ sung quy định về mẫu tem, dán tem điện tử.</li><li class="mb-2">- Sửa đổi quản lý, mua tem điện tử thuốc lá, rượu nhập khẩu và sản xuất trong nước.</li><li>- Lược bỏ một số giấy tờ khi mua tem tại cơ quan thuế.</li></ul>' },
-            { id: 17, category: 'Tài chính', number: 'Thông tư 32/2025/TT-BTC', title: 'Hướng dẫn thực hiện Luật Quản lý thuế, Nghị định 123/2020/NĐ-CP, Nghị định 70/2025/NĐ-CP.', issuedDate: '31/05/2025', effectiveDate: '01/06/2025', details: '<ul><li>Hướng dẫn việc chuyển đổi áp dụng hóa đơn điện tử có mã và không có mã của cơ quan thuế đối với các trường hợp, bao gồm cả các doanh nghiệp có rủi ro cao về thuế.</li></ul>' },
+        // --- DỮ LIỆU NGÂN HÀNG CÂU HỎI ---
+        const questionData = [
+            {
+                "question": "Câu 1: Quy định nhà cung cấp dịch vụ phải xây dựng Hệ thống quản lý an toàn được quy định trong:",
+                "options": ["a. Annex 1", "b. Annex 19", "c. Annex 2", "d. Tất cả tài liệu trên"],
+                "answer": "b. Annex 19"
+            },
+            {
+                "question": "Câu 2: Chương trình an toàn quốc gia do ai ban hành",
+                "options": ["a. Bộ giao thông vận tải", "b. ICAO", "c. Cảng vụ hàng không", "d. Đơn vị cung cấp dịch vụ"],
+                "answer": "a. Bộ giao thông vận tải"
+            },
+            {
+                "question": "Câu 3: Phương pháp nhận diện mối nguy có mấy phương pháp?",
+                "options": ["a. Phân tích các bước của quá trình để nhận diện mối nguy (bottom up)", "b. Phân tích các nguyên nhân gây ra các hậu quả trong quá trình hoạt động để nhận diện mối nguy (top down)", "c. Cả a và b", "d. Tất cả đều sai"],
+                "answer": "c. Cả a và b"
+            },
+            {
+                "question": "Câu 4: Cấu trúc Chương trình an toàn quốc gia theo yêu cầu của ICAO gồm",
+                "options": ["a. Chính sách và mục tiêu an toàn quốc gia", "b. Chương trình quản lý rủi ro an toàn", "c. Bảo đảm an toàn quốc gia, Thúc đẩy an toàn quốc gia", "d. Tất cả yếu tố trên"],
+                "answer": "d. Tất cả yếu tố trên"
+            },
+            {
+                "question": "Câu 5: Theo yêu cầu của ICAO, Thành phần đảm bảo an toàn gồm những yếu tố nào:",
+                "options": ["a. Giám sát và đo lường an toàn, Quản lý sự thay đổi, Liên tục cải tiến hệ thống", "b. Nhận diện và đánh giá rủi ro, Cam kết của lãnh đạo, Quyền hạn và trách nhiệm an toàn", "c. Huấn luyện đào tạo và Phổ biến an toàn", "d. Tất cả các câu trên"],
+                "answer": "a. Giám sát và đo lường an toàn, Quản lý sự thay đổi, Liên tục cải tiến hệ thống"
+            },
+            {
+                "question": "Câu 6: Định nghĩa hành động khắc phục",
+                "options": ["a. Xử lý điểm không phù hợp ngay lúc phát hiện", "b. Xử lý nguyên nhân gốc rễ", "c. Xử lý điểm không phù hợp, tìm nguyên nhân gốc rễ và đề xuất biện pháp khắc phục", "d. Tất cả các câu đều đúng"],
+                "answer": "c. Xử lý điểm không phù hợp, tìm nguyên nhân gốc rễ và đề xuất biện pháp khắc phục"
+            },
+            {
+                "question": "Câu 7: Định nghĩa nào đúng",
+                "options": ["a. Quá trình là một hoạt động biến đổi đầu vào thành đầu ra", "b. Quá trình là một hoạt động không có đầu ra", "c. Quy trình là mô tả các hoạt động của một quá trình", "d. Cả a và c đều đúng"],
+                "answer": "d. Cả a và c đều đúng"
+            },
+            {
+                "question": "Câu 8: Các yêu cầu về việc triển khai Hệ thống quản lý an toàn trong Annex 19 áp dụng trong lĩnh vực nào:",
+                "options": ["a. Đảm bảo chất lượng dịch vụ", "b. Đảm bảo an toàn trong lĩnh vực hàng không", "c. Đảm bảo an toàn trong lĩnh vực hàng hải", "d. Tất cả lĩnh vực trên"],
+                "answer": "b. Đảm bảo an toàn trong lĩnh vực hàng không"
+            },
+            {
+                "question": "Câu 9: Trách nhiệm an toàn của Ban giám đốc cảng thể hiện ở tài liệu nào:",
+                "options": ["a. Tài liệu Hệ thống quản lý an toàn được Cục hàng không Việt Nam phê duyệt", "b. Bảng mô tả công việc của từng chức danh", "c. Quyết định phân công nhiệm vụ của Ban giám đốc.", "d. Tất cả các yếu tố trên"],
+                "answer": "d. Tất cả các yếu tố trên"
+            },
+            {
+                "question": "Câu 10: Chi số an toàn được xác định như thế nào",
+                "options": ["a. Dựa vào các rủi ro an toàn của cảng đang muốn kiểm soát", "b. Theo chương trình an toàn quốc gia", "c. Cả a và b đều đúng", "d. Tất cả đều sai"],
+                "answer": "c. Cả a và b đều đúng"
+            },
+            {
+                "question": "Câu 11: Mục đích của việc xây dựng Hệ thống SMS là:",
+                "options": ["a. Nhận diện các mối nguy trong quá trình hoạt động cung cấp dịch vụ của cảng để đảm bảo đạt mức độ an toàn chấp nhận được và chuyển viêc quản lý an toàn từ bị động sang chủ động", "b. Phục vụ cho việc lưu trữ hồ sơ hệ thống của tổ chức", "c. Thỏa mãn nhu cầu khách hàng, luật định", "d. Thỏa mãn yêu cầu của các hãng hàng không"],
+                "answer": "a. Nhận diện các mối nguy trong quá trình hoạt động cung cấp dịch vụ của cảng để đảm bảo đạt mức độ an toàn chấp nhận được và chuyển viêc quản lý an toàn từ bị động sang chủ động"
+            },
+            {
+                "question": "Câu 12: Nguồn để xác định mối nguy hiểm, bao gồm:",
+                "options": ["a. Các báo cáo thông báo sự cố cũng như quá trình điều tra", "b. Hệ thống báo cáo tự nguyện", "c. Khảo sát định kỳ mối nguy hiểm đối với các trang thiết bị an toàn hàng không; đánh giá an toàn/chất lượng định kỳ; đánh giá hệ thống thu thập dữ liệu hoạt động định kỳ", "d. Tất cả các câu trên"],
+                "answer": "d. Tất cả các câu trên"
+            },
+            {
+                "question": "Câu 13: Mối nguy là:",
+                "options": ["a. Hậu quả, thiệt hại về người và tài sản, giảm mức độ an toàn của Hệ thống", "b. Điều kiện hoặc đối tượng có thể gây ra những thiệt hại người, tài sản, giảm mức độ an toàn hệ thống", "c. Các yêu cầu của Annex 19", "d. Tất cả đều đúng"],
+                "answer": "b. Điều kiện hoặc đối tượng có thể gây ra những thiệt hại người, tài sản, giảm mức độ an toàn hệ thống"
+            },
+            {
+                "question": "Câu 14: Khi đánh giá rủi ro hiện tại ở mức Trung bình tổ chức cần thực hiện các hành động gì?",
+                "options": ["a. Tiến hành nhận diện mối nguy, đánh giá rui ro lại", "b. Bổ sung các biện pháp kiểm soát rủi ro tăng cường", "c. Chấm dứt hoạt động", "d. Chấp nhận mối nguy trên tồn tại trong hoạt động của tổ chức."],
+                "answer": "b. Bổ sung các biện pháp kiểm soát rủi ro tăng cường"
+            },
+            {
+                "question": "Câu 15: Sự cố tàu bay gặp hư hỏng do FOD trong năm 2022 là 0.8/10000 lần chc. Trong năm 2023 tổ chức muốn giảm 10% giá trị thực hiện năm 2018. Vậy",
+                "options": ["a. Chỉ tiêu an toàn 0.8/10000 lần chc", "b. Chỉ tiêu an toàn 0.72/10000 lần chc", "c. Chỉ tiêu an toàn giảm 8.4/100000 lần chc", "d. Tất cả đều sai"],
+                "answer": "b. Chỉ tiêu an toàn 0.72/10000 lần chc"
+            },
+            {
+                "question": "Câu 16: Mục đích đánh giá nội bộ trong Hệ thống SMS - QMS",
+                "options": ["a. Nhận diện các mối nguy đang tồn tại hiện hữu/ tiềm ẩn trong Hệ thống", "b. Xác định các khu vực cần cải tiến", "c. Xác định kế hoạch phân bổ nguồn lực", "d. Tất cả yếu tố trên"],
+                "answer": "d. Tất cả yếu tố trên"
+            },
+            {
+                "question": "Câu 17: Quá trình xem xét kỷ luật công bằng cần xem xét các yếu tố",
+                "options": ["a. Hồ sơ ghi nhận các hành vi gây mất an toàn của cá nhân trước đây", "b. Hồ sơ đào tạo về chuyên môn", "c. Ý định của cá nhân liên quan đến hành vi không phù hợp", "d. Tất cả yếu tố trên"],
+                "answer": "d. Tất cả yếu tố trên"
+            },
+            {
+                "question": "Câu 18: Quản lý sự thay đổi được triển khai thực hiện đối với các thay đổi nào",
+                "options": ["a. Thay đổi về luật định, quy định", "b. Thay đổi quy trình, quá trình, phương án khai thác", "c. Thay đổi cơ sở hạ tầng, trang thiết bị", "d. Tất cả yếu tố trên."],
+                "answer": "d. Tất cả yếu tố trên."
+            },
+            {
+                "question": "Câu 19: Phải có hành động thực hiện hành động khắc phục khi đường biểu diễn các chỉ số an toàn trong năm hiện tại:",
+                "options": ["a. 3 điểm liên tiếp nằm trên cảnh báo mức 1", "b. 2 điểm liên tiếp nằm trên cảnh báo mức 2", "c. 1 điểm nằm trên đường cảnh báo mức 3", "d. Tất cả yếu tố trên."],
+                "answer": "d. Tất cả yếu tố trên."
+            },
+            {
+                "question": "Câu 20: Theo yêu cầu của ICAO, yếu tố thúc đẩy an toàn gồm những thành phần nào:",
+                "options": ["a. Huấn luyện và đào tạo, phổ biến về an toàn", "b. Nhận diện mối nguy, đánh giá rủi ro", "c. Đánh giá nội bộ", "d. Tất cả yếu tố trên."],
+                "answer": "a. Huấn luyện và đào tạo, phổ biến về an toàn"
+            },
+            {
+                "question": "Câu 21: Các bộ phận chính cấu thành SSP gồm:",
+                "options": ["a. Hội đồng kiểm soát rủi ro an toàn hàng không (ASMRC)", "b. Bộ phận thu thập và phân tích sự cố an toàn hàng không (ASICA)", "c. Nhóm tiêu chuẩn hóa an toàn hàng không (ASST", "d. Tất cả bộ phận trên."],
+                "answer": "d. Tất cả bộ phận trên."
+            },
+            {
+                "question": "Câu 22: “Đường cất hạ cánh bị hư hỏng một vị trí, Đội bảo trì Cảng hàng không X tiến hành trám vá và thông báo cho ATC là đường CHC đủ điều kiện đưa vào khai thác. Một lúc sau, Tàu bay hạ cánh vào khu vực trám và một điểm trám vá và làm bê tông tại khu vực trám vá bị bong tróc va chạm gây hư hỏng động cơ tàu bay. Sau đó tàu bay được kéo về xưởng để thay thế động cơ” Mối nguy cụ thể trong tình huống trên được nhận diện.",
+                "options": ["a. Động cơ bị hư hỏng.", "b. Chất lượng trám vá trên đường cất hạ cánh không đảm bảo, bong tróc tạo ra FOD trên đường cất hạ cánh.", "c. Tất cả đều đúng", "d. Tất cả đều sai."],
+                "answer": "b. Chất lượng trám vá trên đường cất hạ cánh không đảm bảo, bong tróc tạo ra FOD trên đường cất hạ cánh."
+            },
+            {
+                "question": "Câu 23: “Đường cất hạ cánh bị hư hỏng một vị trí, Đội bảo trì Cảng hàng không X tiến hành trám vá và thông báo cho ATC là đường CHC đủ điều kiện đưa vào khai thác. Một lúc sau, Tàu bay hạ cánh vào khu vực trám và một điểm trám vá và làm bê tông tại khu vực trám vá bị bong tróc va chạm gây hư hỏng động cơ tàu bay. Sau đó tàu bay được kéo về xưởng để thay thế động cơ” Rủi ro an toàn hiện tại là gì.",
+                "options": ["a. Động cơ bị hư hỏng.", "b. Chất lượng trám vá trên đường cất hạ cánh không đảm bảo, bong tróc tạo ra FOD trên đường cất hạ cánh.", "c. Tất cả đều đúng", "d. Tất cả đều sai."],
+                "answer": "a. Động cơ bị hư hỏng."
+            },
+            {
+                "question": "Câu 24: Đánh giá rủi ro an toàn dựa trên các yếu tố nào.",
+                "options": ["a. Tần xuất xảy ra.", "b. Mức độ nghiêm trọng", "c. Cả a và b", "d. Tất cả đều sai."],
+                "answer": "c. Cả a và b"
+            },
+            {
+                "question": "Câu 25: Hệ thống báo cáo an toàn bao gồm",
+                "options": ["a. Hệ thống báo cáo bắt buộc", "b. Hệ thống báo cáo không bắt buộc (báo cáo an toàn tự nguyện)", "c. Cả a và b", "d. Tất cả đều sai"],
+                "answer": "c. Cả a và b"
+            },
+            {
+                "question": "Câu 26: Giám sát đo lường hệ thống quản lý an toàn thông qua các thông số nào?",
+                "options": ["a. Mục tiêu an toàn", "b. Chỉ số an toàn", "c. Chỉ tiêu an toàn", "d. Tất cả đều đúng"],
+                "answer": "d. Tất cả đều đúng"
+            },
+            {
+                "question": "Câu 27: Báo cáo tự nguyện từ cán bộ nhân viên phục vụ cho mục đích gì:",
+                "options": ["a. Cung cấp thông tin an toàn để phục vụ công tác nhận diện mối nguy, đánh giá rủi ro và đưa các biện pháp kiểm soát rủi ro an toàn.", "b. Để trừng phạt, xử lý, kỷ luật", "c. Tất cả đều sai", "d. Tất cả đều đúng"],
+                "answer": "a. Cung cấp thông tin an toàn để phục vụ công tác nhận diện mối nguy, đánh giá rủi ro và đưa các biện pháp kiểm soát rủi ro an toàn."
+            },
+            {
+                "question": "Câu 28: Phương pháp nhận diện mối nguy qua các phương pháp nào:",
+                "options": ["a. Bị động", "b. Chủ động", "c. Dự báo", "d. Tất cả đều đúng"],
+                "answer": "d. Tất cả đều đúng"
+            },
+            {
+                "question": "Câu 29: Phương pháp nhận diện mối nguy bị động thực hiện như thế nào?",
+                "options": ["a. Phân tích các sự cố, vụ việc xảy ra tại cảng", "b. Hệ thống báo cáo tự nguyện nội bộ", "c. Các đợt đánh giá, giám sát an toàn hoặc chất lượng", "d. Tất cả đều đúng"],
+                "answer": "a. Phân tích các sự cố, vụ việc xảy ra tại cảng"
+            },
+            {
+                "question": "Câu 30: Phương pháp nhận diện mối nguy chủ động thực hiện như thế nào?",
+                "options": ["a. Quá trình điều tra sự cố", "b. Hệ thống báo cáo tự nguyện nội bộ", "c. Các đợt đánh giá, giám sát an toàn hoặc chất lượng", "d. Cả b và c"],
+                "answer": "d. Cả b và c"
+            },
+            {
+                "question": "Câu 31: Khi tại cảng xảy ra sự cố xe thang va chạm với tàu bay, Tổ an toàn nhận diện các mối nguy từ các sự cố trên. Tổ an toàn sử dụng đã phương pháp gì để nhận diện mối nguy?",
+                "options": ["a. Bị động", "b. Chủ động", "c. Dự báo", "d. Tất cả đều đúng"],
+                "answer": "a. Bị động"
+            },
+            {
+                "question": "Câu 32: Khi tại cảng nhận được một báo cáo tự nguyện về sự việc an toàn, Tổ an toàn nhận diện các mối nguy từ báo cáo trên và triển khai các biện pháp kiểm soát rủi ro an toàn. Tổ an toàn sử dụng đã phương pháp gì để nhận diện mối nguy:",
+                "options": ["a. Bị động", "b. Chủ động", "c. Dự báo", "d. Tất cả đều đúng."],
+                "answer": "b. Chủ động"
+            },
+            {
+                "question": "Câu 33: Khi tại cảng xảy ra sự cố xe thang va chạm với tàu bay, Hệ thống quản lý an toàn phải kích hoạt quy trình nào đầu tiên để ngăn ngừa sự cố lặp lại trong tương lai?",
+                "options": ["a. Quy trình xem xét lãnh đạo", "b. Quy trình điều tra an toàn nội bộ", "c. Quy trình nhận diện mối nguy và đánh giá rủi ro", "d. Tất cả đều đúng"],
+                "answer": "b. Quy trình điều tra an toàn nội bộ"
+            },
+            {
+                "question": "Câu 34: Trong thời gian tới, Cảng hàng không của anh/chị sẽ tiến hành sửa chữa đường CHC. Với vai trò là cán bộ lãnh đạo của đơn vị, anh/ chị phải chỉ đạo thực hiện quy trình gì?",
+                "options": ["a. Quy trình xem xét lãnh đạo", "b. Quy trình quản lý sự thay đổi", "c. Quy trình nhận diện mối nguy và đánh giá rủi ro", "d. Tất cả đều đúng"],
+                "answer": "b. Quy trình quản lý sự thay đổi"
+            },
+            {
+                "question": "Câu 35: Nhân viên của đơn vị anh/chị thực hiện nhiệm vụ được giao vận hành phương tiện, trang thiết bị trong khu bay để phục vụ tàu bay, nhưng nhân viên này chưa được huấn luyện về vận hành phương tiện và đơn vị anh chị chưa có quy trình hướng dẫn thực hiện công việc. Nên dẫn tới chạy sai luồng tuyến và chạm với tàu bay. Vậy theo mô hình nguyên nhân tai nạn sai lỗi của nhân viên là:",
+                "options": ["a. Sai lỗi do chủ quan cá nhân tạo ra", "b. Sai lỗi do tổ chức tạo ra", "c. Tất cả đều sai", "d. Tất cả đều đúng."],
+                "answer": "b. Sai lỗi do tổ chức tạo ra"
+            },
+            {
+                "question": "Câu 36: Nhân viên tại cảng hàng không trong quá trình điều khiển cầu ống không đúng quy trình gây ra sự cố va chạm với tàu bay. Tàu bay bị hư hại và được đánh giá là mức độ nghiêm trọng là mức C. Theo thống kê trong vòng 20 năm trở lại đây chỉ xảy ra 1 sự cố như vậy. Vậy chỉ số rủi ro là",
+                "options": ["a. 3C - Cao", "b. 2C – thấp", "c. 2C – Trung bình", "d. 3C – trung bình"],
+                "answer": "c. 2C – Trung bình"
+            },
+            {
+                "question": "Câu 37: Bộ phận nào chịu trách nhiệm phát hiện và báo cáo mối nguy:",
+                "options": ["a. Bộ phận/lãnh đạo bộ phận an toàn", "b. Trưởng bộ phận khai thác", "c. Nhân viên thực hiện nhiệm vụ", "d. Tất cả mọi người thuộc đơn vị"],
+                "answer": "d. Tất cả mọi người thuộc đơn vị"
+            },
+            {
+                "question": "Câu 38: Ba thông tin chủ yếu cần được ghi chú trong bảng công tác QLRR trước khi tiến hành xác định các hành động giảm thiểu rủi ro hoặc các biện pháp bảo vệ:",
+                "options": ["a. Mối nguy, Tình tình trạng mất an toàn, và hậu quả cuối cùng", "b. Mối nguy, các biện pháp phòng ngừa, và biện pháp phục hồi", "c. Hậu quả cuối cùng, các biện pháp phòng ngừa, và biện pháp phục hồi", "d. Hậu quả cuối cùng, các biện pháp phòng ngừa, và mối nguy"],
+                "answer": "a. Mối nguy, Tình tình trạng mất an toàn, và hậu quả cuối cùng"
+            },
+            {
+                "question": "Câu 39: Cảng hàng không quốc tế X sắp tới sẽ tiến hành khai thác tàu bay B747 – 8, vậy Hệ thống quản lý an toàn cần sử dụng các quy trình nào của Hệ thống SMS để đánh giá giá an toàn trước khi đưa vào khai thác:",
+                "options": ["a. Quy trình quản lý rủi ro (QT14)", "b. Quy trình quản lý sự thay đổi (QT05)", "c. Quy trình xem xét lãnh đạo (QT10)", "d. Cả a và b đều đúng"],
+                "answer": "d. Cả a và b đều đúng"
+            },
+            {
+                "question": "Câu 40: Để thực hiện theo dõi và giám sát mục tiêu an toàn, chất lượng tại cảng, thì Chúng ta sử dụng quy trình nào để thực hiện :",
+                "options": ["a. Quy trình giám sát và đo lường (QT09)", "b. Quy trình quản lý rủi ro (QT04)", "c. Quy trình quản lý sự thay đổi (QT05)", "d. Quy trình điều tra an toàn nội bộ (QT06)"],
+                "answer": "a. Quy trình giám sát và đo lường (QT09)"
+            },
+            {
+                "question": "Câu 41: Để thực hiện quản lý rủi ro an toàn tại cảng, thì Chúng ta sử dụng quy trình nào để thực hiện:",
+                "options": ["a. Quy trình giám sát và đo lường (QT09)", "b. Quy trình quản lý rủi ro (QT04)", "c. Quy trình quản lý sự thay đổi (QT05)", "d. Quy trình điều tra an toàn nội bộ (QT06)"],
+                "answer": "b. Quy trình quản lý rủi ro (QT04)"
+            },
+            {
+                "question": "Câu 42: Để thực hiện điều tra nguyên nhân các sự cố, vụ việc mất an toàn tại cảng tại cảng, thì Chúng ta sử dụng quy trình nào để thực hiện:",
+                "options": ["a. Quy trình giám sát và đo lường (QT09)", "b. Quy trình quản lý rủi ro (QT04)", "c. Quy trình quản lý sự thay đổi (QT05)", "d. Quy trình điều tra an toàn nội bộ (QT06)"],
+                "answer": "d. Quy trình điều tra an toàn nội bộ (QT06)"
+            },
+            {
+                "question": "Câu 43: Định nghĩa Hệ thống quản lý an toàn là gì :",
+                "options": ["a. Là việc Thiết lập tổ chức để quản lý an toàn Quy định trách nhiệm đối với an toàn, Xây dựng chính sách và các quy trình quản lý an toàn.", "b. Là việc tiếp cận quản lý an toàn một cách có hệ thống, bao gồm: Thiết lập tổ chức để quản lý an toàn, Xây dựng chính sách và các quy trình quản lý an toàn.", "c. Là việc tiếp cận quản lý an toàn một cách có hệ thống, bao gồm: Thiết lập tổ chức để quản lý an toàn, Quy định trách nhiệm đối với an toàn, Xây dựng chính sách và các quy trình quản lý an toàn để đạt mục tiêu an toàn của tổ chức.", "d. Tất cả đều sai"],
+                "answer": "c. Là việc tiếp cận quản lý an toàn một cách có hệ thống, bao gồm: Thiết lập tổ chức để quản lý an toàn, Quy định trách nhiệm đối với an toàn, Xây dựng chính sách và các quy trình quản lý an toàn để đạt mục tiêu an toàn của tổ chức."
+            },
+            {
+                "question": "Câu 44: Ai ban hành chính sách mục tiêu an toàn?",
+                "options": ["a. Giám đốc cảng", "b. Phó giám đốc phụ trách an toàn", "c. Phó giám đốc phụ trách chất lượng", "d. Tất cả đều đúng"],
+                "answer": "a. Giám đốc cảng"
+            },
+            {
+                "question": "Câu 45: Để thực hiện đánh giá các ảnh hưởng an toàn khai thác để đưa một công trình sân đỗ mới xây dựng vào khai thác tại cảng, thì Chúng ta sử dụng quy trình nào để thực hiện",
+                "options": ["a. Quy trình quản lý sự thay đổi (QT05)", "b. Quy trình quản lý rủi ro (QT04)", "c. Quy trình quản lý sự thay đổi (QT05)", "d. Cả a và b"],
+                "answer": "d. Cả a và b"
+            },
+            {
+                "question": "Câu 46: An toàn là trạng thái mà các rủi ro gây tổn thương/thiệt hại cho người và tài sản được giảm thiểu và duy trì ở ………….. đó thông qua một quy trình nhận diện mối nguy hiểm và quản lý rủi ro liên tục? Điền vào chỗ trống cho đúng",
+                "options": ["a. Bằng ở mức độ chấp nhận được", "b. Thấp hơn mức độ chấp nhận được", "c. Cả a và b đều đúng", "d. Cao hơn mức độ chấp nhận được"],
+                "answer": "c. Cả a và b đều đúng"
+            },
+            {
+                "question": "Câu 47: Những biện pháp kiểm soát FOD nào dưới đây mang tính chất giảm thiểu tần suất xảy ra rủi ro an toàn do FOD gây ra",
+                "options": ["a. Nhân viên thực hiện kiểm tra, thu nhặt FOD trước khi tàu bay vào vị trí đỗ sau khi tàu bay rời khỏi vị trí đỗ", "b. Động cơ tàu bay được thiết kế với các vật liệu có khả năng chịu đựng được va đập với FOD mà vẫn hoạt động bình thường.", "c. Xây dựng kế hoạch khẩn nguy sân bay", "d. Tất cả đều đúng"],
+                "answer": "a. Nhân viên thực hiện kiểm tra, thu nhặt FOD trước khi tàu bay vào vị trí đỗ sau khi tàu bay rời khỏi vị trí đỗ"
+            },
+            {
+                "question": "Câu 48: Những biện pháp kiểm soát FOD nào dưới đây mang tính chất giảm thiểu khả năng xảy ra và mức độ nghiêm trọng của rủi ro an toàn do FOD gây ra:",
+                "options": ["a. Nhân viên thực hiện kiểm tra, thu nhặt FOD trước khi tàu bay vào vị trí đỗ sau khi tàu bay rời khỏi vị trí đỗ", "b. Động cơ tàu bay được thiết kế với các vật liệu có khả năng chịu đựng được va đập với FOD mà vẫn hoạt động bình thường.", "c. Xây dựng kế hoạch khẩn nguy sân bay", "d. Tất cả đều đúng"],
+                "answer": "d. Tất cả đều đúng"
+            },
+            {
+                "question": "Câu 49: Hệ thống quản lý an toàn thực hiện việc kiểm soát tài liệu thông qua quy trình nào",
+                "options": ["a. Quy trình kiểm soát tài liệu (QT01)", "b. Quy trình kiểm soát hồ sơ (QT02)", "c. Quy trình quản lý rủi ro (QT04)", "d. Quy trình lập và theo dõi mục tiêu (QT03)"],
+                "answer": "a. Quy trình kiểm soát tài liệu (QT01)"
+            },
+            {
+                "question": "Câu 50: Thực hiện cải tiến Hệ thống quản lý an toàn thực hiện thông qua quy trình nào",
+                "options": ["a. Quy trình họp xem xét lãnh đạo (QT10)", "b. Quy trình đánh giá nội bộ (QT11)", "c. Quy trình khắc phục và phòng ngừa (QT13)", "d. Tất cả các quy trình trên"],
+                "answer": "d. Tất cả các quy trình trên"
+            }
         ];
 
+
+        // --- LOGIC CỦA ỨNG DỤNG ---
         document.addEventListener('DOMContentLoaded', () => {
-            const documentsList = document.getElementById('documents-list');
-            const filtersContainer = document.getElementById('filters');
+            const questionContainer = document.getElementById('question-container');
             const searchInput = document.getElementById('searchInput');
             const noResults = document.getElementById('no-results');
 
-            const modal = document.getElementById('modal');
-            const modalBox = document.getElementById('modal-box');
-            const closeModalBtn = document.getElementById('close-modal');
-            const modalTitle = document.getElementById('modal-title');
-            const modalContent = document.getElementById('modal-content');
-
-            let currentFilter = 'Tất cả';
-
-            function renderDocuments(docs) {
-                documentsList.innerHTML = '';
-                if (docs.length === 0) {
-                    noResults.classList.remove('hidden');
-                } else {
-                    noResults.classList.add('hidden');
+            // Hàm hiển thị danh sách câu hỏi
+            const displayQuestions = (questions) => {
+                questionContainer.innerHTML = ''; // Xóa nội dung cũ
+                if (questions.length === 0) {
+                    noResults.style.display = 'block';
+                    return;
                 }
-                docs.forEach(doc => {
+                
+                noResults.style.display = 'none';
+
+                questions.forEach(q => {
                     const card = document.createElement('div');
-                    card.className = 'document-card bg-white rounded-xl shadow-md p-5 flex flex-col cursor-pointer';
-                    card.dataset.id = doc.id;
+                    card.className = 'question-card';
+
+                    // Tạo phần các lựa chọn
+                    let optionsHTML = '';
+                    q.options.forEach(opt => {
+                        // Kiểm tra nếu lựa chọn này là đáp án đúng
+                        if (opt === q.answer) {
+                            optionsHTML += `<div><span class="answer">${opt}</span></div>`;
+                        } else {
+                            optionsHTML += `<div>${opt}</div>`;
+                        }
+                    });
+
                     card.innerHTML = `
-                        <div class="flex-grow">
-                            <span class="inline-block bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded-full mb-3">${doc.category}</span>
-                            <h3 class="text-base font-semibold text-slate-800 mb-2">${doc.number}</h3>
-                            <p class="text-slate-600 text-sm">${doc.title}</p>
-                        </div>
-                        <div class="mt-4 pt-4 border-t border-slate-100 text-xs text-slate-500 flex justify-between">
-                            <span>Hiệu lực: <strong>${doc.effectiveDate}</strong></span>
-                            <span>Ban hành: <strong>${doc.issuedDate}</strong></span>
+                        <div class="question">${q.question}</div>
+                        <div class="options">
+                            ${optionsHTML}
                         </div>
                     `;
-                    card.addEventListener('click', () => openModal(doc));
-                    documentsList.appendChild(card);
+                    questionContainer.appendChild(card);
                 });
-            }
+            };
 
-            function setupFilters() {
-                const categories = ['Tất cả', ...new Set(documentsData.map(d => d.category))];
-                filtersContainer.innerHTML = '';
-                categories.forEach(category => {
-                    const button = document.createElement('button');
-                    button.textContent = category;
-                    button.className = 'filter-btn px-4 py-2 text-sm font-medium border border-slate-300 rounded-full transition hover:bg-slate-100';
-                    if (category === currentFilter) {
-                        button.classList.add('filter-btn-active', 'border-blue-600');
-                    }
-                    button.addEventListener('click', () => {
-                        currentFilter = category;
-                        filterAndRender();
-                        updateActiveFilterButton();
-                    });
-                    filtersContainer.appendChild(button);
-                });
-            }
-
-            function updateActiveFilterButton() {
-                document.querySelectorAll('.filter-btn').forEach(btn => {
-                    if (btn.textContent === currentFilter) {
-                        btn.classList.add('filter-btn-active', 'border-blue-600');
-                        btn.classList.remove('bg-slate-100');
-                    } else {
-                        btn.classList.remove('filter-btn-active', 'border-blue-600');
-                    }
-                });
-            }
-
-            function filterAndRender() {
-                const searchTerm = searchInput.value.toLowerCase();
-                let filteredDocs = documentsData;
-
-                if (currentFilter !== 'Tất cả') {
-                    filteredDocs = filteredDocs.filter(d => d.category === currentFilter);
-                }
-
-                if (searchTerm) {
-                    filteredDocs = filteredDocs.filter(d =>
-                        d.title.toLowerCase().includes(searchTerm) ||
-                        d.number.toLowerCase().includes(searchTerm)
-                    );
-                }
+            // Hàm lọc câu hỏi dựa trên từ khóa tìm kiếm
+            const filterQuestions = () => {
+                const searchTerm = searchInput.value.toLowerCase().trim();
                 
-                renderDocuments(filteredDocs);
-            }
-
-            function openModal(doc) {
-                modalTitle.textContent = doc.number;
-                modalContent.innerHTML = `<h4 class="font-semibold text-lg mb-2">${doc.title}</h4><div class="prose prose-sm max-w-none text-slate-600">${doc.details}</div>`;
-                modal.classList.remove('hidden');
-                setTimeout(() => {
-                    modalBox.classList.remove('scale-95', 'opacity-0');
-                }, 10);
-            }
-
-            function closeModal() {
-                 modalBox.classList.add('scale-95', 'opacity-0');
-                 setTimeout(() => {
-                    modal.classList.add('hidden');
-                 }, 300);
-            }
-
-            function setupChart() {
-                const effectiveDates = documentsData.map(d => {
-                    const parts = d.effectiveDate.split('/');
-                    return new Date(parts[2], parts[1] - 1, parts[0]);
+                const filteredQuestions = questionData.filter(q => {
+                    const questionText = q.question.toLowerCase();
+                    const answerText = q.answer.toLowerCase();
+                    const optionsText = q.options.join(' ').toLowerCase();
+                    
+                    return questionText.includes(searchTerm) || 
+                           answerText.includes(searchTerm) || 
+                           optionsText.includes(searchTerm);
                 });
 
-                const monthCounts = effectiveDates.reduce((acc, date) => {
-                    const month = date.toLocaleString('vi-VN', { month: 'long', year: 'numeric' });
-                    acc[month] = (acc[month] || 0) + 1;
-                    return acc;
-                }, {});
+                displayQuestions(filteredQuestions);
+            };
 
-                const sortedMonths = Object.keys(monthCounts).sort((a, b) => {
-                    const [monthA, yearA] = a.replace('Tháng ', '').split(' năm ');
-                    const [monthB, yearB] = b.replace('Tháng ', '').split(' năm ');
-                    return new Date(yearA, monthA - 1) - new Date(yearB, monthB - 1);
-                });
-                
-                const chartLabels = sortedMonths;
-                const chartData = sortedMonths.map(month => monthCounts[month]);
+            // Gắn sự kiện 'input' để tìm kiếm real-time
+            searchInput.addEventListener('input', filterQuestions);
 
-                const ctx = document.getElementById('effectiveDateChart').getContext('2d');
-                new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: chartLabels,
-                        datasets: [{
-                            label: 'Số lượng văn bản',
-                            data: chartData,
-                            backgroundColor: 'rgba(59, 130, 246, 0.7)',
-                            borderColor: 'rgba(37, 99, 235, 1)',
-                            borderWidth: 1,
-                            borderRadius: 4,
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                ticks: {
-                                    stepSize: 1
-                                }
-                            }
-                        },
-                        plugins: {
-                            legend: {
-                                display: false
-                            },
-                            tooltip: {
-                                callbacks: {
-                                    title: (context) => `Hiệu lực ${context[0].label}`
-                                }
-                            }
-                        }
-                    }
-                });
-            }
-
-            searchInput.addEventListener('keyup', filterAndRender);
-            closeModalBtn.addEventListener('click', closeModal);
-            modal.addEventListener('click', (e) => {
-                if (e.target === modal) closeModal();
-            });
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
-                    closeModal();
-                }
-            });
-
-            renderDocuments(documentsData);
-            setupFilters();
-            setupChart();
+            // Hiển thị tất cả câu hỏi khi trang được tải lần đầu
+            displayQuestions(questionData);
         });
     </script>
 </body>
