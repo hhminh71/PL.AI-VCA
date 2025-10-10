@@ -3,288 +3,432 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cổng Thông Tin Văn Bản Pháp Luật - ACV</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Chosen Palette: Corporate Blue and Slate -->
-    <!-- Application Structure Plan: A dashboard-style single-page application. The core is a filterable, searchable list of legal documents presented as interactive cards. The main navigation will be based on legal domains (Xây dựng, Tài chính, PCCC, etc.) derived from the source report, rather than the original chronological grouping. This task-oriented structure helps users from different departments quickly find relevant information. A timeline chart at the top provides a high-level overview of when regulations become effective. Users can filter the document list by clicking on category tags. Clicking on a document card reveals its detailed summary in a modal window. A search bar allows for keyword-based filtering. This structure transforms a static list into an exploratory tool, prioritizing user efficiency. -->
-    <!-- Visualization & Content Choices: 
-        1. Report Info: Number of documents and their effective dates. Goal: Show the volume/timing of new regulations. Viz: Bar Chart (Chart.js/Canvas) showing count per month. Interaction: Hover for details. Justification: Provides a quick visual summary of upcoming changes.
-        2. Report Info: List of all legal documents. Goal: Organize and present detailed information clearly. Viz: Interactive Cards (HTML/CSS/Tailwind). Interaction: Click card to open a modal with details. List is filterable by category tags and searchable. Justification: Progressive disclosure via modals prevents information overload. Domain-based filtering is highly usable for the target audience.
-    -->
-    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <title>Triển khai Văn bản Pháp luật ACV</title>
     <style>
-        body { font-family: 'Inter', sans-serif; }
-        .chart-container { position: relative; width: 100%; max-width: 800px; margin-left: auto; margin-right: auto; height: 300px; max-height: 40vh; }
-        .modal-bg { transition: opacity 0.3s ease; }
-        .modal-box { transition: transform 0.3s ease, opacity 0.3s ease; }
-        .document-card { transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; }
-        .document-card:hover { transform: translateY(-4px); box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1); }
-        .filter-btn-active { background-color: #2563eb; color: white; }
+        /* === KHỐI MÃ CSS CỐ ĐỊNH (PHIÊN BẢN NÚT NHẤN CHUYÊN NGHIỆP) - KHÔNG THAY ĐỔI === */
+        /* Bảng màu chủ đạo */
+        :root {
+            --primary-color: #0c5776; /* Màu chủ đạo */
+            --primary-hover-color: #117aab; /* Màu khi di chuột qua */
+            --background-color: #f8f9fa; /* Màu nền trang */
+            --container-background: #ffffff;
+            --text-color: #343a40; /* Màu chữ chính */
+            --border-color: #dee2e6; /* Màu viền */
+            --header-text-color: #ffffff; /* Màu chữ trên nút nhấn */
+        }
+        
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; 
+            line-height: 1.6; 
+            color: var(--text-color); 
+            background-color: var(--background-color); 
+            margin: 0; 
+            padding: 20px;
+        }
+        
+        .container { 
+            max-width: 900px; 
+            margin: auto; 
+            background: var(--container-background); 
+            padding: 20px 30px; 
+            border-radius: 8px; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        
+        h1 { 
+            color: var(--primary-color); 
+            text-align: center; 
+            border-bottom: 2px solid var(--border-color); 
+            padding-bottom: 15px; 
+            margin-top: 0;
+            font-weight: 600;
+        }
+        
+        .sub-header { 
+            text-align: center; 
+            font-style: italic; 
+            color: #6c757d; 
+            margin-bottom: 40px; 
+        }
+        
+        /* Kiểu nút nhấn cho các nhánh pháp luật */
+        .category-title { 
+            background-color: var(--primary-color);
+            color: var(--header-text-color);
+            padding: 15px 20px;
+            margin-top: 15px; 
+            margin-bottom: 0;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            position: relative;
+            transition: background-color 0.3s ease;
+            border-radius: 8px;
+            width: 100%;
+            text-align: left;
+            border: none;
+        }
+        
+        .category-title:hover { 
+            background-color: var(--primary-hover-color); 
+        }
+        
+        .category-title::after { 
+            content: '+';
+            font-size: 1.6em;
+            font-weight: 300;
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            transition: transform 0.2s ease-in-out;
+        }
+        
+        .category-title.active {
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+        
+        .category-title.active::after { 
+            content: '-';
+        }
+        
+        /* Nội dung bên trong nhánh */
+        .category-content {
+            padding: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease-in-out, padding 0.4s ease-in-out;
+            background-color: var(--container-background);
+            border: 1px solid var(--border-color);
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+        }
+        
+        .category-content.show {
+            padding: 20px 20px 1px 20px;
+        }
+        
+        /* Các mục bên trong */
+        .subcategory-title { color: var(--primary-hover-color); border-left: 4px solid var(--primary-hover-color); padding-left: 10px; margin-top: 20px; margin-bottom: 15px; font-size: 1.2em; }
+        
+        .van-ban-item { 
+            border: 1px solid var(--border-color); 
+            padding: 15px 20px; 
+            margin-bottom: 20px; 
+            border-radius: 5px; 
+            background-color: #fdfdfd; 
+        }
+        
+        .van-ban-item h4 { 
+            color: var(--primary-color); 
+            margin-top: 0; 
+            margin-bottom: 15px; 
+            font-size: 1.1em; 
+        }
+        
+        .van-ban-item ul { 
+            list-style-type: none; 
+            padding-left: 0; 
+            margin-bottom: 15px; 
+        }
+        
+        .van-ban-item li { 
+            margin-bottom: 8px; 
+        }
+        
+        .van-ban-item h5 { 
+            color: var(--text-color); 
+            border-bottom: 1px solid #eee; 
+            padding-bottom: 5px; 
+            margin-top: 20px; 
+            margin-bottom: 10px; 
+            font-size: 1em; 
+        }
+        
+        .van-ban-item p { 
+            margin-bottom: 0; 
+            text-align: justify; 
+        }
+        
+        strong { 
+            font-weight: bold; 
+            color: #000; 
+        }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800">
+<body>
+    <div class="container">
+        <h1>TRIỂN KHAI VĂN BẢN PHÁP LUẬT BAN HÀNH TỪ THÁNG 06 ĐẾN THÁNG 09/2025</h1>
+        <p class="sub-header">Tổng hợp các văn bản pháp luật mới được triển khai trong tháng theo văn bản số 194 PCKTNB của Ban Pháp chế TCT.</p>
 
-    <div class="container mx-auto p-4 md:p-8">
-        
-        <header class="text-center mb-8">
-            <h1 class="text-3xl md:text-4xl font-bold text-slate-900">Cổng Thông Tin Văn Bản Pháp Luật</h1>
-            <p class="mt-2 text-lg text-slate-600">Cập nhật các quy định pháp luật mới liên quan đến hoạt động của ACV (T5-T6/2025)</p>
-        </header>
+        <!-- PHÂN NHÁNH PHÁP LUẬT -->
 
-        <main>
-            <section id="overview" class="mb-10">
-                <h2 class="text-2xl font-semibold mb-4 text-slate-700 text-center">Tổng Quan Lộ Trình Hiệu Lực</h2>
-                <p class="text-center text-slate-500 mb-6 max-w-3xl mx-auto">Biểu đồ dưới đây thể hiện số lượng văn bản quy phạm pháp luật có hiệu lực theo từng tháng, giúp các đơn vị có cái nhìn tổng thể và chuẩn bị kế hoạch tuân thủ kịp thời.</p>
-                <div class="bg-white p-4 rounded-xl shadow-md">
-                    <div class="chart-container">
-                        <canvas id="effectiveDateChart"></canvas>
-                    </div>
-                </div>
-            </section>
-
-            <section id="documents-section">
-                <h2 class="text-2xl font-semibold mb-4 text-slate-700 text-center">Tra Cứu Văn Bản Chi Tiết</h2>
-                <p class="text-center text-slate-500 mb-6 max-w-3xl mx-auto">Sử dụng thanh tìm kiếm hoặc lọc theo lĩnh vực để nhanh chóng tìm thấy văn bản bạn quan tâm. Nhấp vào từng văn bản để xem nội dung chi tiết.</p>
-
-                <div class="flex flex-col md:flex-row gap-4 mb-6">
-                    <div class="relative flex-grow">
-                        <input type="text" id="searchInput" placeholder="Tìm theo số hiệu, tiêu đề..." class="w-full p-3 pl-10 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
-                        <svg class="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                    </div>
-                </div>
-
-                <div id="filters" class="flex flex-wrap justify-center gap-2 mb-8">
-                </div>
-
-                <div id="documents-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                </div>
-                 <p id="no-results" class="text-center text-slate-500 text-lg py-10 hidden">Không tìm thấy văn bản nào phù hợp.</p>
-            </section>
-        </main>
-
-    </div>
-
-    <div id="modal" class="fixed inset-0 bg-black bg-opacity-60 modal-bg flex items-center justify-center p-4 z-50 hidden" role="dialog" aria-modal="true">
-        <div id="modal-box" class="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col transform scale-95 opacity-0 modal-box">
-            <div class="flex items-center justify-between p-5 border-b border-slate-200">
-                <h3 id="modal-title" class="text-xl font-semibold text-slate-800"></h3>
-                <button id="close-modal" class="text-slate-400 hover:text-slate-700 transition" aria-label="Đóng">
-                    <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                </button>
+        <!-- 1. Pháp luật chuyên ngành Hàng không (Phục vụ khai thác) -->
+        <button type="button" class="category-title">Pháp luật chuyên ngành Hàng không (Phục vụ khai thác) (04 VB)</button>
+        <div class="category-content">
+            <div class="van-ban-item">
+                <h4>Luật số 98/2025/QH15 Sửa đổi, bổ sung một số điều của 11 Luật về quân sự, quốc phòng</h4>
+                <ul>
+                    <li><strong>Cơ quan ban hành:</strong> Quốc hội</li>
+                    <li><strong>Ngày ban hành:</strong> 27/06/2026</li>
+                    <li><strong>Ngày hiệu lực:</strong> 01/07/2025</li>
+                </ul>
+                <h5>Nội dung tóm tắt/triển khai:</h5>
+                <p>Sửa đổi, bổ sung quy định về Khu vực phòng thủ và Lực lượng dự bị động viên. Luật yêu cầu cơ quan đăng ký quyền sở hữu <strong>phương tiện hàng không dân dụng</strong> có trách nhiệm định kỳ hằng năm cung cấp thông tin đăng ký phương tiện kỹ thuật dự bị cho Bộ Quốc phòng. <strong>Yêu cầu triển khai:</strong> Cập nhật các quy định liên quan đến quản lý tài sản tàu bay và thực hiện trách nhiệm cung cấp thông tin cho cơ quan Quốc phòng đối với **các đơn vị có liên quan**.</p>
             </div>
-            <div id="modal-content" class="p-6 overflow-y-auto">
+            <div class="van-ban-item">
+                <h4>Nghị định số 220/2025/NĐ-CP Sửa đổi Nghị định lĩnh vực quốc phòng khi tổ chức chính quyền hai cấp</h4>
+                <ul>
+                    <li><strong>Cơ quan ban hành:</strong> Chính phủ</li>
+                    <li><strong>Ngày ban hành:</strong> 07/08/2025</li>
+                    <li><strong>Ngày hiệu lực:</strong> 07/08/2025</li>
+                </ul>
+                <h5>Nội dung tóm tắt/triển khai:</h5>
+                <p>Sửa đổi các Nghị định về công tác quốc phòng ở Bộ ngành trung ương, địa phương và về khu vực phòng thủ. Quy định rõ cơ quan quân sự địa phương là cơ quan thường trực công tác quốc phòng ở địa phương cùng cấp, nhằm tăng cường công tác phối hợp. <strong>Yêu cầu triển khai:</strong> **Các đơn vị có liên quan** đến công tác quốc phòng, an ninh cần nắm rõ mối quan hệ phối hợp, chỉ đạo, hướng dẫn về công tác quốc phòng với cơ quan quân sự địa phương.</p>
             </div>
-            <div class="p-4 bg-slate-50 border-t border-slate-200 text-sm text-slate-500">
-                <p>Nội dung chỉ mang tính chất tham khảo, vui lòng xem văn bản gốc để có thông tin đầy đủ và chính xác nhất.</p>
+            <div class="van-ban-item">
+                <h4>Nghị định số 246/2025/NĐ-CP Sửa đổi Nghị định 68/2015/NĐ-CP đăng ký quốc tịch đối với tàu bay</h4>
+                <ul>
+                    <li><strong>Cơ quan ban hành:</strong> Chính phủ</li>
+                    <li><strong>Ngày ban hành:</strong> 15/09/2025</li>
+                    <li><strong>Ngày hiệu lực:</strong> 01/11/2025</li>
+                </ul>
+                <h5>Nội dung tóm tắt/triển khai:</h5>
+                <p>Bổ sung quy định về hồ sơ đề nghị xóa đăng ký quốc tịch tàu bay và chứng nhận đủ điều kiện bay xuất khẩu theo đề nghị của người được chỉ định tại văn bản IDERA. Hồ sơ phải có văn bản đồng ý xóa đăng ký của những người có quyền lợi quốc tế đã được đăng ký có thứ tự ưu tiên cao hơn. <strong>Yêu cầu triển khai:</strong> **Các đơn vị có liên quan** đến quản lý khai thác, đăng ký tàu bay cần lưu ý các thủ tục mới liên quan đến việc xóa đăng ký và xuất khẩu tàu bay.</p>
+            </div>
+            <div class="van-ban-item">
+                <h4>Thông tư số 23/2025/TT-BXD Quy định đặc điểm kinh tế - kỹ thuật và định mức kinh tế - kỹ thuật dịch vụ kiểm định, miễn kiểm định lần đầu cho xe cơ giới, xe máy chuyên dùng</h4>
+                <ul>
+                    <li><strong>Cơ quan ban hành:</strong> Bộ Xây dựng</li>
+                    <li><strong>Ngày ban hành:</strong> 28/08/2025</li>
+                    <li><strong>Ngày hiệu lực:</strong> 24/10/2025</li>
+                </ul>
+                <h5>Nội dung tóm tắt/triển khai:</h5>
+                <p>Ban hành danh mục đặc điểm kinh tế - kỹ thuật và định mức dịch vụ kiểm định, miễn kiểm định lần đầu cho xe cơ giới, xe máy chuyên dùng. Bao gồm việc cấp giấy chứng nhận/tem kiểm định và kiểm định các phương tiện chuyên dụng như ô tô tải, xe đầu kéo, rơ moóc chuyên dụng. <strong>Yêu cầu triển khai:</strong> **Các đơn vị có liên quan** đến quản lý, sử dụng phương tiện chuyên dùng, xe cơ giới tại các Cảng hàng không cần thực hiện theo định mức và quy trình kiểm định mới.</p>
             </div>
         </div>
+
+        <!-- 2. Pháp luật về Đấu thầu và Lựa chọn nhà thầu -->
+        <button type="button" class="category-title">Pháp luật về Đấu thầu và Lựa chọn nhà thầu (01 VB)</button>
+        <div class="category-content">
+            <div class="van-ban-item">
+                <h4>Nghị định 225/2025/NĐ-CP Sửa đổi các Nghị định hướng dẫn Luật Đấu thầu về lựa chọn nhà đầu tư</h4>
+                <ul>
+                    <li><strong>Cơ quan ban hành:</strong> Chính phủ</li>
+                    <li><strong>Ngày ban hành:</strong> 15/08/2025</li>
+                    <li><strong>Ngày hiệu lực:</strong> 15/08/2025</li>
+                </ul>
+                <h5>Nội dung tóm tắt/triển khai:</h5>
+                <p>Sửa đổi quy định về các dự án áp dụng hình thức <strong>chỉ định nhà đầu tư</strong> (gồm dự án cần đẩy nhanh tiến độ, dự án quan trọng quốc gia, dự án lấn biển...). Quy định 2 quy trình chỉ định nhà đầu tư: quy trình thông thường và quy trình rút gọn. <strong>Yêu cầu triển khai:</strong> **Các đơn vị có liên quan** đến công tác đấu thầu và lựa chọn nhà đầu tư cần cập nhật các trường hợp và quy trình chỉ định thầu mới được sửa đổi.</p>
+            </div>
+        </div>
+        
+        <!-- 3. Pháp luật về Đầu tư và Xây dựng -->
+        <button type="button" class="category-title">Pháp luật về Đầu tư và Xây dựng (03 VB)</button>
+        <div class="category-content">
+            <div class="van-ban-item">
+                <h4>Nghị định số 239/2025/NĐ-CP Sửa đổi Nghị định 31/2021/NĐ-CP hướng dẫn Luật Đầu tư</h4>
+                <ul>
+                    <li><strong>Cơ quan ban hành:</strong> Chính phủ</li>
+                    <li><strong>Ngày ban hành:</strong> 03/09/2025</li>
+                    <li><strong>Ngày hiệu lực:</strong> 03/09/2025</li>
+                </ul>
+                <h5>Nội dung tóm tắt/triển khai:</h5>
+                <p>Rút ngắn thời hạn cấp Giấy chứng nhận đăng ký đầu tư (từ 15 ngày xuống <strong>10 ngày</strong>) và tổng thời gian chấp thuận chủ trương đầu tư (của Thủ tướng từ 65 ngày xuống <strong>38 ngày</strong>). Yêu cầu hồ sơ thủ tục đầu tư phải có <strong>bản điện tử có chữ ký số</strong>. Đặc biệt, bổ sung <strong>Cảng hàng không, sân bay</strong> vào Danh mục ngành, nghề ưu đãi đầu tư. <strong>Yêu cầu triển khai:</strong> **Các đơn vị có liên quan** đến đầu tư, xây dựng cần cập nhật các thay đổi về thủ tục, thời hạn và tận dụng các chính sách ưu đãi đầu tư mới.</p>
+            </div>
+            <div class="van-ban-item">
+                <h4>Nghị định 242/2025/NĐ-CP Quản lý và sử dụng vốn ODA và vốn vay ưu đãi</h4>
+                <ul>
+                    <li><strong>Cơ quan ban hành:</strong> Chính phủ</li>
+                    <li><strong>Ngày ban hành:</strong> 10/09/2025</li>
+                    <li><strong>Ngày hiệu lực:</strong> 10/09/2025</li>
+                </ul>
+                <h5>Nội dung tóm tắt/triển khai:</h5>
+                <p>Chi tiết hóa toàn bộ chu trình các chương trình, dự án sử dụng vốn ODA và vốn vay ưu đãi, từ lập kế hoạch, thẩm định, phê duyệt đến quản lý thực hiện, giải ngân, kế toán. Phân định rõ ràng trách nhiệm giữa các Bộ, ngành và đưa ra quy định riêng cho viện trợ không hoàn lại, các khoản vay cho doanh nghiệp nhà nước. <strong>Yêu cầu triển khai:</strong> **Các đơn vị có liên quan** đến các dự án sử dụng vốn ODA/vốn vay ưu đãi cần cập nhật quy trình quản lý và trách nhiệm để đảm bảo tuân thủ.</p>
+            </div>
+            <div class="van-ban-item">
+                <h4>Nghị định số 243/2025/NĐ-CP Quy định chi tiết một số điều của Luật Đầu tư theo phương thức đối tác công tư (PPP)</h4>
+                <ul>
+                    <li><strong>Cơ quan ban hành:</strong> Chính phủ</li>
+                    <li><strong>Ngày ban hành:</strong> 11/09/2025</li>
+                    <li><strong>Ngày hiệu lực:</strong> 11/09/2025</li>
+                </ul>
+                <h5>Nội dung tóm tắt/triển khai:</h5>
+                <p>Quy định về việc báo cáo tình hình thực hiện hoạt động đầu tư theo phương thức PPP, bao gồm trách nhiệm báo cáo giám sát, đánh giá đầu tư do nhà đầu tư, doanh nghiệp dự án PPP thực hiện, và báo cáo tổng hợp gửi Bộ Tài chính trước ngày 31 tháng 3 năm tiếp theo của kỳ báo cáo. <strong>Yêu cầu triển khai:</strong> **Các đơn vị có liên quan** đến các dự án PPP (Đầu tư và Xây dựng) cần đảm bảo tuân thủ chế độ báo cáo mới về giám sát, đánh giá đầu tư.</p>
+            </div>
+        </div>
+
+        <!-- 4. Pháp luật về Đất đai và Môi trường -->
+        <button type="button" class="category-title">Pháp luật về Đất đai và Môi trường (05 VB)</button>
+        <div class="category-content">
+            <div class="van-ban-item">
+                <h4>Nghị định số 213/2025/NĐ-CP Hướng dẫn Luật Quản lý bảo vệ công trình quốc phòng và khu quân sự</h4>
+                <ul>
+                    <li><strong>Cơ quan ban hành:</strong> Chính phủ</li>
+                    <li><strong>Ngày ban hành:</strong> 30/07/2025</li>
+                    <li><strong>Ngày hiệu lực:</strong> 15/09/2025</li>
+                </ul>
+                <h5>Nội dung tóm tắt/triển khai:</h5>
+                <p>Quy định về hồ sơ, trình tự, thủ tục chuyển mục đích sử dụng công trình quốc phòng, khu quân sự để phát triển kinh tế - xã hội. Quy định rõ quy trình phối hợp giữa bộ/ngành/địa phương có nhu cầu và Bộ Quốc phòng. <strong>Yêu cầu triển khai:</strong> **Các đơn vị có liên quan** đến quản lý đất đai và các dự án có liên quan đến khu quân sự cần nghiên cứu kỹ thủ tục chuyển đổi mục đích sử dụng đất quốc phòng.</p>
+            </div>
+            <div class="van-ban-item">
+                <h4>Nghị định 230/2025/NĐ-CP Quy định trường hợp khác miễn giảm tiền sử dụng đất</h4>
+                <ul>
+                    <li><strong>Cơ quan ban hành:</strong> Chính phủ</li>
+                    <li><strong>Ngày ban hành:</strong> 19/08/2025</li>
+                    <li><strong>Ngày hiệu lực:</strong> 19/08/2025</li>
+                </ul>
+                <h5>Nội dung tóm tắt/triển khai:</h5>
+                <p>Quy định về hồ sơ và thủ tục <strong>giảm tiền thuê đất của năm 2025</strong>. Hồ sơ là 01 Giấy đề nghị giảm tiền thuê đất (nộp đến hết ngày 30/11/2025). Quy định việc hoàn trả ngân sách nhà nước nếu bị kiểm tra, thanh tra phát hiện không thuộc đối tượng được giảm. <strong>Yêu cầu triển khai:</strong> **Các đơn vị có liên quan** đến quản lý đất đai và tài chính cần thực hiện ngay thủ tục đề nghị giảm tiền thuê đất nếu đủ điều kiện, đảm bảo đúng thời hạn.</p>
+            </div>
+            <div class="van-ban-item">
+                <h4>Nghị định 226/2025/NĐ-CP Sửa đổi bổ sung quy định thi hành Luật Đất đai</h4>
+                <ul>
+                    <li><strong>Cơ quan ban hành:</strong> Chính phủ</li>
+                    <li><strong>Ngày ban hành:</strong> 15/08/2025</li>
+                    <li><strong>Ngày hiệu lực:</strong> 15/08/2025</li>
+                </ul>
+                <h5>Nội dung tóm tắt/triển khai:</h5>
+                <p>Bãi bỏ quy định về khung giá đất. Sửa đổi 4 phương pháp định giá đất (So sánh, Thu nhập, Hệ số điều chỉnh giá đất) nhằm phù hợp hơn với thực tế thị trường. <strong>Yêu cầu triển khai:</strong> **Các đơn vị có liên quan** đến công tác định giá đất, bồi thường, giải phóng mặt bằng cần nắm vững sự thay đổi lớn về cơ chế định giá đất khi thực hiện các dự án.</p>
+            </div>
+            <div class="van-ban-item">
+                <h4>Thông tư 53/2025/TT-BNNMT Quy chuẩn kỹ thuật quốc gia về công trình, thiết bị xử lý nước thải tại chỗ (QCVN 98:2025/BNNMT)</h4>
+                <ul>
+                    <li><strong>Cơ quan ban hành:</strong> Bộ Nông nghiệp và Phát triển nông thôn</li>
+                    <li><strong>Ngày ban hành:</strong> 27/08/2025</li>
+                    <li><strong>Ngày hiệu lực:</strong> 26/02/2026</li>
+                </ul>
+                <h5>Nội dung tóm tắt/triển khai:</h5>
+                <p>Ban hành Quy chuẩn kỹ thuật quốc gia QCVN 98:2025/BNNMT. Quy định yêu cầu kỹ thuật đối với công trình/thiết bị xử lý nước thải tại chỗ (đảm bảo an toàn, chống thấm, không phát tán mùi, tiếng ồn) và giá trị giới hạn cho phép của các thông số ô nhiễm trong nước thải sau xử lý ($BOD5 \le 130 mg/l$, $TSS \le 120 mg/l$ cho công suất nhỏ $\le 2 m^3/ngay$). <strong>Yêu cầu triển khai:</strong> **Các đơn vị có liên quan** đến quản lý môi trường, xây dựng, và vận hành hệ thống xử lý nước thải cần đảm bảo tuân thủ Quy chuẩn mới.</p>
+            </div>
+            <div class="van-ban-item">
+                <h4>Quyết định 3097/QĐ-BTC Công bố thủ tục hành chính mới ban hành trong lĩnh vực tài chính đất đai</h4>
+                <ul>
+                    <li><strong>Cơ quan ban hành:</strong> Bộ Tài chính</li>
+                    <li><strong>Ngày ban hành:</strong> 04/09/2025</li>
+                    <li><strong>Ngày hiệu lực:</strong> 04/09/2025</li>
+                </ul>
+                <h5>Nội dung tóm tắt/triển khai:</h5>
+                <p>Công bố thủ tục hành chính về giảm tiền thuê đất phải nộp của năm 2025 (chi tiết hóa Nghị định 230/2025/NĐ-CP). Thủ tục thực hiện từ 19/8/2025 đến hết 30/11/2025. Thời hạn giải quyết là 30 ngày. Hồ sơ gồm 01 bản chính Giấy đề nghị giảm tiền thuê đất. <strong>Yêu cầu triển khai:</strong> **Các đơn vị có liên quan** đến công tác tài chính đất đai cần nắm vững quy trình, thời hạn và thành phần hồ sơ để thực hiện thủ tục giảm tiền thuê đất.</p>
+            </div>
+        </div>
+
+        <!-- 5. Pháp luật về Doanh nghiệp và Lao động -->
+        <button type="button" class="category-title">Pháp luật về Doanh nghiệp và Lao động (03 VB)</button>
+        <div class="category-content">
+            <div class="van-ban-item">
+                <h4>Luật số 97/2025/QH15 Sửa đổi Luật Mặt trận Tổ quốc Việt Nam, Luật Công đoàn, Luật Thực hiện dân chủ ở cơ sở</h4>
+                <ul>
+                    <li><strong>Cơ quan ban hành:</strong> Quốc hội</li>
+                    <li><strong>Ngày ban hành:</strong> 27/06/2025</li>
+                    <li><strong>Ngày hiệu lực:</strong> 01/07/2025</li>
+                </ul>
+                <h5>Nội dung tóm tắt/triển khai:</h5>
+                <p>Sửa đổi Điều 1 Luật Công đoàn Việt Nam, khẳng định Công đoàn là đại diện duy nhất của người lao động ở cấp quốc gia. Cụ thể hóa tính chất "trực thuộc Mặt trận Tổ quốc" của Công đoàn và Đoàn Thanh niên Cộng sản Hồ Chí Minh. <strong>Yêu cầu triển khai:</strong> Áp dụng các thay đổi liên quan đến quan hệ lao động, vai trò của tổ chức Công đoàn và Đoàn Thanh niên tại **các đơn vị có liên quan** đến công tác tổ chức, nhân sự.</p>
+            </div>
+            <div class="van-ban-item">
+                <h4>Nghị định số 248/2025/NĐ-CP Quy định chế độ tiền lương, thù lao, tiền thưởng của người đại diện chủ sở hữu trực tiếp, Kiểm soát viên và người đại diện phần vốn nhà nước tại doanh nghiệp nhà nước</h4>
+                <ul>
+                    <li><strong>Cơ quan ban hành:</strong> Chính phủ</li>
+                    <li><strong>Ngày ban hành:</strong> 15/09/2025</li>
+                    <li><strong>Ngày hiệu lực:</strong> 15/09/2025</li>
+                </ul>
+                <h5>Nội dung tóm tắt/triển khai:</h5>
+                <p>Quy định chi tiết về mức lương cơ bản, mức tiền lương tối đa (có thể gấp 4 lần mức lương cơ bản), mức thù lao tối đa (Kiểm soát viên không chuyên trách không quá 20% lương chuyên trách), và tiền thưởng. Tiền thưởng được xác định trong quỹ tiền thưởng trích từ quỹ khen thưởng, phúc lợi. <strong>Yêu cầu triển khai:</strong> **Các đơn vị có liên quan** đến công tác nhân sự, tiền lương và chế độ đãi ngộ đối với người đại diện phần vốn nhà nước cần cập nhật để áp dụng.</p>
+            </div>
+            <div class="van-ban-item">
+                <h4>Nghị định số 249/2025/NĐ-CP Quy định cơ chế, chính sách thu hút chuyên gia khoa học, công nghệ, đổi mới sáng tạo và chuyển đổi số</h4>
+                <ul>
+                    <li><strong>Cơ quan ban hành:</strong> Chính phủ</li>
+                    <li><strong>Ngày ban hành:</strong> 19/09/2025</li>
+                    <li><strong>Ngày hiệu lực:</strong> 19/09/2025</li>
+                </ul>
+                <h5>Nội dung tóm tắt/triển khai:</h5>
+                <p>Quy định quy trình tuyển chọn chuyên gia KH&CN, đổi mới sáng tạo và chuyển đổi số (cơ chế đề cử, ứng cử). Quy định quyền và nghĩa vụ của chuyên gia (được quyết định vấn đề kỹ thuật, chủ động sử dụng kinh phí, mua trực tiếp công nghệ...). <strong>Yêu cầu triển khai:</strong> **Các đơn vị có liên quan** đến tuyển dụng, quản lý chuyên gia và triển khai các dự án KH&CN cần áp dụng cơ chế mới này để thu hút nguồn nhân lực chất lượng cao.</p>
+            </div>
+        </div>
+
+        <!-- 6. Pháp luật về Tài chính, Kế toán và Thuế -->
+        <button type="button" class="category-title">Pháp luật về Tài chính, Kế toán và Thuế (04 VB)</button>
+        <div class="category-content">
+            <div class="van-ban-item">
+                <h4>Luật số 67/2025/QH15 Luật Thuế thu nhập doanh nghiệp</h4>
+                <ul>
+                    <li><strong>Cơ quan ban hành:</strong> Quốc hội</li>
+                    <li><strong>Ngày ban hành:</strong> 14/06/2025</li>
+                    <li><strong>Ngày hiệu lực:</strong> 01/10/2025</li>
+                </ul>
+                <h5>Nội dung tóm tắt/triển khai:</h5>
+                <p>Bổ sung lĩnh vực hưởng ưu đãi thuế TNDN. Quy định chi tiết các khoản chi không được trừ (tiền phạt vi phạm hành chính, phần chi vượt mức phúc lợi, trích lập dự phòng không đúng, chi không tương ứng doanh thu...). Quy định mới về ưu đãi thuế đối với dự án đầu tư mở rộng. <strong>Yêu cầu triển khai:</strong> Cập nhật, nghiên cứu kỹ lưỡng các quy định về chi phí được trừ, ưu đãi thuế cho dự án đầu tư để áp dụng cho **các đơn vị có liên quan** đến công tác tài chính, kế toán và đầu tư.</p>
+            </div>
+            <div class="van-ban-item">
+                <h4>Luật số 93/2025/QH15 Luật Khoa học, Công nghệ và Đổi mới sáng tạo</h4>
+                <ul>
+                    <li><strong>Cơ quan ban hành:</strong> Quốc hội</li>
+                    <li><strong>Ngày ban hành:</strong> 27/06/2025</li>
+                    <li><strong>Ngày hiệu lực:</strong> 01/10/2025</li>
+                </ul>
+                <h5>Nội dung tóm tắt/triển khai:</h5>
+                <p>Luật quy định chi phí của doanh nghiệp tài trợ cho nghiên cứu KH&CN, đổi mới sáng tạo, khoản chi cho nghiên cứu KH&CN được tính vào chi phí được trừ khi xác định thu nhập chịu thuế TNDN. <strong>Yêu cầu triển khai:</strong> **Các đơn vị có liên quan** đến hoạt động tài chính cần lưu ý quy định này để hạch toán chính xác chi phí liên quan đến KH&CN và đổi mới sáng tạo.</p>
+            </div>
+            <div class="van-ban-item">
+                <h4>Nghị định 240/2025/NĐ-CP Quy định về Quỹ chính sách đối ngoại quốc phòng</h4>
+                <ul>
+                    <li><strong>Cơ quan ban hành:</strong> Chính phủ</li>
+                    <li><strong>Ngày ban hành:</strong> 03/09/2025</li>
+                    <li><strong>Ngày hiệu lực:</strong> 03/09/2025</li>
+                </ul>
+                <h5>Nội dung tóm tắt/triển khai:</h5>
+                <p>Quy định về việc thành lập và hoạt động của Quỹ Chính sách đối ngoại quốc phòng. <strong>Quan trọng:</strong> Khoản đóng góp, ủng hộ, tài trợ của các doanh nghiệp cho Quỹ được hạch toán vào chi phí sản xuất kinh doanh và được <strong>trừ khi xác định thu nhập chịu thuế TNDN</strong>. Doanh nghiệp nhà nước đóng góp tối đa không quá 5% thu nhập tính thuế TNDN hằng năm. <strong>Yêu cầu triển khai:</strong> **Các đơn vị có liên quan** đến công tác tài chính, kế toán cần lưu ý quy định về chi phí được trừ này.</p>
+            </div>
+            <div class="van-ban-item">
+                <h4>Nghị định 245/2025/NĐ-CP Sửa đổi Nghị định 155/2020/NĐ-CP quy định chi tiết Luật Chứng khoán</h4>
+                <ul>
+                    <li><strong>Cơ quan ban hành:</strong> Chính phủ</li>
+                    <li><strong>Ngày ban hành:</strong> 11/09/2025</li>
+                    <li><strong>Ngày hiệu lực:</strong> 11/09/2025</li>
+                </ul>
+                <h5>Nội dung tóm tắt/triển khai:</h5>
+                <p>Sửa đổi, bổ sung quy định về trách nhiệm báo cáo và công bố thông tin về việc sử dụng vốn, số tiền thu được từ đợt chào bán, đợt phát hành cho mục đích không để thực hiện dự án (tương tự các trường hợp huy động vốn để thực hiện dự án). <strong>Yêu cầu triển khai:</strong> **Các đơn vị có liên quan** đến công tác quản trị doanh nghiệp, tài chính, và công bố thông tin cần đảm bảo tuân thủ các quy định mới về minh bạch hóa thông tin huy động vốn.</p>
+            </div>
+        </div>
+        
+        <!-- 7. Pháp luật về Hợp đồng -->
+        <button type="button" class="category-title">Pháp luật về Hợp đồng (00 VB)</button>
+        <div class="category-content">
+            <p style="padding: 0 10px 10px 0; font-style: italic; color: #6c757d;">Không có văn bản pháp luật mới nào liên quan đến nhánh này trong danh sách tổng hợp tháng 09/2025.</p>
+        </div>
+
+        <!-- 8. Pháp luật về Phòng cháy chữa cháy (PCCC) -->
+        <button type="button" class="category-title">Pháp luật về Phòng cháy chữa cháy (PCCC) (00 VB)</button>
+        <div class="category-content">
+            <p style="padding: 0 10px 10px 0; font-style: italic; color: #6c757d;">Không có văn bản pháp luật mới nào liên quan đến nhánh này trong danh sách tổng hợp tháng 09/2025.</p>
+        </div>
+        
     </div>
 
     <script>
-        const documentsData = [
-            { id: 1, category: 'Xây dựng', number: 'Thông tư 05/2025/TT-BXD', title: 'Ban hành định mức kinh tế - kỹ thuật trong bảo trì kết cấu hạ tầng hàng không thuộc khu bay tại các Cảng hàng không sân bay.', issuedDate: '12/05/2025', effectiveDate: '12/05/2025', details: '<ul><li class="mb-2">- Quy định định mức KT-KT trong bảo trì kết cấu hạ tầng hàng không thuộc khu bay sử dụng vốn NSNN.</li><li class="mb-2">- Định mức KT-KT đối với bảo trì công trình xây dựng.</li><li>- Định mức KT-KT đối với bảo dưỡng thiết bị.</li></ul>' },
-            { id: 2, category: 'Tài chính', number: 'Thông tư 27/2025/TT-BTC', title: 'Quy định về quyết toán vốn đầu tư dự án hoàn thành sử dụng vốn nhà nước ngoài vốn đầu tư công.', issuedDate: '22/05/2025', effectiveDate: '22/05/2025', details: '<ul><li>Quy định quyết toán vốn đầu tư đối với các dự án sử dụng vốn nhà nước ngoài vốn đầu tư công sau khi hoàn thành hoặc dừng thực hiện vĩnh viễn.</li></ul>' },
-            { id: 3, category: 'Chứng khoán', number: 'Thông tư 19/2025/TT-BTC', title: 'Quy định việc đăng ký công ty đại chúng, hủy tư cách công ty đại chúng, báo cáo về vốn điều lệ đã góp được kiểm toán.', issuedDate: '05/05/2025', effectiveDate: '05/05/2025', details: '<ul><li class="mb-2">- <strong>Đăng ký công ty đại chúng:</strong> Trình tự, thủ tục, hồ sơ.</li><li>- <strong>Hủy tư cách công ty đại chúng:</strong> Các trường hợp và trình tự, thủ tục.</li></ul>' },
-            { id: 4, category: 'Xây dựng', number: 'Nghị định 101/2025/NĐ-CP', title: 'Sửa đổi, bổ sung một số điều của NĐ 32/2016/NĐ-CP và NĐ 42/2016/NĐ-CP.', issuedDate: '09/05/2025', effectiveDate: '23/06/2025', details: '<ul><li class="mb-2">- Sửa đổi hình thức nộp hồ sơ chấp thuận độ cao công trình, thời hạn giải quyết.</li><li class="mb-2">- Bổ sung trách nhiệm của Bộ Xây dựng.</li><li>- Sửa đổi quy định về mở, đóng sân bay chuyên dùng.</li></ul>' },
-            { id: 5, category: 'Xây dựng', number: 'Thông tư 08/2025/TT-BXD', title: 'Sửa đổi, bổ sung một số định mức xây dựng ban hành tại TT 12/2021/TT-BXD.', issuedDate: '30/05/2025', effectiveDate: '15/07/2025', details: '<ul><li>Sửa đổi, bổ sung các định mức: dự toán xây dựng, sử dụng vật liệu, chi phí quản lý dự án.</li></ul>' },
-            { id: 6, category: 'PCCC & CNCH', number: 'Nghị định 105/2025/NĐ-CP', title: 'Quy định chi tiết Luật Phòng cháy, chữa cháy và cứu nạn, cứu hộ.', issuedDate: '15/05/2025', effectiveDate: '01/07/2025', details: '<ul><li class="mb-2">- Danh mục cơ sở, công trình thuộc diện quản lý, thẩm định PCCC.</li><li class="mb-2">- Quy định về nội quy, hồ sơ quản lý PCCC&CNCH.</li><li class="mb-2">- Yêu cầu kết nối thiết bị báo cháy (trước 01/07/2027).</li><li>- Quy định bảo hiểm cháy, nổ bắt buộc.</li></ul>' },
-            { id: 7, category: 'PCCC & CNCH', number: 'Nghị định 106/2025/NĐ-CP', title: 'Quy định xử phạt vi phạm hành chính trong lĩnh vực PCCC và CNCH.', issuedDate: '15/05/2025', effectiveDate: '01/07/2025', details: '<ul><li class="mb-2">- Hình thức xử phạt: Cảnh cáo, phạt tiền (tối đa 100 triệu cho tổ chức),...</li><li>- Thời hiệu xử phạt: 1 năm.</li></ul>' },
-            { id: 8, category: 'Lưu trữ', number: 'Thông tư 07/2025/TT-BXD', title: 'Quy định thời hạn lưu trữ hồ sơ, tài liệu thuộc phạm vi quản lý của Bộ Xây dựng.', issuedDate: '15/05/2025', effectiveDate: '01/07/2025', details: '<ul><li>Quy định thời hạn lưu trữ cho các lĩnh vực: quy hoạch, kiến trúc, đầu tư xây dựng, hạ tầng kỹ thuật, hàng không,...</li></ul>' },
-            { id: 9, category: 'Lưu trữ', number: 'TT 06/2025/TT-BNV & TT 05/2025/TT-BNV', title: 'Quy định chi tiết Luật Lưu trữ 2024 và nghiệp vụ lưu trữ tài liệu số.', issuedDate: '14-15/05/2025', effectiveDate: '01/07/2025', details: '<ul><li class="mb-2">- Quản lý, hủy, sử dụng tài liệu lưu trữ.</li><li>- Quy trình số hóa, bảo quản, sử dụng và hủy tài liệu lưu trữ số.</li></ul>' },
-            { id: 10, category: 'Tài chính', number: 'Nghị định 70/2025/NĐ-CP', title: 'Sửa đổi Nghị định 123/2020/NĐ-CP quy định về hóa đơn, chứng từ.', issuedDate: '20/03/2025', effectiveDate: '01/06/2025', details: '<ul><li class="mb-2">- Sửa đổi quy định về hóa đơn điện tử từ máy tính tiền.</li><li>- Bổ sung trách nhiệm của tổ chức cung cấp dịch vụ hóa đơn điện tử.</li></ul>' },
-            { id: 11, category: 'Lao động & Thi đua', number: 'Thông tư 003/2025/TT-BNV', title: 'Hướng dẫn thực hiện quản lý lao động, tiền lương, thù lao, tiền thưởng trong doanh nghiệp Nhà nước.', issuedDate: '28/04/2025', effectiveDate: '15/06/2025', details: '<ul><li>Nguyên tắc quản lý, xác định tiền lương, thù lao, tiền thưởng dựa trên lợi nhuận, năng suất lao động.</li></ul>' },
-            { id: 12, category: 'Chứng khoán', number: 'Thông tư 14/2025/TT-BTC', title: 'Sửa đổi TT 119/2020/TT-BTC và TT 58/2021/TT-BTC về giao dịch chứng khoán.', issuedDate: '04/04/2025', effectiveDate: '01/06/2025', details: '<ul><li class="mb-2">- Làm rõ tài liệu trong hồ sơ chuyển quyền sở hữu chứng khoán.</li><li class="mb-2">- Làm rõ thông tin khách hàng khi mở tài khoản lưu ký.</li><li>- Thay thế mẫu hợp đồng chứng khoán phái sinh.</li></ul>' },
-            { id: 13, category: 'Môi trường', number: 'Thông tư 01/2025/TT-BNNMT', title: 'Ban hành 03 Quy chuẩn Quốc gia về chất lượng môi trường xung quanh.', issuedDate: '15/05/2025', effectiveDate: '14/11/2025', details: '<ul><li class="mb-2">- QCVN 26:2025/BNNMT - Quy chuẩn kỹ thuật Quốc gia về tiếng ồn.</li><li class="mb-2">- QCVN 27:2025/BNNMT - Quy chuẩn kỹ thuật Quốc gia về độ rung.</li><li>- QCVN 28:2025/BNNMT - Quy chuẩn kỹ thuật Quốc gia về chất lượng trầm tích.</li></ul>' },
-            { id: 14, category: 'PCCC & CNCH', number: 'Thông tư 37/2025/TT-BCA', title: 'Quy định về nhiệm vụ công tác PCCC, CNCH của lực lượng Công an nhân dân.', issuedDate: '15/05/2025', effectiveDate: '01/07/2025', details: '<ul><li class="mb-2">- Quy trình thẩm định thiết kế về phòng cháy, chữa cháy.</li><li class="mb-2">- Quy trình kiểm tra công tác nghiệm thu về phòng cháy, chữa cháy.</li><li>- Quy trình kiểm tra về phòng cháy chữa cháy.</li></ul>' },
-            { id: 15, category: 'Lao động & Thi đua', number: 'Thông tư 28/2025/TT-BTC', title: 'Hướng dẫn mức chi tổ chức thực hiện công tác thi đua, khen thưởng.', issuedDate: '26/05/2025', effectiveDate: '15/07/2025', details: '<ul><li>Quy định chi tiết về mức chi cho công tác thi đua, khen thưởng, chi in ấn, làm hiện vật, chi tuyên truyền, phổ biến...</li></ul>' },
-            { id: 16, category: 'Tài chính', number: 'Thông tư 31/2025/TT-BTC', title: 'Sửa đổi Thông tư 23/2021/TT-BTC hướng dẫn việc in, phát hành, quản lý và sử dụng tem điện tử.', issuedDate: '31/05/2025', effectiveDate: '01/06/2025', details: '<ul><li class="mb-2">- Sửa đổi, bổ sung quy định về mẫu tem, dán tem điện tử.</li><li class="mb-2">- Sửa đổi quản lý, mua tem điện tử thuốc lá, rượu nhập khẩu và sản xuất trong nước.</li><li>- Lược bỏ một số giấy tờ khi mua tem tại cơ quan thuế.</li></ul>' },
-            { id: 17, category: 'Tài chính', number: 'Thông tư 32/2025/TT-BTC', title: 'Hướng dẫn thực hiện Luật Quản lý thuế, Nghị định 123/2020/NĐ-CP, Nghị định 70/2025/NĐ-CP.', issuedDate: '31/05/2025', effectiveDate: '01/06/2025', details: '<ul><li>Hướng dẫn việc chuyển đổi áp dụng hóa đơn điện tử có mã và không có mã của cơ quan thuế đối với các trường hợp, bao gồm cả các doanh nghiệp có rủi ro cao về thuế.</li></ul>' },
-        ];
-
-        document.addEventListener('DOMContentLoaded', () => {
-            const documentsList = document.getElementById('documents-list');
-            const filtersContainer = document.getElementById('filters');
-            const searchInput = document.getElementById('searchInput');
-            const noResults = document.getElementById('no-results');
-
-            const modal = document.getElementById('modal');
-            const modalBox = document.getElementById('modal-box');
-            const closeModalBtn = document.getElementById('close-modal');
-            const modalTitle = document.getElementById('modal-title');
-            const modalContent = document.getElementById('modal-content');
-
-            let currentFilter = 'Tất cả';
-
-            function renderDocuments(docs) {
-                documentsList.innerHTML = '';
-                if (docs.length === 0) {
-                    noResults.classList.remove('hidden');
-                } else {
-                    noResults.classList.add('hidden');
-                }
-                docs.forEach(doc => {
-                    const card = document.createElement('div');
-                    card.className = 'document-card bg-white rounded-xl shadow-md p-5 flex flex-col cursor-pointer';
-                    card.dataset.id = doc.id;
-                    card.innerHTML = `
-                        <div class="flex-grow">
-                            <span class="inline-block bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded-full mb-3">${doc.category}</span>
-                            <h3 class="text-base font-semibold text-slate-800 mb-2">${doc.number}</h3>
-                            <p class="text-slate-600 text-sm">${doc.title}</p>
-                        </div>
-                        <div class="mt-4 pt-4 border-t border-slate-100 text-xs text-slate-500 flex justify-between">
-                            <span>Hiệu lực: <strong>${doc.effectiveDate}</strong></span>
-                            <span>Ban hành: <strong>${doc.issuedDate}</strong></span>
-                        </div>
-                    `;
-                    card.addEventListener('click', () => openModal(doc));
-                    documentsList.appendChild(card);
-                });
-            }
-
-            function setupFilters() {
-                const categories = ['Tất cả', ...new Set(documentsData.map(d => d.category))];
-                filtersContainer.innerHTML = '';
-                categories.forEach(category => {
-                    const button = document.createElement('button');
-                    button.textContent = category;
-                    button.className = 'filter-btn px-4 py-2 text-sm font-medium border border-slate-300 rounded-full transition hover:bg-slate-100';
-                    if (category === currentFilter) {
-                        button.classList.add('filter-btn-active', 'border-blue-600');
-                    }
-                    button.addEventListener('click', () => {
-                        currentFilter = category;
-                        filterAndRender();
-                        updateActiveFilterButton();
-                    });
-                    filtersContainer.appendChild(button);
-                });
-            }
-
-            function updateActiveFilterButton() {
-                document.querySelectorAll('.filter-btn').forEach(btn => {
-                    if (btn.textContent === currentFilter) {
-                        btn.classList.add('filter-btn-active', 'border-blue-600');
-                        btn.classList.remove('bg-slate-100');
+        /* === KHỐI MÃ JAVASCRIPT CỐ ĐỊNH (PHIÊN BẢN NÚT NHẤN) - KHÔNG THAY ĐỔI === */
+        document.addEventListener("DOMContentLoaded", function() {
+            const accordions = document.querySelectorAll('.category-title');
+            accordions.forEach(accordion => {
+                accordion.addEventListener('click', function() {
+                    this.classList.toggle('active');
+                    const content = this.nextElementSibling;
+                    if (content.style.maxHeight) {
+                        // Collapse the content
+                        content.style.maxHeight = null;
+                        content.classList.remove('show');
                     } else {
-                        btn.classList.remove('filter-btn-active', 'border-blue-600');
+                        // Expand the content
+                        content.classList.add('show');
+                        content.style.maxHeight = content.scrollHeight + "px";
                     }
                 });
-            }
-
-            function filterAndRender() {
-                const searchTerm = searchInput.value.toLowerCase();
-                let filteredDocs = documentsData;
-
-                if (currentFilter !== 'Tất cả') {
-                    filteredDocs = filteredDocs.filter(d => d.category === currentFilter);
-                }
-
-                if (searchTerm) {
-                    filteredDocs = filteredDocs.filter(d =>
-                        d.title.toLowerCase().includes(searchTerm) ||
-                        d.number.toLowerCase().includes(searchTerm)
-                    );
-                }
-                
-                renderDocuments(filteredDocs);
-            }
-
-            function openModal(doc) {
-                modalTitle.textContent = doc.number;
-                modalContent.innerHTML = `<h4 class="font-semibold text-lg mb-2">${doc.title}</h4><div class="prose prose-sm max-w-none text-slate-600">${doc.details}</div>`;
-                modal.classList.remove('hidden');
-                setTimeout(() => {
-                    modalBox.classList.remove('scale-95', 'opacity-0');
-                }, 10);
-            }
-
-            function closeModal() {
-                 modalBox.classList.add('scale-95', 'opacity-0');
-                 setTimeout(() => {
-                    modal.classList.add('hidden');
-                 }, 300);
-            }
-
-            function setupChart() {
-                const effectiveDates = documentsData.map(d => {
-                    const parts = d.effectiveDate.split('/');
-                    return new Date(parts[2], parts[1] - 1, parts[0]);
-                });
-
-                const monthCounts = effectiveDates.reduce((acc, date) => {
-                    const month = date.toLocaleString('vi-VN', { month: 'long', year: 'numeric' });
-                    acc[month] = (acc[month] || 0) + 1;
-                    return acc;
-                }, {});
-
-                const sortedMonths = Object.keys(monthCounts).sort((a, b) => {
-                    const [monthA, yearA] = a.replace('Tháng ', '').split(' năm ');
-                    const [monthB, yearB] = b.replace('Tháng ', '').split(' năm ');
-                    return new Date(yearA, monthA - 1) - new Date(yearB, monthB - 1);
-                });
-                
-                const chartLabels = sortedMonths;
-                const chartData = sortedMonths.map(month => monthCounts[month]);
-
-                const ctx = document.getElementById('effectiveDateChart').getContext('2d');
-                new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: chartLabels,
-                        datasets: [{
-                            label: 'Số lượng văn bản',
-                            data: chartData,
-                            backgroundColor: 'rgba(59, 130, 246, 0.7)',
-                            borderColor: 'rgba(37, 99, 235, 1)',
-                            borderWidth: 1,
-                            borderRadius: 4,
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                ticks: {
-                                    stepSize: 1
-                                }
-                            }
-                        },
-                        plugins: {
-                            legend: {
-                                display: false
-                            },
-                            tooltip: {
-                                callbacks: {
-                                    title: (context) => `Hiệu lực ${context[0].label}`
-                                }
-                            }
-                        }
-                    }
-                });
-            }
-
-            searchInput.addEventListener('keyup', filterAndRender);
-            closeModalBtn.addEventListener('click', closeModal);
-            modal.addEventListener('click', (e) => {
-                if (e.target === modal) closeModal();
             });
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
-                    closeModal();
-                }
-            });
-
-            renderDocuments(documentsData);
-            setupFilters();
-            setupChart();
         });
+        /* === KẾT THÚC KHỐI MÃ JAVASCRIPT === */
     </script>
 </body>
 </html>
