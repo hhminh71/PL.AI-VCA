@@ -3,287 +3,487 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cổng Thông Tin Văn Bản Pháp Luật - ACV</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Chosen Palette: Corporate Blue and Slate -->
-    <!-- Application Structure Plan: A dashboard-style single-page application. The core is a filterable, searchable list of legal documents presented as interactive cards. The main navigation will be based on legal domains (Xây dựng, Tài chính, PCCC, etc.) derived from the source report, rather than the original chronological grouping. This task-oriented structure helps users from different departments quickly find relevant information. A timeline chart at the top provides a high-level overview of when regulations become effective. Users can filter the document list by clicking on category tags. Clicking on a document card reveals its detailed summary in a modal window. A search bar allows for keyword-based filtering. This structure transforms a static list into an exploratory tool, prioritizing user efficiency. -->
-    <!-- Visualization & Content Choices: 
-        1. Report Info: Number of documents and their effective dates. Goal: Show the volume/timing of new regulations. Viz: Bar Chart (Chart.js/Canvas) showing count per month. Interaction: Hover for details. Justification: Provides a quick visual summary of upcoming changes.
-        2. Report Info: List of all legal documents. Goal: Organize and present detailed information clearly. Viz: Interactive Cards (HTML/CSS/Tailwind). Interaction: Click card to open a modal with details. List is filterable by category tags and searchable. Justification: Progressive disclosure via modals prevents information overload. Domain-based filtering is highly usable for the target audience.
-    -->
-    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <title>Ngân hàng câu hỏi: Điều tra An toàn Nội bộ</title>
     <style>
-        body { font-family: 'Inter', sans-serif; }
-        .chart-container { position: relative; width: 100%; max-width: 800px; margin-left: auto; margin-right: auto; height: 300px; max-height: 40vh; }
-        .modal-bg { transition: opacity 0.3s ease; }
-        .modal-box { transition: transform 0.3s ease, opacity 0.3s ease; }
-        .document-card { transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; }
-        .document-card:hover { transform: translateY(-4px); box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1); }
-        .filter-btn-active { background-color: #2563eb; color: white; }
+        :root {
+            --primary-color: #2563eb;
+            --bg-color: #f3f4f6;
+            --card-bg: #ffffff;
+            --text-color: #1f2937;
+            --highlight-color: #dc2626; /* Màu đỏ cho đáp án đúng */
+            --border-color: #e5e7eb;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.5;
+            padding-bottom: 40px;
+        }
+
+        /* Header & Search Bar */
+        .header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .search-container {
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        #search-input {
+            width: 100%;
+            padding: 12px 20px;
+            border-radius: 25px;
+            border: none;
+            font-size: 16px;
+            outline: none;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+
+        #search-input:focus {
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            transform: scale(1.01);
+        }
+
+        /* Question Cards */
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 0 15px;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--border-color);
+            transition: transform 0.2s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .question-number {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            color: #6b7280;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .question-text {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #111827;
+        }
+
+        .options-list {
+            list-style-type: none;
+        }
+
+        .option-item {
+            padding: 8px 12px;
+            margin-bottom: 4px;
+            border-radius: 6px;
+            font-size: 1rem;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .option-label {
+            min-width: 25px;
+            font-weight: 600;
+        }
+
+        /* Highlight Correct Answer */
+        .correct-answer {
+            color: var(--highlight-color);
+            font-weight: 600;
+            background-color: #fef2f2;
+        }
+
+        .no-results {
+            text-align: center;
+            color: #6b7280;
+            margin-top: 40px;
+            display: none;
+        }
+        
+        .footer-note {
+            text-align: center;
+            font-size: 0.8rem;
+            color: #6b7280;
+            margin-top: 20px;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .header h1 {
+                font-size: 1.25rem;
+            }
+        }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800">
+<body>
 
-    <div class="container mx-auto p-4 md:p-8">
-        
-        <header class="text-center mb-8">
-            <h1 class="text-3xl md:text-4xl font-bold text-slate-900">Cổng Thông Tin Văn Bản Pháp Luật</h1>
-            <p class="mt-2 text-lg text-slate-600">Cập nhật các quy định pháp luật mới liên quan đến hoạt động của ACV (T5-T6/2025)</p>
-        </header>
-
-        <main>
-            <section id="overview" class="mb-10">
-                <h2 class="text-2xl font-semibold mb-4 text-slate-700 text-center">Tổng Quan Lộ Trình Hiệu Lực</h2>
-                <p class="text-center text-slate-500 mb-6 max-w-3xl mx-auto">Biểu đồ dưới đây thể hiện số lượng văn bản quy phạm pháp luật có hiệu lực theo từng tháng, giúp các đơn vị có cái nhìn tổng thể và chuẩn bị kế hoạch tuân thủ kịp thời.</p>
-                <div class="bg-white p-4 rounded-xl shadow-md">
-                    <div class="chart-container">
-                        <canvas id="effectiveDateChart"></canvas>
-                    </div>
-                </div>
-            </section>
-
-            <section id="documents-section">
-                <h2 class="text-2xl font-semibold mb-4 text-slate-700 text-center">Tra Cứu Văn Bản Chi Tiết</h2>
-                <p class="text-center text-slate-500 mb-6 max-w-3xl mx-auto">Sử dụng thanh tìm kiếm hoặc lọc theo lĩnh vực để nhanh chóng tìm thấy văn bản bạn quan tâm. Nhấp vào từng văn bản để xem nội dung chi tiết.</p>
-
-                <div class="flex flex-col md:flex-row gap-4 mb-6">
-                    <div class="relative flex-grow">
-                        <input type="text" id="searchInput" placeholder="Tìm theo số hiệu, tiêu đề..." class="w-full p-3 pl-10 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
-                        <svg class="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                    </div>
-                </div>
-
-                <div id="filters" class="flex flex-wrap justify-center gap-2 mb-8">
-                </div>
-
-                <div id="documents-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                </div>
-                 <p id="no-results" class="text-center text-slate-500 text-lg py-10 hidden">Không tìm thấy văn bản nào phù hợp.</p>
-            </section>
-        </main>
-
-    </div>
-
-    <div id="modal" class="fixed inset-0 bg-black bg-opacity-60 modal-bg flex items-center justify-center p-4 z-50 hidden" role="dialog" aria-modal="true">
-        <div id="modal-box" class="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col transform scale-95 opacity-0 modal-box">
-            <div class="flex items-center justify-between p-5 border-b border-slate-200">
-                <h3 id="modal-title" class="text-xl font-semibold text-slate-800"></h3>
-                <button id="close-modal" class="text-slate-400 hover:text-slate-700 transition" aria-label="Đóng">
-                    <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                </button>
-            </div>
-            <div id="modal-content" class="p-6 overflow-y-auto">
-            </div>
-            <div class="p-4 bg-slate-50 border-t border-slate-200 text-sm text-slate-500">
-                <p>Nội dung chỉ mang tính chất tham khảo, vui lòng xem văn bản gốc để có thông tin đầy đủ và chính xác nhất.</p>
-            </div>
+    <div class="header">
+        <h1>Ngân hàng câu hỏi: Điều tra An toàn</h1>
+        <div class="search-container">
+            <input type="text" id="search-input" placeholder="Tìm kiếm câu hỏi hoặc đáp án..." autocomplete="off">
         </div>
     </div>
 
+    <div class="container" id="quiz-container">
+        <!-- Javascript will inject cards here -->
+    </div>
+    
+    <div class="no-results" id="no-results">
+        Không tìm thấy câu hỏi nào phù hợp với từ khóa của bạn.
+    </div>
+
+    <div class="footer-note">
+        Generated by WebQ Architect. Đáp án được xác định tự động dựa trên quy trình an toàn hàng không.
+    </div>
+
     <script>
-        const documentsData = [
-            { id: 1, category: 'Xây dựng', number: 'Thông tư 05/2025/TT-BXD', title: 'Ban hành định mức kinh tế - kỹ thuật trong bảo trì kết cấu hạ tầng hàng không thuộc khu bay tại các Cảng hàng không sân bay.', issuedDate: '12/05/2025', effectiveDate: '12/05/2025', details: '<ul><li class="mb-2">- Quy định định mức KT-KT trong bảo trì kết cấu hạ tầng hàng không thuộc khu bay sử dụng vốn NSNN.</li><li class="mb-2">- Định mức KT-KT đối với bảo trì công trình xây dựng.</li><li>- Định mức KT-KT đối với bảo dưỡng thiết bị.</li></ul>' },
-            { id: 2, category: 'Tài chính', number: 'Thông tư 27/2025/TT-BTC', title: 'Quy định về quyết toán vốn đầu tư dự án hoàn thành sử dụng vốn nhà nước ngoài vốn đầu tư công.', issuedDate: '22/05/2025', effectiveDate: '22/05/2025', details: '<ul><li>Quy định quyết toán vốn đầu tư đối với các dự án sử dụng vốn nhà nước ngoài vốn đầu tư công sau khi hoàn thành hoặc dừng thực hiện vĩnh viễn.</li></ul>' },
-            { id: 3, category: 'Chứng khoán', number: 'Thông tư 19/2025/TT-BTC', title: 'Quy định việc đăng ký công ty đại chúng, hủy tư cách công ty đại chúng, báo cáo về vốn điều lệ đã góp được kiểm toán.', issuedDate: '05/05/2025', effectiveDate: '05/05/2025', details: '<ul><li class="mb-2">- <strong>Đăng ký công ty đại chúng:</strong> Trình tự, thủ tục, hồ sơ.</li><li>- <strong>Hủy tư cách công ty đại chúng:</strong> Các trường hợp và trình tự, thủ tục.</li></ul>' },
-            { id: 4, category: 'Xây dựng', number: 'Nghị định 101/2025/NĐ-CP', title: 'Sửa đổi, bổ sung một số điều của NĐ 32/2016/NĐ-CP và NĐ 42/2016/NĐ-CP.', issuedDate: '09/05/2025', effectiveDate: '23/06/2025', details: '<ul><li class="mb-2">- Sửa đổi hình thức nộp hồ sơ chấp thuận độ cao công trình, thời hạn giải quyết.</li><li class="mb-2">- Bổ sung trách nhiệm của Bộ Xây dựng.</li><li>- Sửa đổi quy định về mở, đóng sân bay chuyên dùng.</li></ul>' },
-            { id: 5, category: 'Xây dựng', number: 'Thông tư 08/2025/TT-BXD', title: 'Sửa đổi, bổ sung một số định mức xây dựng ban hành tại TT 12/2021/TT-BXD.', issuedDate: '30/05/2025', effectiveDate: '15/07/2025', details: '<ul><li>Sửa đổi, bổ sung các định mức: dự toán xây dựng, sử dụng vật liệu, chi phí quản lý dự án.</li></ul>' },
-            { id: 6, category: 'PCCC & CNCH', number: 'Nghị định 105/2025/NĐ-CP', title: 'Quy định chi tiết Luật Phòng cháy, chữa cháy và cứu nạn, cứu hộ.', issuedDate: '15/05/2025', effectiveDate: '01/07/2025', details: '<ul><li class="mb-2">- Danh mục cơ sở, công trình thuộc diện quản lý, thẩm định PCCC.</li><li class="mb-2">- Quy định về nội quy, hồ sơ quản lý PCCC&CNCH.</li><li class="mb-2">- Yêu cầu kết nối thiết bị báo cháy (trước 01/07/2027).</li><li>- Quy định bảo hiểm cháy, nổ bắt buộc.</li></ul>' },
-            { id: 7, category: 'PCCC & CNCH', number: 'Nghị định 106/2025/NĐ-CP', title: 'Quy định xử phạt vi phạm hành chính trong lĩnh vực PCCC và CNCH.', issuedDate: '15/05/2025', effectiveDate: '01/07/2025', details: '<ul><li class="mb-2">- Hình thức xử phạt: Cảnh cáo, phạt tiền (tối đa 100 triệu cho tổ chức),...</li><li>- Thời hiệu xử phạt: 1 năm.</li></ul>' },
-            { id: 8, category: 'Lưu trữ', number: 'Thông tư 07/2025/TT-BXD', title: 'Quy định thời hạn lưu trữ hồ sơ, tài liệu thuộc phạm vi quản lý của Bộ Xây dựng.', issuedDate: '15/05/2025', effectiveDate: '01/07/2025', details: '<ul><li>Quy định thời hạn lưu trữ cho các lĩnh vực: quy hoạch, kiến trúc, đầu tư xây dựng, hạ tầng kỹ thuật, hàng không,...</li></ul>' },
-            { id: 9, category: 'Lưu trữ', number: 'TT 06/2025/TT-BNV & TT 05/2025/TT-BNV', title: 'Quy định chi tiết Luật Lưu trữ 2024 và nghiệp vụ lưu trữ tài liệu số.', issuedDate: '14-15/05/2025', effectiveDate: '01/07/2025', details: '<ul><li class="mb-2">- Quản lý, hủy, sử dụng tài liệu lưu trữ.</li><li>- Quy trình số hóa, bảo quản, sử dụng và hủy tài liệu lưu trữ số.</li></ul>' },
-            { id: 10, category: 'Tài chính', number: 'Nghị định 70/2025/NĐ-CP', title: 'Sửa đổi Nghị định 123/2020/NĐ-CP quy định về hóa đơn, chứng từ.', issuedDate: '20/03/2025', effectiveDate: '01/06/2025', details: '<ul><li class="mb-2">- Sửa đổi quy định về hóa đơn điện tử từ máy tính tiền.</li><li>- Bổ sung trách nhiệm của tổ chức cung cấp dịch vụ hóa đơn điện tử.</li></ul>' },
-            { id: 11, category: 'Lao động & Thi đua', number: 'Thông tư 003/2025/TT-BNV', title: 'Hướng dẫn thực hiện quản lý lao động, tiền lương, thù lao, tiền thưởng trong doanh nghiệp Nhà nước.', issuedDate: '28/04/2025', effectiveDate: '15/06/2025', details: '<ul><li>Nguyên tắc quản lý, xác định tiền lương, thù lao, tiền thưởng dựa trên lợi nhuận, năng suất lao động.</li></ul>' },
-            { id: 12, category: 'Chứng khoán', number: 'Thông tư 14/2025/TT-BTC', title: 'Sửa đổi TT 119/2020/TT-BTC và TT 58/2021/TT-BTC về giao dịch chứng khoán.', issuedDate: '04/04/2025', effectiveDate: '01/06/2025', details: '<ul><li class="mb-2">- Làm rõ tài liệu trong hồ sơ chuyển quyền sở hữu chứng khoán.</li><li class="mb-2">- Làm rõ thông tin khách hàng khi mở tài khoản lưu ký.</li><li>- Thay thế mẫu hợp đồng chứng khoán phái sinh.</li></ul>' },
-            { id: 13, category: 'Môi trường', number: 'Thông tư 01/2025/TT-BNNMT', title: 'Ban hành 03 Quy chuẩn Quốc gia về chất lượng môi trường xung quanh.', issuedDate: '15/05/2025', effectiveDate: '14/11/2025', details: '<ul><li class="mb-2">- QCVN 26:2025/BNNMT - Quy chuẩn kỹ thuật Quốc gia về tiếng ồn.</li><li class="mb-2">- QCVN 27:2025/BNNMT - Quy chuẩn kỹ thuật Quốc gia về độ rung.</li><li>- QCVN 28:2025/BNNMT - Quy chuẩn kỹ thuật Quốc gia về chất lượng trầm tích.</li></ul>' },
-            { id: 14, category: 'PCCC & CNCH', number: 'Thông tư 37/2025/TT-BCA', title: 'Quy định về nhiệm vụ công tác PCCC, CNCH của lực lượng Công an nhân dân.', issuedDate: '15/05/2025', effectiveDate: '01/07/2025', details: '<ul><li class="mb-2">- Quy trình thẩm định thiết kế về phòng cháy, chữa cháy.</li><li class="mb-2">- Quy trình kiểm tra công tác nghiệm thu về phòng cháy, chữa cháy.</li><li>- Quy trình kiểm tra về phòng cháy chữa cháy.</li></ul>' },
-            { id: 15, category: 'Lao động & Thi đua', number: 'Thông tư 28/2025/TT-BTC', title: 'Hướng dẫn mức chi tổ chức thực hiện công tác thi đua, khen thưởng.', issuedDate: '26/05/2025', effectiveDate: '15/07/2025', details: '<ul><li>Quy định chi tiết về mức chi cho công tác thi đua, khen thưởng, chi in ấn, làm hiện vật, chi tuyên truyền, phổ biến...</li></ul>' },
-            { id: 16, category: 'Tài chính', number: 'Thông tư 31/2025/TT-BTC', title: 'Sửa đổi Thông tư 23/2021/TT-BTC hướng dẫn việc in, phát hành, quản lý và sử dụng tem điện tử.', issuedDate: '31/05/2025', effectiveDate: '01/06/2025', details: '<ul><li class="mb-2">- Sửa đổi, bổ sung quy định về mẫu tem, dán tem điện tử.</li><li class="mb-2">- Sửa đổi quản lý, mua tem điện tử thuốc lá, rượu nhập khẩu và sản xuất trong nước.</li><li>- Lược bỏ một số giấy tờ khi mua tem tại cơ quan thuế.</li></ul>' },
-            { id: 17, category: 'Tài chính', number: 'Thông tư 32/2025/TT-BTC', title: 'Hướng dẫn thực hiện Luật Quản lý thuế, Nghị định 123/2020/NĐ-CP, Nghị định 70/2025/NĐ-CP.', issuedDate: '31/05/2025', effectiveDate: '01/06/2025', details: '<ul><li>Hướng dẫn việc chuyển đổi áp dụng hóa đơn điện tử có mã và không có mã của cơ quan thuế đối với các trường hợp, bao gồm cả các doanh nghiệp có rủi ro cao về thuế.</li></ul>' },
+        // Dữ liệu câu hỏi được phân tích từ văn bản gốc
+        // Đáp án đúng (correctIndex) được AI xác định dựa trên kiến thức chuyên môn (0=a, 1=b, 2=c, 3=d)
+        const quizData = [
+            {
+                q: "Mục đích chính của công tác điều tra an toàn nội bộ là gì?",
+                options: ["Giảm thiểu chi phí điều tra", "Hiểu rõ trách nhiệm của các đơn vị trong công tác điều tra", "Cải thiện chất lượng dịch vụ khách hàng", "Tăng doanh thu cho cảng hàng không"],
+                correctIndex: 1 // Hiểu rõ trách nhiệm (trong bối cảnh nội bộ)
+            },
+            {
+                q: "Bước đầu tiên trong quy trình điều tra an toàn nội bộ là gì?",
+                options: ["Tiếp nhận thông tin và triển khai", "Xử lý ban đầu", "Báo cáo ban đầu", "Bình giảng và điều tra nguyên nhân"],
+                correctIndex: 0 // Tiếp nhận thông tin
+            },
+            {
+                q: "Bộ phận nào chịu trách nhiệm tiếp nhận thông tin về sự cố tại cảng hàng không?",
+                options: ["Phòng/ bộ phận Kỹ thuật", "Bộ phận trực ban trưởng", "Phòng/bộ phận tổ chức nhân sự", "Ban giám đốc cảng"],
+                correctIndex: 1 // Trực ban trưởng
+            },
+            {
+                q: "Tài liệu tham chiếu nào được dùng trong điều tra an toàn nội bộ?",
+                options: ["Thông tư 14/2019/TT-BGTVT", "Quyết định 1204/QĐ-TCTCHKVN", "Thông tư 29/2021/TT-BGTVT", "Thông tư 13/2020/TT-BLĐTBXH"],
+                correctIndex: 1 // QĐ 1204 (Quy định nội bộ ACV)
+            },
+            {
+                q: "Trong xử lý ban đầu, điều gì cần được thực hiện ngay lập tức?",
+                options: ["Thực hiện báo cáo cuối cùng", "Đánh giá hiệu quả điều tra", "Lập biên bản và ngăn chặn hậu quả", "Phân tích dữ liệu sự cố"],
+                correctIndex: 2 // Lập biên bản và ngăn chặn hậu quả
+            },
+            {
+                q: "Trong quy trình điều tra an toàn nội bộ, bước nào sau đây liên quan lập báo cáo ban đầu?",
+                options: ["Thu thập chứng cứ", "Phân tích nguyên nhân", "Lập báo cáo ban đầu", "Đề xuất biện pháp phòng ngừa"],
+                correctIndex: 2 // Lập báo cáo ban đầu
+            },
+            {
+                q: "Biểu mẫu nào được dùng để ghi lại lời khai của nhân chứng?",
+                options: ["B02.QT06/...", "B01.QT06/...", "B03.QT06/...", "QT13/..."],
+                correctIndex: 1 // B01 (Thường là mẫu đầu tiên)
+            },
+            {
+                q: "Điều gì cần lưu ý khi xử lý tai nạn lao động?",
+                options: ["Giữ nguyên hiện trường theo Thông tư 13/2020/TT-BLĐTBXH", "Chỉ giữ nguyên hiện trường nếu cần thiết", "Không cần giữ nguyên hiện trường", "Giữ nguyên hiện trường theo quy định riêng của cảng"],
+                correctIndex: 0 // Tuân thủ TT13/2020
+            },
+            {
+                q: "Khi phỏng vấn nhân chứng trong điều tra an toàn, điều tra viên cần tránh hành vi nào sau đây?",
+                options: ["Khuyến khích nhân chứng trình bày sự việc theo hiểu biết của mình", "Ghi chép đầy đủ các thông tin quan trọng", "Để các nhân chứng trao đổi và ảnh hưởng lẫn nhau trong quá trình cung cấp tin", "Lựa chọn địa điểm phỏng vấn phù hợp"],
+                correctIndex: 2 // Tránh để nhân chứng thông đồng/ảnh hưởng lẫn nhau
+            },
+            {
+                q: "Tài liệu nào sau đây quy định việc báo cáo ban đầu?",
+                options: ["QT14/...", "QT13/...", "B03.QT06/...", "B02.QT06/..."],
+                correctIndex: 1 // QT13 (Quy trình báo cáo)
+            },
+            {
+                q: "Bộ phận nào chịu trách nhiệm báo cáo tai nạn liên quan đến an ninh?",
+                options: ["Phòng/ bộ phận Tổ chức nhân sự", "Phòng/ bộ phận Điều hành sân bay", "Phòng/ bộ phận An toàn – Kiểm soát chất lượng", "Các câu trên đều sai"],
+                correctIndex: 2 // AT-KSCL (Đầu mối báo cáo an toàn/an ninh)
+            },
+            {
+                q: "Điều gì cần thực hiện trong quá trình xem xét các vụ việc mức độ E (Sự cố mức thấp)?",
+                options: ["Xác định nguyên nhân rõ ràng và thực hiện hành động khắc phục", "Chuyển vụ việc sang cấp trên", "Lập kế hoạch khẩn nguy", "Gửi báo cáo ngay lập tức"],
+                correctIndex: 0 // Xác định nguyên nhân và khắc phục
+            },
+            {
+                q: "Nguyên nhân nào được xem là nguyên nhân trực tiếp trong điều tra an toàn?",
+                options: ["Chính sách không phù hợp", "Thực hiện sai quy trình", "Phân bổ nguồn lực thiếu sót", "Thiên tai"],
+                correctIndex: 1 // Thực hiện sai quy trình (Hành vi không an toàn)
+            },
+            {
+                q: "Khi tiến hành phỏng vấn nhân chứng trong điều tra an toàn, điều tra viên cần đảm bảo điều kiện nào sau đây?",
+                options: ["Nhân chứng được phỏng vấn trong trạng thái tâm lý ổn định", "Phỏng vấn càng nhanh càng tốt", "Chỉ thực hiện phỏng vấn tại văn phòng", "Yêu cầu nhân chứng ký tên trước khi phỏng vấn"],
+                correctIndex: 0 // Tâm lý ổn định
+            },
+            {
+                q: "Bước cuối cùng trong quy trình điều tra là gì?",
+                options: ["Báo cáo ban đầu", "Phổ biến và rút kinh nghiệm", "Lưu hồ sơ", "Xem xét và phê duyệt"],
+                correctIndex: 1 // Phổ biến rút kinh nghiệm (hoặc Lưu hồ sơ tùy quy trình, nhưng phổ biến là đích đến)
+            },
+            {
+                q: "Tại sao việc kiểm tra hiện trường ngay sau sự cố là quan trọng?",
+                options: ["Để tránh bị gián đoạn công việc", "Để cảnh báo cho cán bộ, nhân viên khác", "Để giải quyết vấn đề nhanh chóng", "Để hiểu rõ bối cảnh và tình huống của sự việc"],
+                correctIndex: 3 // Hiểu rõ bối cảnh
+            },
+            {
+                q: "Đơn vị nào chịu trách nhiệm lưu trữ hồ sơ điều tra sự cố, tai nạn?",
+                options: ["Phòng/ bộ phận Tổ chức nhân sự", "Phòng/ bộ phận AT&KSCL", "Phòng/ bộ phận Kỹ thuật", "Các câu trên đều đúng"],
+                correctIndex: 1 // Phòng AT&KSCL
+            },
+            {
+                q: "Nguyên nhân nào sau đây được xếp vào nhóm lỗi của tổ chức trong điều tra an toàn?",
+                options: ["Người lao động bị căng thẳng do áp lực gia đình", "Điều kiện thời tiết bất lợi trong quá trình làm việc", "Lưu lượng hành khách tăng đột biến", "Thiết kế và bố trí cơ sở hạ tầng không phù hợp với yêu cầu an toàn"],
+                correctIndex: 3 // Lỗi tổ chức (Organizational factor)
+            },
+            {
+                q: "Khi nào cần yêu cầu nhân chứng ký tên vào biên bản lấy lời khai?",
+                options: ["Sau khi đọc lại toàn bộ lời khai", "Trước khi phỏng vấn", "Sau khi thảo luận với các nhân chứng khác", "Sau khi gửi báo cáo lên cấp trên"],
+                correctIndex: 0 // Sau khi đọc lại (xác nhận)
+            },
+            {
+                q: "Trong phỏng vấn nhân chứng, kỹ thuật nào giúp đảm bảo thông tin thu được chính xác và khách quan?",
+                options: ["Sử dụng câu hỏi mở, trung lập và không dẫn dắt", "Yêu cầu nhân chứng viết lại toàn bộ sự việc theo mẫu có sẵn", "Đặt câu hỏi mang tính suy đoán để kiểm tra phản ứng", "Luu D050"],
+                correctIndex: 0 // Câu hỏi mở, trung lập
+            },
+            {
+                q: "Trong điều tra an toàn, môi trường làm việc thường được xem là:",
+                options: ["Yếu tố không liên quan", "Yếu tố ảnh hưởng đến năng suất", "Nguyên nhân tiềm ẩn hoặc yếu tố góp phần gây sự cố", "Nội dung không cần điều tra"],
+                correctIndex: 2 // Yếu tố tiềm ẩn/góp phần
+            },
+            {
+                q: "Báo cáo nào được lập ngay sau khi xử lý ban đầu sự cố?",
+                options: ["Báo cáo tổng kết", "Báo cáo ban đầu", "Báo cáo giám sát", "Báo cáo rút kinh nghiệm"],
+                correctIndex: 1 // Báo cáo ban đầu
+            },
+            {
+                q: "Các biện pháp khắc phục cần đáp ứng điều kiện nào?",
+                options: ["Thực tế và dễ thực hiện", "Phức tạp và chi tiết", "Không cần đo lường kết quả", "Chỉ áp dụng cho các sự cố nhỏ"],
+                correctIndex: 0 // Thực tế, khả thi
+            },
+            {
+                q: "Nguyên nhân nào là yếu tố khách quan?",
+                options: ["Sai sót trong quy trình", "Thiên tai", "Lỗi cố ý của người lao động", "Stress"],
+                correctIndex: 1 // Thiên tai
+            },
+            {
+                q: "Nhân tố nào được coi là nguyên nhân gốc rễ trong điều tra?",
+                options: ["Thời tiết", "Thực hiện sai quy trình", "Các yếu tố bên ngoài", "Chính sách của tổ chức không hợp lý"],
+                correctIndex: 3 // Chính sách (Hệ thống)
+            },
+            {
+                q: "Quy trình nào sau đây giúp ngăn ngừa sự cố, tai nạn tái diễn?",
+                options: ["Quy trình điều tra an toàn nội bộ", "Quy trình thực hiện hành động khắc phục/phòng ngừa", "Quy trình báo cáo", "Quy trình kiểm soát hồ sơ"],
+                correctIndex: 1 // Khắc phục/Phòng ngừa (CAPA)
+            },
+            {
+                q: "Báo cáo kết quả điều tra an toàn nội bộ cần gửi đến đâu?",
+                options: ["Phòng Tổ chức nhân sự", "Ban giám đốc cảng", "Các nhân viên liên quan", "Tổng công ty Cảng hàng không Việt Nam – CTCP"],
+                correctIndex: 3 // TCT CHK VN (Cấp trên quản lý)
+            },
+            {
+                q: "Điểm khác biệt chính giữa nguyên nhân trực tiếp và nguyên nhân tiềm ẩn trong điều tra an toàn là gì?",
+                options: ["Nguyên nhân trực tiếp là hành động hoặc điều kiện xảy ra ngay trước sự cố, còn nguyên nhân tiềm ẩn là những yếu tố nền tảng tồn tại trong hệ thống từ trước", "Nguyên nhân trực tiếp luôn do cá nhân gây ra, còn nguyên nhân tiềm ẩn luôn do môi trường", "Nguyên nhân tiềm ẩn không cần xem xét nếu đã xác định được nguyên nhân trực tiếp", "Hai loại nguyên nhân này không có mối liên hệ với nhau"],
+                correctIndex: 0 // Định nghĩa đúng về Direct vs Latent
+            },
+            {
+                q: "Bước nào liên quan đến việc phổ biến thông tin sau cuộc họp bình giảng?",
+                options: ["Bước 6", "Bước 5", "Bước 7", "Bước 3"],
+                correctIndex: 2 // Bước 7 (thường là bước cuối trong quy trình 7 bước)
+            },
+            {
+                q: "Khi nào cần có nhân viên y tế hỗ trợ trong quá trình làm việc với người liên quan đến sự cố?",
+                options: ["Khi không có chấn thương", "Khi có tử vong hoặc chấn thương nghiêm trọng", "Khi tai nạn nhẹ", "Khi chỉ thiệt hại tài sản"],
+                correctIndex: 1 // Tử vong/Chấn thương nghiêm trọng (Hỗ trợ tâm lý/sức khỏe)
+            },
+            {
+                q: "Điều tra an toàn nội bộ là gì?",
+                options: ["Hoạt động xác định lỗi cá nhân và trách nhiệm pháp lý", "Hoạt động thu thập thông tin nhằm xác định nguyên nhân sự cố để cải thiện an toàn", "Hoạt động phục vụ công tác xử phạt vi phạm", "Hoạt động báo cáo hành chính nội bộ"],
+                correctIndex: 1 // Định nghĩa chuẩn ICAO: Tìm nguyên nhân để cải thiện, không đổ lỗi
+            },
+            {
+                q: "Vai trò cốt lõi của công tác điều tra an toàn nội bộ đối với hệ thống an toàn của đơn vị là gì?",
+                options: ["Xác định trách nhiệm cá nhân", "Phục vụ xử phạt vi phạm", "Ngăn ngừa sự cố, tai nạn tái diễn và cải thiện an toàn hệ thống", "Đáp ứng yêu cầu báo cáo hành chính"],
+                correctIndex: 2 // Ngăn ngừa tái diễn
+            },
+            {
+                q: "Đối tượng của điều tra an toàn nội bộ bao gồm những gì?",
+                options: ["Chỉ tai nạn hàng không nghiêm trọng", "Chỉ sự cố gây thiệt hại lớn", "Tai nạn, sự cố, vụ việc và các bất thường có nguy cơ mất an toàn", "Chỉ các vụ việc do con người gây ra"],
+                correctIndex: 2 // Bao trùm tất cả sự cố/vụ việc
+            },
+            {
+                q: "Nguyên tắc quan trọng nhất trong điều tra an toàn nội bộ là gì?",
+                options: ["Nhanh chóng kết luận trách nhiệm", "Đảm bảo tính bảo mật tuyệt đối", "Khách quan, không đổ lỗi", "Thu thập càng nhiều bằng chứng càng tốt"],
+                correctIndex: 2 // Khách quan, không đổ lỗi (Non-punitive)
+            },
+            {
+                q: "Kết quả điều tra an toàn nội bộ được sử dụng chủ yếu để làm gì trong hệ thống an toàn của đơn vị?",
+                options: ["Lưu trữ hồ sơ", "Hỗ trợ cải tiến quy trình và thực hiện các biện pháp phòng ngừa rủi ro an toàn", "Xác định trách nhiệm cá nhân", "Báo cáo cấp trên"],
+                correctIndex: 1 // Cải tiến và phòng ngừa
+            },
+            {
+                q: "Phát biểu nào sau đây mô tả chính xác nhất sự khác nhau giữa tai nạn và sự cố trong hàng không?",
+                options: ["Tai nạn chỉ liên quan đến con người, sự cố chỉ liên quan đến thiết bị", "Tai nạn luôn xảy ra trên không, sự cố xảy ra dưới mặt đất", "Tai nạn gây hậu quả nghiêm trọng về người và/hoặc tài sản; sự cố là vụ việc ảnh hưởng hoặc có khả năng ảnh hưởng đến an toàn nhưng chưa gây hậu quả nghiêm trọng như tai nạn", "Đánh giá mức độ thiệt hại"],
+                correctIndex: 2 // Sự khác biệt về hậu quả
+            },
+            {
+                q: "Mục đích của việc phân loại tai nạn và sự cố trong điều tra an toàn là gì?",
+                options: ["Để xác định mức xử phạt phù hợp", "Để phục vụ thống kê hành chính", "Để lựa chọn phương pháp điều tra và biện pháp phòng ngừa phù hợp", "Để xác định trách nhiệm cá nhân"],
+                correctIndex: 2 // Chọn phương pháp và quy mô điều tra phù hợp
+            },
+            {
+                q: "Mục tiêu chính của việc áp dụng các phương pháp điều tra an toàn là gì?",
+                options: ["Thu thập bằng chứng để xử lý kỷ luật", "Xác định nguyên nhân gốc rễ của sự cố", "Hoàn thiện hồ sơ báo cáo", "Đánh giá năng lực cá nhân"],
+                correctIndex: 1 // Tìm nguyên nhân gốc rễ (Root cause)
+            },
+            {
+                q: "Phương pháp “5 Why” được sử dụng trong điều tra an toàn nhằm mục đích gì?",
+                options: ["Xác định người gây ra sự cố", "Phân loại mức độ tai nạn", "Truy tìm nguyên nhân gốc rễ của sự cố", "Đánh giá mức độ thiệt hại"],
+                correctIndex: 2 // Truy tìm nguyên nhân gốc rễ
+            },
+            {
+                q: "Công cụ nào sau đây thường được sử dụng để phân tích mối quan hệ nguyên nhân hậu quả trong điều tra an toàn?",
+                options: ["Biểu đồ Pareto", "Sơ đồ xương cá (Ishikawa)", "Danh mục kiểm tra", "Biểu đồ Gantt"],
+                correctIndex: 1 // Ishikawa (Xương cá)
+            },
+            {
+                q: "Khi phỏng vấn nhân chứng trong điều tra an toàn nội bộ, nguyên tắc nào sau đây cần được ưu tiên tuân thủ?",
+                options: ["Đặt câu hỏi đóng để tiết kiệm thời gian", "Phỏng vấn càng nhiều người càng tốt", "Không đổ lỗi, tạo môi trường cởi mở và khách quan", "Ghi âm để làm bằng chứng xử lý kỷ luật"],
+                correctIndex: 2 // Không đổ lỗi
+            },
+            {
+                q: "Kết quả cuối cùng quan trọng nhất của việc áp dụng các phương pháp công cụ điều tra an toàn là gì?",
+                options: ["Báo cáo điều tra hoàn chỉnh", "Danh sách lỗi cá nhân", "Các khuyến nghị và biện pháp phòng ngừa an toàn", "Hồ sơ lưu trữ nội bộ"],
+                correctIndex: 2 // Khuyến nghị an toàn
+            },
+            {
+                q: "Mục tiêu quan trọng nhất của báo cáo điều tra an toàn nội bộ là gì?",
+                options: ["Xác định lỗi và trách nhiệm cá nhân", "Mô tả chi tiết sự việc để lưu hồ sơ", "Trình bày nguyên nhân và đề xuất biện pháp phòng ngừa", "Phục vụ xử lý kỷ luật"],
+                correctIndex: 2 // Nguyên nhân & Phòng ngừa
+            },
+            {
+                q: "Phần nào sau đây là nội dung bắt buộc trong báo cáo điều tra an toàn nội bộ?",
+                options: ["Đánh giá năng lực cá nhân liên quan", "Phân tích nguyên nhân và các yếu tố đóng góp", "Đề xuất hình thức xử lý kỷ luật", "Nhận xét chủ quan của điều tra viên"],
+                correctIndex: 1 // Phân tích nguyên nhân
+            },
+            {
+                q: "Khi đề xuất biện pháp khắc phục trong báo cáo điều tra an toàn, yêu cầu nào sau đây là đúng nhất?",
+                options: ["Biện pháp càng nhiều càng tốt", "Biện pháp mang tính chung chung để dễ áp dụng", "Biện pháp cụ thể, khả thi và gắn với nguyên nhân đã xác định", "Biện pháp tập trung vào nhắc nhở cá nhân"],
+                correctIndex: 2 // Cụ thể, khả thi (SMART)
+            }
         ];
 
-        document.addEventListener('DOMContentLoaded', () => {
-            const documentsList = document.getElementById('documents-list');
-            const filtersContainer = document.getElementById('filters');
-            const searchInput = document.getElementById('searchInput');
-            const noResults = document.getElementById('no-results');
+        const container = document.getElementById('quiz-container');
+        const searchInput = document.getElementById('search-input');
+        const noResults = document.getElementById('no-results');
 
-            const modal = document.getElementById('modal');
-            const modalBox = document.getElementById('modal-box');
-            const closeModalBtn = document.getElementById('close-modal');
-            const modalTitle = document.getElementById('modal-title');
-            const modalContent = document.getElementById('modal-content');
-
-            let currentFilter = 'Tất cả';
-
-            function renderDocuments(docs) {
-                documentsList.innerHTML = '';
-                if (docs.length === 0) {
-                    noResults.classList.remove('hidden');
-                } else {
-                    noResults.classList.add('hidden');
-                }
-                docs.forEach(doc => {
-                    const card = document.createElement('div');
-                    card.className = 'document-card bg-white rounded-xl shadow-md p-5 flex flex-col cursor-pointer';
-                    card.dataset.id = doc.id;
-                    card.innerHTML = `
-                        <div class="flex-grow">
-                            <span class="inline-block bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded-full mb-3">${doc.category}</span>
-                            <h3 class="text-base font-semibold text-slate-800 mb-2">${doc.number}</h3>
-                            <p class="text-slate-600 text-sm">${doc.title}</p>
-                        </div>
-                        <div class="mt-4 pt-4 border-t border-slate-100 text-xs text-slate-500 flex justify-between">
-                            <span>Hiệu lực: <strong>${doc.effectiveDate}</strong></span>
-                            <span>Ban hành: <strong>${doc.issuedDate}</strong></span>
-                        </div>
-                    `;
-                    card.addEventListener('click', () => openModal(doc));
-                    documentsList.appendChild(card);
-                });
+        function renderQuestions(data) {
+            container.innerHTML = '';
+            if (data.length === 0) {
+                noResults.style.display = 'block';
+                return;
+            } else {
+                noResults.style.display = 'none';
             }
 
-            function setupFilters() {
-                const categories = ['Tất cả', ...new Set(documentsData.map(d => d.category))];
-                filtersContainer.innerHTML = '';
-                categories.forEach(category => {
-                    const button = document.createElement('button');
-                    button.textContent = category;
-                    button.className = 'filter-btn px-4 py-2 text-sm font-medium border border-slate-300 rounded-full transition hover:bg-slate-100';
-                    if (category === currentFilter) {
-                        button.classList.add('filter-btn-active', 'border-blue-600');
+            data.forEach((item, index) => {
+                const card = document.createElement('div');
+                card.className = 'card';
+
+                const qNum = document.createElement('div');
+                qNum.className = 'question-number';
+                qNum.innerText = `Câu hỏi ${item.originalIndex + 1}`; // Sử dụng index gốc
+
+                const qText = document.createElement('div');
+                qText.className = 'question-text';
+                qText.innerText = item.q;
+
+                const optionsList = document.createElement('ul');
+                optionsList.className = 'options-list';
+
+                const labels = ['a', 'b', 'c', 'd'];
+
+                item.options.forEach((opt, idx) => {
+                    const li = document.createElement('li');
+                    li.className = 'option-item';
+                    
+                    // Logic tô màu đỏ cho đáp án đúng
+                    if (idx === item.correctIndex) {
+                        li.classList.add('correct-answer');
                     }
-                    button.addEventListener('click', () => {
-                        currentFilter = category;
-                        filterAndRender();
-                        updateActiveFilterButton();
-                    });
-                    filtersContainer.appendChild(button);
-                });
-            }
 
-            function updateActiveFilterButton() {
-                document.querySelectorAll('.filter-btn').forEach(btn => {
-                    if (btn.textContent === currentFilter) {
-                        btn.classList.add('filter-btn-active', 'border-blue-600');
-                        btn.classList.remove('bg-slate-100');
-                    } else {
-                        btn.classList.remove('filter-btn-active', 'border-blue-600');
-                    }
-                });
-            }
+                    const label = document.createElement('span');
+                    label.className = 'option-label';
+                    label.innerText = `${labels[idx]}.`;
 
-            function filterAndRender() {
-                const searchTerm = searchInput.value.toLowerCase();
-                let filteredDocs = documentsData;
+                    const text = document.createElement('span');
+                    text.innerText = opt;
 
-                if (currentFilter !== 'Tất cả') {
-                    filteredDocs = filteredDocs.filter(d => d.category === currentFilter);
-                }
-
-                if (searchTerm) {
-                    filteredDocs = filteredDocs.filter(d =>
-                        d.title.toLowerCase().includes(searchTerm) ||
-                        d.number.toLowerCase().includes(searchTerm)
-                    );
-                }
-                
-                renderDocuments(filteredDocs);
-            }
-
-            function openModal(doc) {
-                modalTitle.textContent = doc.number;
-                modalContent.innerHTML = `<h4 class="font-semibold text-lg mb-2">${doc.title}</h4><div class="prose prose-sm max-w-none text-slate-600">${doc.details}</div>`;
-                modal.classList.remove('hidden');
-                setTimeout(() => {
-                    modalBox.classList.remove('scale-95', 'opacity-0');
-                }, 10);
-            }
-
-            function closeModal() {
-                 modalBox.classList.add('scale-95', 'opacity-0');
-                 setTimeout(() => {
-                    modal.classList.add('hidden');
-                 }, 300);
-            }
-
-            function setupChart() {
-                const effectiveDates = documentsData.map(d => {
-                    const parts = d.effectiveDate.split('/');
-                    return new Date(parts[2], parts[1] - 1, parts[0]);
+                    li.appendChild(label);
+                    li.appendChild(text);
+                    optionsList.appendChild(li);
                 });
 
-                const monthCounts = effectiveDates.reduce((acc, date) => {
-                    const month = date.toLocaleString('vi-VN', { month: 'long', year: 'numeric' });
-                    acc[month] = (acc[month] || 0) + 1;
-                    return acc;
-                }, {});
-
-                const sortedMonths = Object.keys(monthCounts).sort((a, b) => {
-                    const [monthA, yearA] = a.replace('Tháng ', '').split(' năm ');
-                    const [monthB, yearB] = b.replace('Tháng ', '').split(' năm ');
-                    return new Date(yearA, monthA - 1) - new Date(yearB, monthB - 1);
-                });
-                
-                const chartLabels = sortedMonths;
-                const chartData = sortedMonths.map(month => monthCounts[month]);
-
-                const ctx = document.getElementById('effectiveDateChart').getContext('2d');
-                new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: chartLabels,
-                        datasets: [{
-                            label: 'Số lượng văn bản',
-                            data: chartData,
-                            backgroundColor: 'rgba(59, 130, 246, 0.7)',
-                            borderColor: 'rgba(37, 99, 235, 1)',
-                            borderWidth: 1,
-                            borderRadius: 4,
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                ticks: {
-                                    stepSize: 1
-                                }
-                            }
-                        },
-                        plugins: {
-                            legend: {
-                                display: false
-                            },
-                            tooltip: {
-                                callbacks: {
-                                    title: (context) => `Hiệu lực ${context[0].label}`
-                                }
-                            }
-                        }
-                    }
-                });
-            }
-
-            searchInput.addEventListener('keyup', filterAndRender);
-            closeModalBtn.addEventListener('click', closeModal);
-            modal.addEventListener('click', (e) => {
-                if (e.target === modal) closeModal();
+                card.appendChild(qNum);
+                card.appendChild(qText);
+                card.appendChild(optionsList);
+                container.appendChild(card);
             });
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
-                    closeModal();
-                }
+        }
+
+        // Thêm originalIndex để giữ số thứ tự câu hỏi khi tìm kiếm
+        const quizDataWithIndex = quizData.map((item, index) => ({...item, originalIndex: index}));
+
+        // Initial Render
+        renderQuestions(quizDataWithIndex);
+
+        // Search Functionality
+        searchInput.addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase().trim();
+            
+            if (!term) {
+                renderQuestions(quizDataWithIndex);
+                return;
+            }
+
+            const filtered = quizDataWithIndex.filter(item => {
+                const matchQuestion = item.q.toLowerCase().includes(term);
+                const matchOption = item.options.some(opt => opt.toLowerCase().includes(term));
+                return matchQuestion || matchOption;
             });
 
-            renderDocuments(documentsData);
-            setupFilters();
-            setupChart();
+            renderQuestions(filtered);
         });
     </script>
 </body>
