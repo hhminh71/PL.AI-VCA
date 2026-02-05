@@ -3,488 +3,773 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ngân hàng câu hỏi: Điều tra An toàn Nội bộ</title>
+    <title>Ngân Hàng Câu Hỏi - Điều Tra An Toàn Nội Bộ</title>
     <style>
         :root {
             --primary-color: #2563eb;
-            --bg-color: #f3f4f6;
+            --bg-color: #f8fafc;
             --card-bg: #ffffff;
-            --text-color: #1f2937;
-            --highlight-color: #dc2626; /* Màu đỏ cho đáp án đúng */
-            --border-color: #e5e7eb;
+            --text-main: #1e293b;
+            --text-secondary: #64748b;
+            --highlight: #dc2626; /* Màu đỏ cho đáp án đúng */
+            --border: #e2e8f0;
+            --option-hover: #f1f5f9;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             background-color: var(--bg-color);
-            color: var(--text-color);
-            line-height: 1.5;
-            padding-bottom: 40px;
+            color: var(--text-main);
+            padding: 20px;
+            line-height: 1.6;
         }
 
-        /* Header & Search Bar */
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* Header & Search */
         .header {
-            background-color: var(--primary-color);
-            color: white;
-            padding: 20px;
             text-align: center;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
         }
 
         .header h1 {
             font-size: 1.5rem;
-            margin-bottom: 15px;
-            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--primary-color);
         }
 
         .search-container {
-            max-width: 800px;
-            margin: 0 auto;
-            position: relative;
+            position: sticky;
+            top: 20px;
+            z-index: 100;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--border);
         }
 
-        #search-input {
+        #searchInput {
             width: 100%;
-            padding: 12px 20px;
-            border-radius: 25px;
-            border: none;
+            padding: 12px 16px;
             font-size: 16px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
             outline: none;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-            transition: all 0.3s ease;
+            transition: border-color 0.2s;
         }
 
-        #search-input:focus {
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            transform: scale(1.01);
+        #searchInput:focus {
+            border-color: var(--primary-color);
+        }
+
+        .stats {
+            margin-top: 8px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            text-align: right;
         }
 
         /* Question Cards */
-        .container {
-            max-width: 800px;
-            margin: 20px auto;
-            padding: 0 15px;
+        #questionList {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
         }
 
         .card {
-            background-color: var(--card-bg);
-            border-radius: 8px;
+            background: var(--card-bg);
             padding: 20px;
-            margin-bottom: 16px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            border: 1px solid var(--border-color);
-            transition: transform 0.2s ease;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
         }
 
         .card:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
         }
 
-        .question-number {
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            color: #6b7280;
-            font-weight: 700;
+        .q-header {
+            display: flex;
+            justify-content: space-between;
             margin-bottom: 8px;
         }
 
-        .question-text {
-            font-size: 1.1rem;
-            font-weight: 600;
-            margin-bottom: 16px;
-            color: #111827;
+        .q-number {
+            font-weight: 700;
+            color: var(--primary-color);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
+        .q-text {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 16px;
+            color: var(--text-main);
+        }
+
+        /* Options Styles */
         .options-list {
-            list-style-type: none;
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
         }
 
         .option-item {
             padding: 8px 12px;
-            margin-bottom: 4px;
             border-radius: 6px;
+            border: 1px solid transparent;
             font-size: 1rem;
-            display: flex;
-            align-items: flex-start;
+            color: var(--text-main);
+            transition: background-color 0.2s;
         }
-
-        .option-label {
-            min-width: 25px;
-            font-weight: 600;
-        }
-
-        /* Highlight Correct Answer */
-        .correct-answer {
-            color: var(--highlight-color);
-            font-weight: 600;
+        
+        /* Style for correct answer */
+        .option-item.correct {
+            color: var(--highlight);
+            font-weight: 700;
             background-color: #fef2f2;
+            border-color: #fee2e2;
+        }
+        
+        .option-item:not(.correct) {
+            color: var(--text-secondary);
         }
 
         .no-results {
             text-align: center;
-            color: #6b7280;
-            margin-top: 40px;
-            display: none;
-        }
-        
-        .footer-note {
-            text-align: center;
-            font-size: 0.8rem;
-            color: #6b7280;
-            margin-top: 20px;
+            padding: 40px;
+            color: var(--text-secondary);
+            font-style: italic;
         }
 
-        /* Responsive */
+        /* Highlight match */
+        .highlight-match {
+            background-color: #fde047;
+            padding: 0 2px;
+            border-radius: 2px;
+            color: black;
+        }
+
         @media (max-width: 600px) {
-            .header h1 {
-                font-size: 1.25rem;
-            }
+            body { padding: 10px; }
+            .header h1 { font-size: 1.25rem; }
+            .card { padding: 15px; }
+            .q-text { font-size: 1rem; }
         }
     </style>
 </head>
 <body>
 
+<div class="container">
     <div class="header">
-        <h1>Ngân hàng câu hỏi: Điều tra An toàn</h1>
-        <div class="search-container">
-            <input type="text" id="search-input" placeholder="Tìm kiếm câu hỏi hoặc đáp án..." autocomplete="off">
-        </div>
+        <h1>NGÂN HÀNG CÂU HỎI<br>ĐIỀU TRA AN TOÀN NỘI BỘ</h1>
     </div>
 
-    <div class="container" id="quiz-container">
-        <!-- Javascript will inject cards here -->
-    </div>
-    
-    <div class="no-results" id="no-results">
-        Không tìm thấy câu hỏi nào phù hợp với từ khóa của bạn.
+    <div class="search-container">
+        <input type="text" id="searchInput" placeholder="🔍 Nhập từ khóa để tìm kiếm (ví dụ: báo cáo, quy trình...)" autofocus>
+        <div class="stats" id="resultStats">Hiển thị tất cả câu hỏi</div>
     </div>
 
-    <div class="footer-note">
-        Generated by WebQ Architect. Đáp án được xác định tự động dựa trên quy trình an toàn hàng không.
+    <div id="questionList">
+        <!-- Questions will be rendered here by JS -->
     </div>
+</div>
 
-    <script>
-        // Dữ liệu câu hỏi được phân tích từ văn bản gốc
-        // Đáp án đúng (correctIndex) được AI xác định dựa trên kiến thức chuyên môn (0=a, 1=b, 2=c, 3=d)
-        const quizData = [
-            {
-                q: "Mục đích chính của công tác điều tra an toàn nội bộ là gì?",
-                options: ["Giảm thiểu chi phí điều tra", "Hiểu rõ trách nhiệm của các đơn vị trong công tác điều tra", "Cải thiện chất lượng dịch vụ khách hàng", "Tăng doanh thu cho cảng hàng không"],
-                correctIndex: 1 // Hiểu rõ trách nhiệm (trong bối cảnh nội bộ)
-            },
-            {
-                q: "Bước đầu tiên trong quy trình điều tra an toàn nội bộ là gì?",
-                options: ["Tiếp nhận thông tin và triển khai", "Xử lý ban đầu", "Báo cáo ban đầu", "Bình giảng và điều tra nguyên nhân"],
-                correctIndex: 0 // Tiếp nhận thông tin
-            },
-            {
-                q: "Bộ phận nào chịu trách nhiệm tiếp nhận thông tin về sự cố tại cảng hàng không?",
-                options: ["Phòng/ bộ phận Kỹ thuật", "Bộ phận trực ban trưởng", "Phòng/bộ phận tổ chức nhân sự", "Ban giám đốc cảng"],
-                correctIndex: 1 // Trực ban trưởng
-            },
-            {
-                q: "Tài liệu tham chiếu nào được dùng trong điều tra an toàn nội bộ?",
-                options: ["Thông tư 14/2019/TT-BGTVT", "Quyết định 1204/QĐ-TCTCHKVN", "Thông tư 29/2021/TT-BGTVT", "Thông tư 13/2020/TT-BLĐTBXH"],
-                correctIndex: 1 // QĐ 1204 (Quy định nội bộ ACV)
-            },
-            {
-                q: "Trong xử lý ban đầu, điều gì cần được thực hiện ngay lập tức?",
-                options: ["Thực hiện báo cáo cuối cùng", "Đánh giá hiệu quả điều tra", "Lập biên bản và ngăn chặn hậu quả", "Phân tích dữ liệu sự cố"],
-                correctIndex: 2 // Lập biên bản và ngăn chặn hậu quả
-            },
-            {
-                q: "Trong quy trình điều tra an toàn nội bộ, bước nào sau đây liên quan lập báo cáo ban đầu?",
-                options: ["Thu thập chứng cứ", "Phân tích nguyên nhân", "Lập báo cáo ban đầu", "Đề xuất biện pháp phòng ngừa"],
-                correctIndex: 2 // Lập báo cáo ban đầu
-            },
-            {
-                q: "Biểu mẫu nào được dùng để ghi lại lời khai của nhân chứng?",
-                options: ["B02.QT06/...", "B01.QT06/...", "B03.QT06/...", "QT13/..."],
-                correctIndex: 1 // B01 (Thường là mẫu đầu tiên)
-            },
-            {
-                q: "Điều gì cần lưu ý khi xử lý tai nạn lao động?",
-                options: ["Giữ nguyên hiện trường theo Thông tư 13/2020/TT-BLĐTBXH", "Chỉ giữ nguyên hiện trường nếu cần thiết", "Không cần giữ nguyên hiện trường", "Giữ nguyên hiện trường theo quy định riêng của cảng"],
-                correctIndex: 0 // Tuân thủ TT13/2020
-            },
-            {
-                q: "Khi phỏng vấn nhân chứng trong điều tra an toàn, điều tra viên cần tránh hành vi nào sau đây?",
-                options: ["Khuyến khích nhân chứng trình bày sự việc theo hiểu biết của mình", "Ghi chép đầy đủ các thông tin quan trọng", "Để các nhân chứng trao đổi và ảnh hưởng lẫn nhau trong quá trình cung cấp tin", "Lựa chọn địa điểm phỏng vấn phù hợp"],
-                correctIndex: 2 // Tránh để nhân chứng thông đồng/ảnh hưởng lẫn nhau
-            },
-            {
-                q: "Tài liệu nào sau đây quy định việc báo cáo ban đầu?",
-                options: ["QT14/...", "QT13/...", "B03.QT06/...", "B02.QT06/..."],
-                correctIndex: 1 // QT13 (Quy trình báo cáo)
-            },
-            {
-                q: "Bộ phận nào chịu trách nhiệm báo cáo tai nạn liên quan đến an ninh?",
-                options: ["Phòng/ bộ phận Tổ chức nhân sự", "Phòng/ bộ phận Điều hành sân bay", "Phòng/ bộ phận An toàn – Kiểm soát chất lượng", "Các câu trên đều sai"],
-                correctIndex: 2 // AT-KSCL (Đầu mối báo cáo an toàn/an ninh)
-            },
-            {
-                q: "Điều gì cần thực hiện trong quá trình xem xét các vụ việc mức độ E (Sự cố mức thấp)?",
-                options: ["Xác định nguyên nhân rõ ràng và thực hiện hành động khắc phục", "Chuyển vụ việc sang cấp trên", "Lập kế hoạch khẩn nguy", "Gửi báo cáo ngay lập tức"],
-                correctIndex: 0 // Xác định nguyên nhân và khắc phục
-            },
-            {
-                q: "Nguyên nhân nào được xem là nguyên nhân trực tiếp trong điều tra an toàn?",
-                options: ["Chính sách không phù hợp", "Thực hiện sai quy trình", "Phân bổ nguồn lực thiếu sót", "Thiên tai"],
-                correctIndex: 1 // Thực hiện sai quy trình (Hành vi không an toàn)
-            },
-            {
-                q: "Khi tiến hành phỏng vấn nhân chứng trong điều tra an toàn, điều tra viên cần đảm bảo điều kiện nào sau đây?",
-                options: ["Nhân chứng được phỏng vấn trong trạng thái tâm lý ổn định", "Phỏng vấn càng nhanh càng tốt", "Chỉ thực hiện phỏng vấn tại văn phòng", "Yêu cầu nhân chứng ký tên trước khi phỏng vấn"],
-                correctIndex: 0 // Tâm lý ổn định
-            },
-            {
-                q: "Bước cuối cùng trong quy trình điều tra là gì?",
-                options: ["Báo cáo ban đầu", "Phổ biến và rút kinh nghiệm", "Lưu hồ sơ", "Xem xét và phê duyệt"],
-                correctIndex: 1 // Phổ biến rút kinh nghiệm (hoặc Lưu hồ sơ tùy quy trình, nhưng phổ biến là đích đến)
-            },
-            {
-                q: "Tại sao việc kiểm tra hiện trường ngay sau sự cố là quan trọng?",
-                options: ["Để tránh bị gián đoạn công việc", "Để cảnh báo cho cán bộ, nhân viên khác", "Để giải quyết vấn đề nhanh chóng", "Để hiểu rõ bối cảnh và tình huống của sự việc"],
-                correctIndex: 3 // Hiểu rõ bối cảnh
-            },
-            {
-                q: "Đơn vị nào chịu trách nhiệm lưu trữ hồ sơ điều tra sự cố, tai nạn?",
-                options: ["Phòng/ bộ phận Tổ chức nhân sự", "Phòng/ bộ phận AT&KSCL", "Phòng/ bộ phận Kỹ thuật", "Các câu trên đều đúng"],
-                correctIndex: 1 // Phòng AT&KSCL
-            },
-            {
-                q: "Nguyên nhân nào sau đây được xếp vào nhóm lỗi của tổ chức trong điều tra an toàn?",
-                options: ["Người lao động bị căng thẳng do áp lực gia đình", "Điều kiện thời tiết bất lợi trong quá trình làm việc", "Lưu lượng hành khách tăng đột biến", "Thiết kế và bố trí cơ sở hạ tầng không phù hợp với yêu cầu an toàn"],
-                correctIndex: 3 // Lỗi tổ chức (Organizational factor)
-            },
-            {
-                q: "Khi nào cần yêu cầu nhân chứng ký tên vào biên bản lấy lời khai?",
-                options: ["Sau khi đọc lại toàn bộ lời khai", "Trước khi phỏng vấn", "Sau khi thảo luận với các nhân chứng khác", "Sau khi gửi báo cáo lên cấp trên"],
-                correctIndex: 0 // Sau khi đọc lại (xác nhận)
-            },
-            {
-                q: "Trong phỏng vấn nhân chứng, kỹ thuật nào giúp đảm bảo thông tin thu được chính xác và khách quan?",
-                options: ["Sử dụng câu hỏi mở, trung lập và không dẫn dắt", "Yêu cầu nhân chứng viết lại toàn bộ sự việc theo mẫu có sẵn", "Đặt câu hỏi mang tính suy đoán để kiểm tra phản ứng", "Luu D050"],
-                correctIndex: 0 // Câu hỏi mở, trung lập
-            },
-            {
-                q: "Trong điều tra an toàn, môi trường làm việc thường được xem là:",
-                options: ["Yếu tố không liên quan", "Yếu tố ảnh hưởng đến năng suất", "Nguyên nhân tiềm ẩn hoặc yếu tố góp phần gây sự cố", "Nội dung không cần điều tra"],
-                correctIndex: 2 // Yếu tố tiềm ẩn/góp phần
-            },
-            {
-                q: "Báo cáo nào được lập ngay sau khi xử lý ban đầu sự cố?",
-                options: ["Báo cáo tổng kết", "Báo cáo ban đầu", "Báo cáo giám sát", "Báo cáo rút kinh nghiệm"],
-                correctIndex: 1 // Báo cáo ban đầu
-            },
-            {
-                q: "Các biện pháp khắc phục cần đáp ứng điều kiện nào?",
-                options: ["Thực tế và dễ thực hiện", "Phức tạp và chi tiết", "Không cần đo lường kết quả", "Chỉ áp dụng cho các sự cố nhỏ"],
-                correctIndex: 0 // Thực tế, khả thi
-            },
-            {
-                q: "Nguyên nhân nào là yếu tố khách quan?",
-                options: ["Sai sót trong quy trình", "Thiên tai", "Lỗi cố ý của người lao động", "Stress"],
-                correctIndex: 1 // Thiên tai
-            },
-            {
-                q: "Nhân tố nào được coi là nguyên nhân gốc rễ trong điều tra?",
-                options: ["Thời tiết", "Thực hiện sai quy trình", "Các yếu tố bên ngoài", "Chính sách của tổ chức không hợp lý"],
-                correctIndex: 3 // Chính sách (Hệ thống)
-            },
-            {
-                q: "Quy trình nào sau đây giúp ngăn ngừa sự cố, tai nạn tái diễn?",
-                options: ["Quy trình điều tra an toàn nội bộ", "Quy trình thực hiện hành động khắc phục/phòng ngừa", "Quy trình báo cáo", "Quy trình kiểm soát hồ sơ"],
-                correctIndex: 1 // Khắc phục/Phòng ngừa (CAPA)
-            },
-            {
-                q: "Báo cáo kết quả điều tra an toàn nội bộ cần gửi đến đâu?",
-                options: ["Phòng Tổ chức nhân sự", "Ban giám đốc cảng", "Các nhân viên liên quan", "Tổng công ty Cảng hàng không Việt Nam – CTCP"],
-                correctIndex: 3 // TCT CHK VN (Cấp trên quản lý)
-            },
-            {
-                q: "Điểm khác biệt chính giữa nguyên nhân trực tiếp và nguyên nhân tiềm ẩn trong điều tra an toàn là gì?",
-                options: ["Nguyên nhân trực tiếp là hành động hoặc điều kiện xảy ra ngay trước sự cố, còn nguyên nhân tiềm ẩn là những yếu tố nền tảng tồn tại trong hệ thống từ trước", "Nguyên nhân trực tiếp luôn do cá nhân gây ra, còn nguyên nhân tiềm ẩn luôn do môi trường", "Nguyên nhân tiềm ẩn không cần xem xét nếu đã xác định được nguyên nhân trực tiếp", "Hai loại nguyên nhân này không có mối liên hệ với nhau"],
-                correctIndex: 0 // Định nghĩa đúng về Direct vs Latent
-            },
-            {
-                q: "Bước nào liên quan đến việc phổ biến thông tin sau cuộc họp bình giảng?",
-                options: ["Bước 6", "Bước 5", "Bước 7", "Bước 3"],
-                correctIndex: 2 // Bước 7 (thường là bước cuối trong quy trình 7 bước)
-            },
-            {
-                q: "Khi nào cần có nhân viên y tế hỗ trợ trong quá trình làm việc với người liên quan đến sự cố?",
-                options: ["Khi không có chấn thương", "Khi có tử vong hoặc chấn thương nghiêm trọng", "Khi tai nạn nhẹ", "Khi chỉ thiệt hại tài sản"],
-                correctIndex: 1 // Tử vong/Chấn thương nghiêm trọng (Hỗ trợ tâm lý/sức khỏe)
-            },
-            {
-                q: "Điều tra an toàn nội bộ là gì?",
-                options: ["Hoạt động xác định lỗi cá nhân và trách nhiệm pháp lý", "Hoạt động thu thập thông tin nhằm xác định nguyên nhân sự cố để cải thiện an toàn", "Hoạt động phục vụ công tác xử phạt vi phạm", "Hoạt động báo cáo hành chính nội bộ"],
-                correctIndex: 1 // Định nghĩa chuẩn ICAO: Tìm nguyên nhân để cải thiện, không đổ lỗi
-            },
-            {
-                q: "Vai trò cốt lõi của công tác điều tra an toàn nội bộ đối với hệ thống an toàn của đơn vị là gì?",
-                options: ["Xác định trách nhiệm cá nhân", "Phục vụ xử phạt vi phạm", "Ngăn ngừa sự cố, tai nạn tái diễn và cải thiện an toàn hệ thống", "Đáp ứng yêu cầu báo cáo hành chính"],
-                correctIndex: 2 // Ngăn ngừa tái diễn
-            },
-            {
-                q: "Đối tượng của điều tra an toàn nội bộ bao gồm những gì?",
-                options: ["Chỉ tai nạn hàng không nghiêm trọng", "Chỉ sự cố gây thiệt hại lớn", "Tai nạn, sự cố, vụ việc và các bất thường có nguy cơ mất an toàn", "Chỉ các vụ việc do con người gây ra"],
-                correctIndex: 2 // Bao trùm tất cả sự cố/vụ việc
-            },
-            {
-                q: "Nguyên tắc quan trọng nhất trong điều tra an toàn nội bộ là gì?",
-                options: ["Nhanh chóng kết luận trách nhiệm", "Đảm bảo tính bảo mật tuyệt đối", "Khách quan, không đổ lỗi", "Thu thập càng nhiều bằng chứng càng tốt"],
-                correctIndex: 2 // Khách quan, không đổ lỗi (Non-punitive)
-            },
-            {
-                q: "Kết quả điều tra an toàn nội bộ được sử dụng chủ yếu để làm gì trong hệ thống an toàn của đơn vị?",
-                options: ["Lưu trữ hồ sơ", "Hỗ trợ cải tiến quy trình và thực hiện các biện pháp phòng ngừa rủi ro an toàn", "Xác định trách nhiệm cá nhân", "Báo cáo cấp trên"],
-                correctIndex: 1 // Cải tiến và phòng ngừa
-            },
-            {
-                q: "Phát biểu nào sau đây mô tả chính xác nhất sự khác nhau giữa tai nạn và sự cố trong hàng không?",
-                options: ["Tai nạn chỉ liên quan đến con người, sự cố chỉ liên quan đến thiết bị", "Tai nạn luôn xảy ra trên không, sự cố xảy ra dưới mặt đất", "Tai nạn gây hậu quả nghiêm trọng về người và/hoặc tài sản; sự cố là vụ việc ảnh hưởng hoặc có khả năng ảnh hưởng đến an toàn nhưng chưa gây hậu quả nghiêm trọng như tai nạn", "Đánh giá mức độ thiệt hại"],
-                correctIndex: 2 // Sự khác biệt về hậu quả
-            },
-            {
-                q: "Mục đích của việc phân loại tai nạn và sự cố trong điều tra an toàn là gì?",
-                options: ["Để xác định mức xử phạt phù hợp", "Để phục vụ thống kê hành chính", "Để lựa chọn phương pháp điều tra và biện pháp phòng ngừa phù hợp", "Để xác định trách nhiệm cá nhân"],
-                correctIndex: 2 // Chọn phương pháp và quy mô điều tra phù hợp
-            },
-            {
-                q: "Mục tiêu chính của việc áp dụng các phương pháp điều tra an toàn là gì?",
-                options: ["Thu thập bằng chứng để xử lý kỷ luật", "Xác định nguyên nhân gốc rễ của sự cố", "Hoàn thiện hồ sơ báo cáo", "Đánh giá năng lực cá nhân"],
-                correctIndex: 1 // Tìm nguyên nhân gốc rễ (Root cause)
-            },
-            {
-                q: "Phương pháp “5 Why” được sử dụng trong điều tra an toàn nhằm mục đích gì?",
-                options: ["Xác định người gây ra sự cố", "Phân loại mức độ tai nạn", "Truy tìm nguyên nhân gốc rễ của sự cố", "Đánh giá mức độ thiệt hại"],
-                correctIndex: 2 // Truy tìm nguyên nhân gốc rễ
-            },
-            {
-                q: "Công cụ nào sau đây thường được sử dụng để phân tích mối quan hệ nguyên nhân hậu quả trong điều tra an toàn?",
-                options: ["Biểu đồ Pareto", "Sơ đồ xương cá (Ishikawa)", "Danh mục kiểm tra", "Biểu đồ Gantt"],
-                correctIndex: 1 // Ishikawa (Xương cá)
-            },
-            {
-                q: "Khi phỏng vấn nhân chứng trong điều tra an toàn nội bộ, nguyên tắc nào sau đây cần được ưu tiên tuân thủ?",
-                options: ["Đặt câu hỏi đóng để tiết kiệm thời gian", "Phỏng vấn càng nhiều người càng tốt", "Không đổ lỗi, tạo môi trường cởi mở và khách quan", "Ghi âm để làm bằng chứng xử lý kỷ luật"],
-                correctIndex: 2 // Không đổ lỗi
-            },
-            {
-                q: "Kết quả cuối cùng quan trọng nhất của việc áp dụng các phương pháp công cụ điều tra an toàn là gì?",
-                options: ["Báo cáo điều tra hoàn chỉnh", "Danh sách lỗi cá nhân", "Các khuyến nghị và biện pháp phòng ngừa an toàn", "Hồ sơ lưu trữ nội bộ"],
-                correctIndex: 2 // Khuyến nghị an toàn
-            },
-            {
-                q: "Mục tiêu quan trọng nhất của báo cáo điều tra an toàn nội bộ là gì?",
-                options: ["Xác định lỗi và trách nhiệm cá nhân", "Mô tả chi tiết sự việc để lưu hồ sơ", "Trình bày nguyên nhân và đề xuất biện pháp phòng ngừa", "Phục vụ xử lý kỷ luật"],
-                correctIndex: 2 // Nguyên nhân & Phòng ngừa
-            },
-            {
-                q: "Phần nào sau đây là nội dung bắt buộc trong báo cáo điều tra an toàn nội bộ?",
-                options: ["Đánh giá năng lực cá nhân liên quan", "Phân tích nguyên nhân và các yếu tố đóng góp", "Đề xuất hình thức xử lý kỷ luật", "Nhận xét chủ quan của điều tra viên"],
-                correctIndex: 1 // Phân tích nguyên nhân
-            },
-            {
-                q: "Khi đề xuất biện pháp khắc phục trong báo cáo điều tra an toàn, yêu cầu nào sau đây là đúng nhất?",
-                options: ["Biện pháp càng nhiều càng tốt", "Biện pháp mang tính chung chung để dễ áp dụng", "Biện pháp cụ thể, khả thi và gắn với nguyên nhân đã xác định", "Biện pháp tập trung vào nhắc nhở cá nhân"],
-                correctIndex: 2 // Cụ thể, khả thi (SMART)
-            }
-        ];
+<script>
+    // Dữ liệu ngân hàng câu hỏi đầy đủ với các phương án
+    const questionsData = [
+        { 
+            id: 1, 
+            q: "Mục đích chính của công tác điều tra an toàn nội bộ là gì?", 
+            options: [
+                "a. Giảm thiểu chi phí điều tra",
+                "b. Hiểu rõ trách nhiệm của các đơn vị trong công tác điều tra",
+                "c. Cải thiện chất lượng dịch vụ khách hàng",
+                "d. Tăng doanh thu cho cảng hàng không"
+            ],
+            correctIndex: 1 
+        },
+        { 
+            id: 2, 
+            q: "Bước đầu tiên trong quy trình điều tra an toàn nội bộ là gì?", 
+            options: [
+                "a. Tiếp nhận thông tin và triển khai",
+                "b. Xử lý ban đầu",
+                "c. Báo cáo ban đầu",
+                "d. Bình giảng và điều tra nguyên nhân"
+            ],
+            correctIndex: 0 
+        },
+        { 
+            id: 3, 
+            q: "Bộ phận nào chịu trách nhiệm tiếp nhận thông tin về sự cố tại cảng hàng không?", 
+            options: [
+                "a. Phòng/ bộ phận Kỹ thuật",
+                "b. Bộ phận trực ban trưởng",
+                "c. Phòng/bộ phận tổ chức nhân sự",
+                "d. Ban giám đốc cảng"
+            ],
+            correctIndex: 1 
+        },
+        { 
+            id: 4, 
+            q: "Tài liệu tham chiếu nào được dùng trong điều tra an toàn nội bộ?", 
+            options: [
+                "a. Thông tư 14/2019/TT-BGTVT",
+                "b. Quyết định 1204/QĐ-TCTCHKVN",
+                "c. Thông tư 29/2021/TT-BGTVT",
+                "d. Thông tư 13/2020/TT-BLĐTBXH"
+            ],
+            correctIndex: 2 
+        },
+        { 
+            id: 5, 
+            q: "Trong xử lý ban đầu, điều gì cần được thực hiện ngay lập tức?", 
+            options: [
+                "a. Thực hiện báo cáo cuối cùng",
+                "b. Đánh giá hiệu quả điều tra",
+                "c. Lập biên bản và ngăn chặn hậu quả",
+                "d. Phân tích dữ liệu sự cố"
+            ],
+            correctIndex: 2 
+        },
+        { 
+            id: 6, 
+            q: "Trong quy trình điều tra an toàn nội bộ, bước nào sau đây liên quan lập báo cáo ban đầu?", 
+            options: [
+                "a. Thu thập chứng cứ",
+                "b. Phân tích nguyên nhân",
+                "c. Lập báo cáo ban đầu",
+                "d. Đề xuất biện pháp phòng ngừa"
+            ],
+            correctIndex: 2 
+        },
+        { 
+            id: 7, 
+            q: "Biểu mẫu nào được dùng để ghi lại lời khai của nhân chứng?", 
+            options: [
+                "a. B02.QT06/...",
+                "b. B01.QT06/...",
+                "c. B03.QT06/...",
+                "d. QT13/..."
+            ],
+            correctIndex: 1 
+        },
+        { 
+            id: 8, 
+            q: "Điều gì cần lưu ý khi xử lý tai nạn lao động?", 
+            options: [
+                "a. Giữ nguyên hiện trường theo Thông tư 13/2020/TT-BLĐTBXH",
+                "b. Chỉ giữ nguyên hiện trường nếu cần thiết",
+                "c. Không cần giữ nguyên hiện trường",
+                "d. Giữ nguyên hiện trường theo quy định riêng của cảng"
+            ],
+            correctIndex: 0 
+        },
+        { 
+            id: 9, 
+            q: "Khi phỏng vấn nhân chứng trong điều tra an toàn, điều tra viên cần tránh hành vi nào sau đây?", 
+            options: [
+                "a. Khuyến khích nhân chứng trình bày sự việc theo hiểu biết của mình",
+                "b. Ghi chép đầy đủ các thông tin quan trọng",
+                "c. Để các nhân chứng trao đổi và ảnh hưởng lẫn nhau trong quá trình cung cấp tin",
+                "d. Lựa chọn địa điểm phỏng vấn phù hợp"
+            ],
+            correctIndex: 2 
+        },
+        { 
+            id: 10, 
+            q: "Tài liệu nào sau đây quy định việc báo cáo ban đầu?", 
+            options: [
+                "a. QT14/...",
+                "b. QT13/...",
+                "c. B03.QT06/...",
+                "d. B02.QT06/..."
+            ],
+            correctIndex: 0 
+        },
+        { 
+            id: 11, 
+            q: "Bộ phận nào chịu trách nhiệm báo cáo tai nạn liên quan đến an ninh?", 
+            options: [
+                "a. Phòng/ bộ phận Tổ chức nhân sự",
+                "b. Phòng/ bộ phận Điều hành sân bay",
+                "c. Phòng/ bộ phận An toàn – Kiểm soát chất lượng",
+                "d. Các câu trên đều sai."
+            ],
+            correctIndex: 3 
+        },
+        { 
+            id: 12, 
+            q: "Điều gì cần thực hiện trong quá trình xem xét các vụ việc mức độ E?", 
+            options: [
+                "a. Xác định nguyên nhân rõ ràng và thực hiện hành động khắc phục",
+                "b. Chuyển vụ việc sang cấp trên",
+                "c. Lập kế hoạch khẩn nguy",
+                "d. Gửi báo cáo ngay lập tức"
+            ],
+            correctIndex: 0 
+        },
+        { 
+            id: 13, 
+            q: "Nguyên nhân nào được xem là nguyên nhân trực tiếp trong điều tra an toàn?", 
+            options: [
+                "a. Chính sách không phù hợp",
+                "b. Thực hiện sai quy trình",
+                "c. Phân bổ nguồn lực thiếu sót",
+                "d. Thiên tai"
+            ],
+            correctIndex: 1 
+        },
+        { 
+            id: 14, 
+            q: "Khi tiến hành phỏng vấn nhân chứng trong điều tra an toàn, điều tra viên cần đảm bảo điều kiện nào sau đây?", 
+            options: [
+                "a. Nhân chứng được phỏng vấn trong trạng thái tâm lý ổn định",
+                "b. Phỏng vấn càng nhanh càng tốt",
+                "c. Chỉ thực hiện phỏng vấn tại văn phòng",
+                "d. Yêu cầu nhân chứng ký tên trước khi phỏng vấn"
+            ],
+            correctIndex: 0 
+        },
+        { 
+            id: 15, 
+            q: "Bước cuối cùng trong quy trình điều tra là gì?", 
+            options: [
+                "a. Báo cáo ban đầu",
+                "b. Phổ biến và rút kinh nghiệm",
+                "c. Lưu hồ sơ",
+                "d. Xem xét và phê duyệt"
+            ],
+            correctIndex: 2 
+        },
+        { 
+            id: 16, 
+            q: "Tại sao việc kiểm tra hiện trường ngay sau sự cố là quan trọng?", 
+            options: [
+                "a. Để tránh bị gián đoạn công việc",
+                "b. Để cảnh báo cho cán bộ, nhân viên khác",
+                "c. Để giải quyết vấn đề nhanh chóng",
+                "d. Để hiểu rõ bối cảnh và tình huống của sự việc"
+            ],
+            correctIndex: 3 
+        },
+        { 
+            id: 17, 
+            q: "Đơn vị nào chịu trách nhiệm lưu trữ hồ sơ điều tra sự cố, tai nạn?", 
+            options: [
+                "a. Phòng/ bộ phận Tổ chức nhân sự",
+                "b. Phòng/ bộ phận AT&KSCL",
+                "c. Phòng/ bộ phận Kỹ thuật",
+                "d. Các câu trên đều đúng"
+            ],
+            correctIndex: 1 
+        },
+        { 
+            id: 18, 
+            q: "Nguyên nhân nào sau đây được xếp vào nhóm lỗi của tổ chức trong điều tra an toàn?", 
+            options: [
+                "a. Người lao động bị căng thẳng do áp lực gia đình",
+                "b. Điều kiện thời tiết bất lợi trong quá trình làm việc",
+                "c. Lưu lượng hành khách tăng đột biến",
+                "d. Thiết kế và bố trí cơ sở hạ tầng không phù hợp với yêu cầu an toàn"
+            ],
+            correctIndex: 3 
+        },
+        { 
+            id: 19, 
+            q: "Khi nào cần yêu cầu nhân chứng ký tên vào biên bản lấy lời khai?", 
+            options: [
+                "a. Sau khi đọc lại toàn bộ lời khai",
+                "b. Trước khi phỏng vấn",
+                "c. Sau khi thảo luận với các nhân chứng khác",
+                "d. Sau khi gửi báo cáo lên cấp trên"
+            ],
+            correctIndex: 0 
+        },
+        { 
+            id: 20, 
+            q: "Trong phỏng vấn nhân chứng, kỹ thuật nào giúp đảm bảo thông tin thu thập được chính xác và khách quan?", 
+            options: [
+                "a. Sử dụng câu hỏi mở, trung lập và không dẫn dắt",
+                "b. Yêu cầu nhân chứng viết lại toàn bộ sự việc theo mẫu có sẵn",
+                "c. Đặt câu hỏi mang tính suy đoán để kiểm tra phản ứng",
+                "d. Xem xét và phê duyệt"
+            ],
+            correctIndex: 0 
+        },
+        { 
+            id: 21, 
+            q: "Trong điều tra an toàn, môi trường làm việc thường được xem là:", 
+            options: [
+                "a. Yếu tố không liên quan",
+                "b. Yếu tố ảnh hưởng đến năng suất",
+                "c. Nguyên nhân tiềm ẩn hoặc yếu tố góp phần gây sự cố",
+                "d. Nội dung không cần điều tra"
+            ],
+            correctIndex: 2 
+        },
+        { 
+            id: 22, 
+            q: "Báo cáo nào được lập ngay sau khi xử lý ban đầu sự cố?", 
+            options: [
+                "a. Báo cáo tổng kết",
+                "b. Báo cáo ban đầu",
+                "c. Báo cáo giám sát",
+                "d. Báo cáo rút kinh nghiệm"
+            ],
+            correctIndex: 1 
+        },
+        { 
+            id: 23, 
+            q: "Các biện pháp khắc phục cần đáp ứng điều kiện nào?", 
+            options: [
+                "a. Thực tế và dễ thực hiện",
+                "b. Phức tạp và chi tiết",
+                "c. Không cần đo lường kết quả",
+                "d. Chỉ áp dụng cho các sự cố nhỏ"
+            ],
+            correctIndex: 0 
+        },
+        { 
+            id: 24, 
+            q: "Nguyên nhân nào là yếu tố khách quan?", 
+            options: [
+                "a. Sai sót trong quy trình",
+                "b. Thiên tai",
+                "c. Lỗi cố ý của người lao động",
+                "d. Stress"
+            ],
+            correctIndex: 1 
+        },
+        { 
+            id: 25, 
+            q: "Nhân tố nào được coi là nguyên nhân gốc rễ trong điều tra?", 
+            options: [
+                "a. Thời tiết",
+                "b. Thực hiện sai quy trình",
+                "c. Các yếu tố bên ngoài",
+                "d. Chính sách của tổ chức không hợp lý"
+            ],
+            correctIndex: 3 
+        },
+        { 
+            id: 26, 
+            q: "Quy trình nào sau đây giúp ngăn ngừa sự cố, tai nạn tái diễn?", 
+            options: [
+                "a. Quy trình điều tra an toàn nội bộ",
+                "b. Quy trình thực hiện hành động khắc phục/phòng ngừa",
+                "c. Quy trình báo cáo",
+                "d. Quy trình kiểm soát hồ sơ"
+            ],
+            correctIndex: 1 
+        },
+        { 
+            id: 27, 
+            q: "Báo cáo kết quả điều tra an toàn nội bộ cần gửi đến đâu?", 
+            options: [
+                "a. Phòng Tổ chức nhân sự",
+                "b. Ban giám đốc cảng",
+                "c. Các nhân viên liên quan",
+                "d. Tổng công ty Cảng hàng không Việt Nam – CTCP"
+            ],
+            correctIndex: 3 
+        },
+        { 
+            id: 28, 
+            q: "Điểm khác biệt chính giữa nguyên nhân trực tiếp và nguyên nhân tiềm ẩn trong điều tra an toàn là gì?", 
+            options: [
+                "a. Nguyên nhân trực tiếp là hành động hoặc điều kiện xảy ra ngay trước sự cố, còn nguyên nhân tiềm ẩn là những yếu tố nền tảng tồn tại trong hệ thống từ trước",
+                "b. Nguyên nhân trực tiếp luôn do cá nhân gây ra, còn nguyên nhân tiềm ẩn luôn do môi trường",
+                "c. Nguyên nhân tiềm ẩn không cần xem xét nếu đã xác định được nguyên nhân trực tiếp",
+                "d. Hai loại nguyên nhân này không có mối liên hệ với nhau"
+            ],
+            correctIndex: 0 
+        },
+        { 
+            id: 29, 
+            q: "Bước nào liên quan đến việc phổ biến thông tin sau cuộc họp bình giảng?", 
+            options: [
+                "a. Bước 6",
+                "b. Bước 5",
+                "c. Bước 7",
+                "d. Bước 3"
+            ],
+            correctIndex: 2 
+        },
+        { 
+            id: 30, 
+            q: "Khi nào cần có nhân viên y tế hỗ trợ trong quá trình làm việc với người liên quan đến sự cố?", 
+            options: [
+                "a. Khi không có chấn thương",
+                "b. Khi có tử vong hoặc chấn thương nghiêm trọng",
+                "c. Khi tai nạn nhẹ",
+                "d. Khi chỉ thiệt hại tài sản"
+            ],
+            correctIndex: 1 
+        },
+        { 
+            id: 31, 
+            q: "Điều tra an toàn nội bộ là gì?", 
+            options: [
+                "a. Hoạt động xác định lỗi cá nhân và trách nhiệm pháp lý",
+                "b. Hoạt động thu thập thông tin nhằm xác định nguyên nhân sự cố để cải thiện an toàn",
+                "c. Hoạt động phục vụ công tác xử phạt vi phạm",
+                "d. Hoạt động báo cáo hành chính nội bộ"
+            ],
+            correctIndex: 1 
+        },
+        { 
+            id: 32, 
+            q: "Vai trò cốt lõi của công tác điều tra an toàn nội bộ đối với hệ thống an toàn của đơn vị là gì?", 
+            options: [
+                "a. Xác định trách nhiệm cá nhân",
+                "b. Phục vụ xử phạt vi phạm",
+                "c. Ngăn ngừa sự cố, tai nạn tái diễn và cải thiện an toàn hệ thống",
+                "d. Đáp ứng yêu cầu báo cáo hành chính"
+            ],
+            correctIndex: 2 
+        },
+        { 
+            id: 33, 
+            q: "Đối tượng của điều tra an toàn nội bộ bao gồm những gì?", 
+            options: [
+                "a. Chỉ tai nạn hàng không nghiêm trọng",
+                "b. Chỉ sự cố gây thiệt hại lớn",
+                "c. Tai nạn, sự cố, vụ việc và các bất thường có nguy cơ mất an toàn",
+                "d. Chỉ các vụ việc do con người gây ra"
+            ],
+            correctIndex: 2 
+        },
+        { 
+            id: 34, 
+            q: "Nguyên tắc quan trọng nhất trong điều tra an toàn nội bộ là gì?", 
+            options: [
+                "a. Nhanh chóng kết luận trách nhiệm",
+                "b. Đảm bảo tính bảo mật tuyệt đối",
+                "c. Khách quan, không đổ lỗi",
+                "d. Thu thập càng nhiều bằng chứng càng tốt"
+            ],
+            correctIndex: 2 
+        },
+        { 
+            id: 35, 
+            q: "Kết quả điều tra an toàn nội bộ được sử dụng chủ yếu để làm gì trong hệ thống an toàn của đơn vị?", 
+            options: [
+                "a. Lưu trữ hồ sơ",
+                "b. Hỗ trợ cải tiến quy trình và thực hiện các biện pháp phòng ngừa rủi ro an toàn",
+                "c. Xác định trách nhiệm cá nhân",
+                "d. Báo cáo cấp trên"
+            ],
+            correctIndex: 1 
+        },
+        { 
+            id: 36, 
+            q: "Phát biểu nào sau đây mô tả chính xác nhất sự khác nhau giữa tai nạn và sự cố trong hàng không?", 
+            options: [
+                "a. Tai nạn chỉ liên quan đến con người, sự cố chỉ liên quan đến thiết bị",
+                "b. Tai nạn luôn xảy ra trên không, sự cố xảy ra dưới mặt đất",
+                "c. Tai nạn gây hậu quả nghiêm trọng về người và/hoặc tài sản; sự cố là vụ việc có nguy cơ gây mất an toàn nhưng hậu quả thấp hơn",
+                "d. Đánh giá mức độ thiệt hại"
+            ],
+            correctIndex: 2 
+        },
+        { 
+            id: 37, 
+            q: "Mục đích của việc phân loại tai nạn và sự cố trong điều tra an toàn là gì?", 
+            options: [
+                "a. Để xác định mức xử phạt phù hợp",
+                "b. Để phục vụ thống kê hành chính",
+                "c. Để lựa chọn phương pháp điều tra và biện pháp phòng ngừa phù hợp",
+                "d. Để xác định trách nhiệm cá nhân"
+            ],
+            correctIndex: 2 
+        },
+        { 
+            id: 38, 
+            q: "Mục tiêu chính của việc áp dụng các phương pháp điều tra an toàn là gì?", 
+            options: [
+                "a. Thu thập bằng chứng để xử lý kỷ luật",
+                "b. Xác định nguyên nhân gốc rễ của sự cố",
+                "c. Hoàn thiện hồ sơ báo cáo",
+                "d. Đánh giá năng lực cá nhân"
+            ],
+            correctIndex: 1 
+        },
+        { 
+            id: 39, 
+            q: "Phương pháp “5 Why” được sử dụng trong điều tra an toàn nhằm mục đích gì?", 
+            options: [
+                "a. Xác định người gây ra sự cố",
+                "b. Phân loại mức độ tai nạn",
+                "c. Truy tìm nguyên nhân gốc rễ của sự cố",
+                "d. Đánh giá mức độ thiệt hại"
+            ],
+            correctIndex: 2 
+        },
+        { 
+            id: 40, 
+            q: "Công cụ nào sau đây thường được sử dụng để phân tích mối quan hệ nguyên nhân hậu quả trong điều tra an toàn?", 
+            options: [
+                "a. Biểu đồ Pareto",
+                "b. Sơ đồ xương cá (Ishikawa)",
+                "c. Danh mục kiểm tra",
+                "d. Biểu đồ Gantt"
+            ],
+            correctIndex: 1 
+        },
+        { 
+            id: 41, 
+            q: "Khi phỏng vấn nhân chứng trong điều tra an toàn nội bộ, nguyên tắc nào sau đây cần được ưu tiên tuân thủ?", 
+            options: [
+                "a. Đặt câu hỏi đóng để tiết kiệm thời gian",
+                "b. Phỏng vấn càng nhiều người càng tốt",
+                "c. Không đổ lỗi, tạo môi trường cởi mở và khách quan",
+                "d. Ghi âm để làm bằng chứng xử lý kỷ luật"
+            ],
+            correctIndex: 2 
+        },
+        { 
+            id: 42, 
+            q: "Kết quả cuối cùng quan trọng nhất của việc áp dụng các phương pháp công cụ điều tra an toàn là gì?", 
+            options: [
+                "a. Báo cáo điều tra hoàn chỉnh",
+                "b. Danh sách lỗi cá nhân",
+                "c. Các khuyến nghị và biện pháp phòng ngừa an toàn",
+                "d. Hồ sơ lưu trữ nội bộ"
+            ],
+            correctIndex: 2 
+        },
+        { 
+            id: 43, 
+            q: "Mục tiêu quan trọng nhất của báo cáo điều tra an toàn nội bộ là gì?", 
+            options: [
+                "a. Xác định lỗi và trách nhiệm cá nhân",
+                "b. Mô tả chi tiết sự việc để lưu hồ sơ",
+                "c. Trình bày nguyên nhân và đề xuất biện pháp phòng ngừa",
+                "d. Phục vụ xử lý kỷ luật"
+            ],
+            correctIndex: 2 
+        },
+        { 
+            id: 44, 
+            q: "Phần nào sau đây là nội dung bắt buộc trong báo cáo điều tra an toàn nội bộ?", 
+            options: [
+                "a. Đánh giá năng lực cá nhân liên quan",
+                "b. Phân tích nguyên nhân và các yếu tố đóng góp",
+                "c. Đề xuất hình thức xử lý kỷ luật",
+                "d. Nhận xét chủ quan của điều tra viên"
+            ],
+            correctIndex: 1 
+        },
+        { 
+            id: 45, 
+            q: "Khi đề xuất biện pháp khắc phục trong báo cáo điều tra an toàn, yêu cầu nào sau đây là đúng nhất?", 
+            options: [
+                "a. Biện pháp càng nhiều càng tốt",
+                "b. Biện pháp mang tính chung chung để dễ áp dụng",
+                "c. Biện pháp cụ thể, khả thi và gắn với nguyên nhân đã xác định",
+                "d. Biện pháp tập trung vào nhắc nhở cá nhân"
+            ],
+            correctIndex: 2 
+        }
+    ];
 
-        const container = document.getElementById('quiz-container');
-        const searchInput = document.getElementById('search-input');
-        const noResults = document.getElementById('no-results');
+    const searchInput = document.getElementById('searchInput');
+    const questionList = document.getElementById('questionList');
+    const resultStats = document.getElementById('resultStats');
 
-        function renderQuestions(data) {
-            container.innerHTML = '';
-            if (data.length === 0) {
-                noResults.style.display = 'block';
-                return;
-            } else {
-                noResults.style.display = 'none';
-            }
-
-            data.forEach((item, index) => {
-                const card = document.createElement('div');
-                card.className = 'card';
-
-                const qNum = document.createElement('div');
-                qNum.className = 'question-number';
-                qNum.innerText = `Câu hỏi ${item.originalIndex + 1}`; // Sử dụng index gốc
-
-                const qText = document.createElement('div');
-                qText.className = 'question-text';
-                qText.innerText = item.q;
-
-                const optionsList = document.createElement('ul');
-                optionsList.className = 'options-list';
-
-                const labels = ['a', 'b', 'c', 'd'];
-
-                item.options.forEach((opt, idx) => {
-                    const li = document.createElement('li');
-                    li.className = 'option-item';
-                    
-                    // Logic tô màu đỏ cho đáp án đúng
-                    if (idx === item.correctIndex) {
-                        li.classList.add('correct-answer');
-                    }
-
-                    const label = document.createElement('span');
-                    label.className = 'option-label';
-                    label.innerText = `${labels[idx]}.`;
-
-                    const text = document.createElement('span');
-                    text.innerText = opt;
-
-                    li.appendChild(label);
-                    li.appendChild(text);
-                    optionsList.appendChild(li);
-                });
-
-                card.appendChild(qNum);
-                card.appendChild(qText);
-                card.appendChild(optionsList);
-                container.appendChild(card);
-            });
+    // Hàm render danh sách câu hỏi
+    function renderQuestions(data, keyword = '') {
+        questionList.innerHTML = '';
+        
+        if (data.length === 0) {
+            questionList.innerHTML = `<div class="no-results">Không tìm thấy kết quả nào cho "${keyword}"</div>`;
+            resultStats.textContent = `Tìm thấy 0 kết quả`;
+            return;
         }
 
-        // Thêm originalIndex để giữ số thứ tự câu hỏi khi tìm kiếm
-        const quizDataWithIndex = quizData.map((item, index) => ({...item, originalIndex: index}));
+        resultStats.textContent = `Tìm thấy ${data.length} kết quả`;
 
-        // Initial Render
-        renderQuestions(quizDataWithIndex);
-
-        // Search Functionality
-        searchInput.addEventListener('input', (e) => {
-            const term = e.target.value.toLowerCase().trim();
+        data.forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'card';
             
-            if (!term) {
-                renderQuestions(quizDataWithIndex);
-                return;
+            let qText = item.q;
+            // Xử lý options: highlight text nếu có keyword, và tô màu đáp án đúng
+            const optionsHTML = item.options.map((opt, index) => {
+                let optText = opt;
+                const isCorrect = index === item.correctIndex;
+                const className = isCorrect ? 'option-item correct' : 'option-item';
+                
+                if (keyword) {
+                    // Highlight keyword trong option
+                    const regex = new RegExp(`(${keyword})`, 'gi');
+                    optText = optText.replace(regex, '<span class="highlight-match">$1</span>');
+                }
+                
+                return `<li class="${className}">${optText}</li>`;
+            }).join('');
+
+            // Highlight keyword trong câu hỏi
+            if (keyword) {
+                const regex = new RegExp(`(${keyword})`, 'gi');
+                qText = qText.replace(regex, '<span class="highlight-match">$1</span>');
             }
 
-            const filtered = quizDataWithIndex.filter(item => {
-                const matchQuestion = item.q.toLowerCase().includes(term);
-                const matchOption = item.options.some(opt => opt.toLowerCase().includes(term));
-                return matchQuestion || matchOption;
-            });
-
-            renderQuestions(filtered);
+            card.innerHTML = `
+                <div class="q-header">
+                    <span class="q-number">Câu ${item.id}</span>
+                </div>
+                <div class="q-text">${qText}</div>
+                <ul class="options-list">
+                    ${optionsHTML}
+                </ul>
+            `;
+            questionList.appendChild(card);
         });
-    </script>
+    }
+
+    // Hàm xử lý tìm kiếm
+    function handleSearch(e) {
+        const keyword = e.target.value.trim().toLowerCase();
+        
+        // Lọc dữ liệu: tìm trong câu hỏi HOẶC bất kỳ đáp án nào
+        const filteredData = questionsData.filter(item => {
+            const inQuestion = item.q.toLowerCase().includes(keyword);
+            const inOptions = item.options.some(opt => opt.toLowerCase().includes(keyword));
+            const inId = item.id.toString() === keyword;
+            
+            return inQuestion || inOptions || inId;
+        });
+
+        renderQuestions(filteredData, keyword);
+    }
+
+    // Event listener
+    searchInput.addEventListener('input', handleSearch);
+
+    // Render ban đầu
+    renderQuestions(questionsData);
+
+</script>
+
 </body>
 </html>
