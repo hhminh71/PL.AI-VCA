@@ -3,550 +3,610 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WEB Ngân Hàng Câu Hỏi - SMS-003</title>
+    <title>Ngân Hàng Câu Hỏi - Annex 14</title>
     <style>
-        /* --- General Reset & Styling --- */
+        /* === BIẾN MÀU SẮC & THIẾT KẾ === */
         :root {
-            --primary-color: #007bff;
-            --secondary-color: #6c757d;
-            --danger-color: #dc3545;
-            --background-color: #f4f7f6;
-            --card-background: #ffffff;
-            --shadow-light: 0 2px 4px rgba(0, 0, 0, 0.05);
-            --shadow-hover: 0 4px 8px rgba(0, 0, 0, 0.1);
+            --bg-color: #f0f4f8;
+            --primary-color: #1a365d;
+            --accent-color: #3182ce;
+            --card-bg: #ffffff;
+            --text-main: #2d3748;
+            --text-muted: #718096;
+            --correct-color: #e53e3e;
+            --correct-bg: #fff5f5;
+            --explain-border: #4299e1;
+            --explain-bg: #ebf8ff;
+        }
+
+        /* === RESET & CƠ BẢN === */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
         body {
-            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: var(--background-color);
-            color: #343a40;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
             line-height: 1.6;
-        }
-
-        .container {
-            max-width: 1000px;
-            margin: 20px auto;
-            padding: 0 15px;
-        }
-
-        /* --- Header & Search Bar --- */
-        .header {
-            background-color: var(--primary-color);
-            color: white;
-            padding: 20px 0;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            text-align: center;
-        }
-
-        .header h1 {
-            margin: 0 0 10px 0;
-            font-size: 1.8em;
-        }
-
-        .search-container {
-            padding: 0 15px;
-            max-width: 600px;
+            padding: 20px;
+            max-width: 900px;
             margin: 0 auto;
+        }
+
+        /* === HEADER & TÌM KIẾM === */
+        .header-container {
+            position: sticky;
+            top: 0;
+            background-color: var(--bg-color);
+            padding: 10px 0 20px 0;
+            z-index: 100;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 5px;
+            font-size: 28px;
+        }
+
+        .stats {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .search-wrapper {
+            position: relative;
+            width: 100%;
         }
 
         #searchInput {
             width: 100%;
-            padding: 12px 20px;
-            border: none;
-            border-radius: 8px;
-            font-size: 1em;
-            box-shadow: var(--shadow-light);
-            transition: box-shadow 0.3s, border 0.3s;
+            padding: 16px 20px 16px 45px;
+            font-size: 16px;
+            border: 2px solid #cbd5e0;
+            border-radius: 12px;
+            outline: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
         }
 
         #searchInput:focus {
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+            border-color: var(--accent-color);
+            box-shadow: 0 4px 12px rgba(49, 130, 206, 0.2);
         }
 
-        /* --- Question Card Styling --- */
-        .question-list {
-            display: grid;
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #a0aec0;
+            width: 20px;
+            height: 20px;
+        }
+
+        /* === GIAO DIỆN KHỐI CÂU HỎI (CARDS) === */
+        #questionContainer {
+            display: flex;
+            flex-direction: column;
             gap: 15px;
         }
 
-        .question-card {
-            background-color: var(--card-background);
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: var(--shadow-light);
-            transition: transform 0.2s, box-shadow 0.2s;
-            border-left: 5px solid var(--primary-color);
+        .card {
+            background: var(--card-bg);
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            white-space: pre-wrap; /* Giữ nguyên định dạng xuống dòng của text gốc */
+            word-wrap: break-word;
         }
 
-        .question-card:hover {
+        .card:hover {
             transform: translateY(-2px);
-            box-shadow: var(--shadow-hover);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.08);
         }
 
-        .question-card h3 {
-            margin-top: 0;
+        /* Ẩn card khi không khớp tìm kiếm */
+        .card.hidden {
+            display: none !important;
+        }
+
+        /* === ĐỊNH DẠNG THÀNH PHẦN TRONG CÂU HỎI === */
+        .question-title {
+            font-weight: 700;
+            font-size: 1.15em;
             color: var(--primary-color);
-            font-size: 1.1em;
-            border-bottom: 1px dashed #eee;
-            padding-bottom: 10px;
-            margin-bottom: 10px;
-        }
-
-        .options-list {
-            list-style: none;
-            padding: 0;
-            margin: 10px 0 15px 0;
-        }
-
-        .option-item {
-            margin-bottom: 5px;
-            padding-left: 0;
-        }
-
-        .answer-label {
-            font-weight: bold;
-            color: var(--secondary-color);
-            margin-top: 10px;
+            margin-bottom: 8px;
             display: block;
         }
 
-        /* --- The CRITICAL Style: Highlight Answer --- */
         .correct-answer {
-            color: var(--danger-color); /* Tô màu đỏ */
-            font-weight: 600;
-            margin-top: 5px;
+            color: var(--correct-color);
+            font-weight: bold;
+            background-color: var(--correct-bg);
+            padding: 2px 6px;
+            border-radius: 4px;
+            border: 1px solid #feb2b2;
+        }
+
+        .explanation {
+            margin-top: 15px;
+            padding: 12px 16px;
+            background-color: var(--explain-bg);
+            border-left: 4px solid var(--explain-border);
+            border-radius: 4px 8px 8px 4px;
+            font-size: 0.95em;
+            color: #2b6cb0;
             display: block;
         }
 
-        /* --- Empty State Message --- */
-        #emptyMessage {
-            text-align: center;
-            padding: 50px 20px;
-            color: var(--secondary-color);
-            font-style: italic;
-            display: none; /* Hidden by default */
-        }
-
-        /* --- Responsive Design (Mobile First) --- */
+        /* Responsive */
         @media (max-width: 600px) {
-            .header h1 {
-                font-size: 1.5em;
-            }
-            .question-card {
-                padding: 15px;
-            }
-            .question-card h3 {
-                font-size: 1em;
-            }
+            body { padding: 10px; }
+            .card { padding: 16px; }
+            h1 { font-size: 24px; }
         }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <h1>Ngân Hàng Câu Hỏi - SMS-003 (2025)</h1>
-        <div class="search-container">
-            <input type="text" id="searchInput" placeholder="🔎 Nhập từ khóa để tìm kiếm Câu hỏi hoặc Đáp án...">
+    <div class="header-container">
+        <h1>Ngân Hàng Câu Hỏi Annex 14</h1>
+        <div class="stats" id="statsCounter">Đang tải dữ liệu...</div>
+        <div class="search-wrapper">
+            <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+            <input type="search" id="searchInput" placeholder="Nhập từ khóa câu hỏi hoặc đáp án để tìm kiếm...">
         </div>
     </div>
 
-    <div class="container">
-        <div class="question-list" id="questionList">
-            <!-- Dữ liệu Câu hỏi sẽ được chèn ở đây bằng JavaScript -->
-        </div>
-        <div id="emptyMessage">
-            Không tìm thấy câu hỏi nào phù hợp với từ khóa của bạn.
-        </div>
+    <div id="questionContainer">
+        <!-- Nội dung sẽ được JavaScript tạo tự động tại đây -->
     </div>
 
     <script>
-        const questionData = [
-            {
-                id: 1,
-                question: "Quy định nhà cung cấp dịch vụ phải xây dựng Hệ thống quản lý an toàn được quy định trong:",
-                options: ["a. Annex 1", "b. Annex 19", "c. Annex 2", "d. Tất cả tài liệu trên"],
-                answer: "b. Annex 19"
-            },
-            {
-                id: 2,
-                question: "Chương trình an toàn quốc gia do ai ban hành",
-                options: ["a. Bộ Xây dựng", "b. ICAO", "c. Cảng vụ hàng không", "d. Đơn vị cung cấp dịch vụ"],
-                answer: "a. Bộ Xây dựng"
-            },
-            {
-                id: 3,
-                question: "Nhận diện mối nguy có mấy phương pháp?",
-                options: ["a. Phân tích các bước của quá trình để nhận diện mối nguy (bottom up)", "b. Phân tích các nguyên nhân gây ra các hậu quả trong quá trình hoạt động để nhận diện mối nguy (top down)", "c. Cả a và b", "d. Tất cả đều sai"],
-                answer: "c. Cả a và b"
-            },
-            {
-                id: 4,
-                question: "Cấu trúc Chương trình an toàn quốc gia theo yêu cầu của ICAO gồm",
-                options: ["a. Chính sách và mục tiêu an toàn quốc gia", "b. Chương trình quản lý rủi ro an toàn", "c. Bảo đảm an toàn quốc gia, Thúc đẩy an toàn quốc gia", "d. Tất cả yếu tố trên"],
-                answer: "d. Tất cả yếu tố trên"
-            },
-            {
-                id: 5,
-                question: "Theo yêu cầu của ICAO, Thành phần đảm bảo an toàn gồm những yếu tố nào:",
-                options: ["a. Giám sát và đo lường an toàn, Quản lý sự thay đổi, Liên tục cải tiến hệ thống", "b. Nhận diện và đánh giá rủi ro, Cam kết của lãnh đạo, Quyền hạn và trách nhiệm an toàn", "c. Huấn luyện đào tạo và Phổ biến an toàn", "d. Tất cả các câu trên"],
-                answer: "a. Giám sát và đo lường an toàn, Quản lý sự thay đổi, Liên tục cải tiến hệ thống"
-            },
-            {
-                id: 6,
-                question: "Định nghĩa hành động khắc phục",
-                options: ["a. Xử lý điểm không phù hợp ngay lúc phát hiện", "b. Xử lý nguyên nhân gốc rễ", "c. Xử lý điểm không phù hợp, tìm nguyên nhân gốc rễ và đề xuất biện pháp khắc phục", "d. Tất cả các câu đều đúng"],
-                answer: "c. Xử lý điểm không phù hợp, tìm nguyên nhân gốc rễ và đề xuất biện pháp khắc phục"
-            },
-            {
-                id: 7,
-                question: "Định nghĩa nào đúng",
-                options: ["a. Quá trình là một hoạt động biến đổi đầu vào thành đầu ra", "b. Quá trình là một hoạt động không có đầu ra", "c. Quy trình là mô tả các hoạt động của một quá trình", "d. Cả a và c đều đúng"],
-                answer: "d. Cả a và c đều đúng"
-            },
-            {
-                id: 8,
-                question: "Các yêu cầu về việc triển khai Hệ thống quản lý an toàn trong Annex 19 áp dụng trong lĩnh vực nào:",
-                options: ["a. Đảm bảo chất lượng dịch vụ", "b. Đảm bảo an toàn trong lĩnh vực hàng không", "c. Đảm bảo an toàn trong lĩnh vực hàng hải", "d. Tất cả lĩnh vực trên"],
-                answer: "b. Đảm bảo an toàn trong lĩnh vực hàng không"
-            },
-            {
-                id: 9,
-                question: "Trách nhiệm an toàn của Ban giám đốc cảng thể hiện ở tài liệu nào:",
-                options: ["a. Tài liệu Hệ thống quản lý an toàn được Cục hàng không Việt Nam phê duyệt", "b. Bảng mô tả công việc của từng chức danh", "c. Quyết định phân công nhiệm vụ của Ban giám đốc.", "d. Tất cả các yếu tố trên"],
-                answer: "d. Tất cả các yếu tố trên"
-            },
-            {
-                id: 10,
-                question: "Chi số an toàn được xác định như thế nào",
-                options: ["a. Dựa vào các rủi ro an toàn của cảng đang muốn kiểm soát", "b. Theo chương trình an toàn quốc gia", "c. Cả a và b đều đúng", "d. Tất cả đều sai"],
-                answer: "c. Cả a và b đều đúng"
-            },
-            {
-                id: 11,
-                question: "Mục đích của việc xây dựng Hệ thống SMS là:",
-                options: ["a. Nhận diện các mối nguy trong quá trình hoạt động cung cấp dịch vụ của cảng để đảm bảo đạt mức độ an toàn chấp nhận được và chuyển viêc quản lý an toàn từ bị động sang chủ động", "b. Phục vụ cho việc lưu trữ hồ sơ hệ thống của tổ chức", "c. Thỏa mãn nhu cầu khách hàng, luật định", "d. Thỏa mãn yêu cầu của các hãng hàng không"],
-                answer: "a. Nhận diện các mối nguy trong quá trình hoạt động cung cấp dịch vụ của cảng để đảm bảo đạt mức độ an toàn chấp nhận được và chuyển viêc quản lý an toàn từ bị động sang chủ động"
-            },
-            {
-                id: 12,
-                question: "Nguồn để xác định mối nguy hiểm, bao gồm:",
-                options: ["a. Các báo cáo thông báo sự cố cũng như quá trình điều tra", "b. Hệ thống báo cáo tự nguyện", "c. Khảo sát định kỳ mối nguy hiểm đối với các trang thiết bị an toàn hàng không; đánh giá an toàn/chất lượng định kỳ; đánh giá hệ thống thu thập dữ liệu hoạt động định kỳ", "d. Tất cả các câu trên"],
-                answer: "d. Tất cả các câu trên"
-            },
-            {
-                id: 13,
-                question: "Mối nguy là:",
-                options: ["a. Hậu quả, thiệt hại về người và tài sản, giảm mức độ an toàn của Hệ thống", "b. Điều kiện hoặc đối tượng có thể gây ra những thiệt hại người, tài sản, giảm mức độ an toàn hệ thống", "c. Các yêu cầu của Annex 19", "d. Tất cả đều đúng"],
-                answer: "b. Điều kiện hoặc đối tượng có thể gây ra những thiệt hại người, tài sản, giảm mức độ an toàn hệ thống"
-            },
-            {
-                id: 14,
-                question: "Khi đánh giá rủi ro hiện tại ở mức Trung bình tổ chức cần thực hiện các hành động gì?",
-                options: ["a. Tiến hành nhận diện mối nguy, đánh giá rui ro lại", "b. Bổ sung các biện pháp kiểm soát rủi ro tăng cường", "c. Chấm dứt hoạt động", "d. Chấp nhận mối nguy trên tồn tại trong hoạt động của tổ chức."],
-                answer: "b. Bổ sung các biện pháp kiểm soát rủi ro tăng cường"
-            },
-            {
-                id: 15,
-                question: "Sự cố tàu bay gặp hư hỏng do FOD trong năm 2022 là 0.8/10000 lần chc. Trong năm 2023 tổ chức muốn giảm 10% giá trị thực hiện năm 2018. Vậy",
-                options: ["a. Chỉ tiêu an toàn 0.8/10000 lần chc", "b. Chỉ tiêu an toàn 0.72/10000 lần chc", "c. Chỉ tiêu an toàn giảm 8.4/100000 lần chc", "d. Tất cả đều sai"],
-                answer: "b. Chỉ tiêu an toàn 0.72/10000 lần chc"
-            },
-            {
-                id: 16,
-                question: "Mục đích đánh giá nội bộ trong Hệ thống SMS - QMS",
-                options: ["a. Nhận diện các mối nguy đang tồn tại hiện hữu/ tiềm ẩn trong Hệ thống", "b. Xác định các khu vực cần cải tiến", "c. Xác định kế hoạch phân bổ nguồn lực", "d. Tất cả yếu tố trên"],
-                answer: "d. Tất cả yếu tố trên"
-            },
-            {
-                id: 17,
-                question: "Quá trình xem xét kỷ luật công bằng cần xem xét các yếu tố",
-                options: ["a. Hồ sơ ghi nhận các hành vi gây mất an toàn của cá nhân trước đây", "b. Hồ sơ đào tạo về chuyên môn", "c. Ý định của cá nhân liên quan đến hành vi không phù hợp", "d. Tất cả yếu tố trên"],
-                answer: "d. Tất cả yếu tố trên"
-            },
-            {
-                id: 18,
-                question: "Quản lý sự thay đổi được triển khai thực hiện đối với các thay đổi nào",
-                options: ["a. Thay đổi về luật định, quy định", "b. Thay đổi quy trình, quá trình, phương án khai thác", "c. Thay đổi cơ sở hạ tầng, trang thiết bị", "d. Tất cả yếu tố trên."],
-                answer: "d. Tất cả yếu tố trên."
-            },
-            {
-                id: 19,
-                question: "Phải có hành động khắc phục khi đường biểu diễn các chỉ số an toàn trong năm hiện tại:",
-                options: ["a. 3 điểm liên tiếp nằm trên cảnh báo mức 1", "b. 2 điểm liên tiếp nằm trên cảnh báo mức 2", "c. 1 điểm nằm trên đường cảnh báo mức 3", "d. Tất cả yếu tố trên."],
-                answer: "d. Tất cả yếu tố trên."
-            },
-            {
-                id: 20,
-                question: "Theo yêu cầu của ICAO, Thành phần thúc đẩy an toàn gồm những yếu tố nào:",
-                options: ["a. Huấn luyện và đào tạo, phổ biến về an toàn", "b. Nhận diện mối nguy, đánh giá rủi ro", "c. Đánh giá nội bộ", "d. Tất cả yếu tố trên."],
-                answer: "a. Huấn luyện và đào tạo, phổ biến về an toàn"
-            },
-            {
-                id: 21,
-                question: "Các bộ phận chính cấu thành SSP gồm:",
-                options: ["a. Hội đồng kiểm soát rủi ro an toàn hàng không (ASMRC)", "b. Bộ phận thu thập và phân tích sự cố an toàn hàng không (ASICA)", "c. Nhóm tiêu chuẩn hóa an toàn hàng không (ASST)", "d. Tất cả bộ phận trên."],
-                answer: "d. Tất cả bộ phận trên."
-            },
-            {
-                id: 22,
-                question: "“Đường cất hạ cánh bị hư hỏng một vị trí, Đội bảo trì Cảng hàng không X tiến hành trám vá và thông báo cho ATC là đường CHC đủ điều kiện đưa vào khai thác. Một lúc sau, Tàu bay hạ cánh vào khu vực trám và một điểm trám vá và làm bê tông tại khu vực trám vá bị bong tróc va chạm gây hư hỏng động cơ tàu bay. Sau đó tàu bay được kéo về xưởng để thay thế động cơ” Mối nguy cụ thể trong tình huống trên được nhận diện.",
-                options: ["a. Động cơ bị hư hỏng.", "b. Chất lượng trám vá trên đường cất hạ cánh không đảm bảo, bong tróc tạo ra FOD trên đường cất hạ cánh.", "c. Tất cả đều đúng", "d. Tất cả đều sai."],
-                answer: "b. Chất lượng trám vá trên đường cất hạ cánh không đảm bảo, bong tróc tạo ra FOD trên đường cất hạ cánh."
-            },
-            {
-                id: 23,
-                question: "“Đường cất hạ cánh bị hư hỏng một vị trí, Đội bảo trì Cảng hàng không X tiến hành trám vá và thông báo cho ATC là đường CHC đủ điều kiện đưa vào khai thác. Một lúc sau, Tàu bay hạ cánh vào khu vực trám và một điểm trám vá và làm bê tông tại khu vực trám vá bị bong tróc va chạm gây hư hỏng động cơ tàu bay. Sau đó tàu bay được kéo về xưởng để thay thế động cơ” Rủi ro an toàn hiện tại là gì.",
-                options: ["a. Động cơ bị hư hỏng.", "b. Chất lượng trám vá trên đường cất hạ cánh không đảm bảo, bong tróc tạo ra FOD trên đường cất hạ cánh.", "c. Tất cả đều đúng", "d. Tất cả đều sai."],
-                answer: "a. Động cơ bị hư hỏng."
-            },
-            {
-                id: 24,
-                question: "Đánh giá rủi ro an toàn dựa trên các yếu tố nào.",
-                options: ["a. Tần xuất xảy ra.", "b. Mức độ nghiêm trọng", "c. Cả a và b", "d. Tất cả đều sai."],
-                answer: "c. Cả a và b"
-            },
-            {
-                id: 25,
-                question: "Hệ thống báo cáo an toàn bao gồm",
-                options: ["a. Hệ thống báo cáo bắt buộc", "b. Hệ thống báo cáo không bắt buộc (báo cáo an toàn tự nguyện)", "c. Cả a và b", "d. Tất cả đều sai"],
-                answer: "c. Cả a và b"
-            },
-            {
-                id: 26,
-                question: "Giám sát đo lường hệ thống quản lý an toàn thông qua các thông số nào?",
-                options: ["a. Mục tiêu an toàn", "b. Chỉ số an toàn", "c. Chỉ tiêu an toàn", "d. Tất cả đều đúng"],
-                answer: "d. Tất cả đều đúng"
-            },
-            {
-                id: 27,
-                question: "Báo cáo tự nguyện từ cán bộ nhân viên phục vụ cho mục đích gì:",
-                options: ["a. Cung cấp thông tin an toàn để phục vụ công tác nhận diện mối nguy, đánh giá rủi ro và đưa các biện pháp kiểm soát rủi ro an toàn.", "b. Để trừng phạt, xử lý, kỷ luật", "c. Tất cả đều sai", "d. Tất cả đều đúng"],
-                answer: "a. Cung cấp thông tin an toàn để phục vụ công tác nhận diện mối nguy, đánh giá rủi ro và đưa các biện pháp kiểm soát rủi ro an toàn."
-            },
-            {
-                id: 28,
-                question: "Phương pháp nhận diện mối nguy qua các phương pháp nào:",
-                options: ["a. Bị động", "b. Chủ động", "c. Dự báo", "d. Tất cả đều đúng"],
-                answer: "d. Tất cả đều đúng"
-            },
-            {
-                id: 29,
-                question: "Phương pháp nhận diện mối nguy bị động thực hiện như thế nào?",
-                options: ["a. Phân tích các sự cố, vụ việc xảy ra tại cảng", "b. Hệ thống báo cáo tự nguyện nội bộ", "c. Các đợt đánh giá, giám sát an toàn hoặc chất lượng", "d. Tất cả đều đúng"],
-                answer: "a. Phân tích các sự cố, vụ việc xảy ra tại cảng"
-            },
-            {
-                id: 30,
-                question: "Phương pháp nhận diện mối nguy chủ động thực hiện như thế nào?",
-                options: ["a. Quá trình điều tra sự cố", "b. Hệ thống báo cáo tự nguyện nội bộ", "c. Các đợt đánh giá, giám sát an toàn hoặc chất lượng", "d. Cả b và c"],
-                answer: "d. Cả b và c"
-            },
-            {
-                id: 31,
-                question: "Khi tại cảng xảy ra sự cố xe thang va chạm với tàu bay, Tổ an toàn nhận diện các mối nguy từ các sự cố trên. Tổ an toàn đã sử dụng phương pháp gì để nhận diện mối nguy?",
-                options: ["a. Bị động", "b. Chủ động", "c. Dự báo", "d. Tất cả đều đúng"],
-                answer: "a. Bị động"
-            },
-            {
-                id: 32,
-                question: "Khi tại cảng nhận được một báo cáo tự nguyện về sự việc an toàn, Tổ an toàn nhận diện các mối nguy từ báo cáo trên và triển khai các biện pháp kiểm soát rủi ro an toàn. Tổ an toàn đã sử dụng phương pháp gì để nhận diện mối nguy:",
-                options: ["a. Bị động", "b. Chủ động", "c. Dự báo", "d. Tất cả đều đúng."],
-                answer: "b. Chủ động"
-            },
-            {
-                id: 33,
-                question: "Khi tại cảng xảy ra sự cố xe thang va chạm với tàu bay, Hệ thống quản lý an toàn phải kích hoạt quy trình nào đầu tiên để ngăn ngừa sự cố lặp lại trong tương lai?",
-                options: ["a. Quy trình xem xét lãnh đạo", "b. Quy trình điều tra an toàn nội bộ", "c. Quy trình nhận diện mối nguy và đánh giá rủi ro", "d. Tất cả đều đúng"],
-                answer: "b. Quy trình điều tra an toàn nội bộ"
-            },
-            {
-                id: 34,
-                question: "Trong thời gian tới, Cảng hàng không của anh/chị sẽ tiến hành sửa chữa đường CHC. Với vai trò là cán bộ lãnh đạo của đơn vị, anh/ chị phải chỉ đạo thực hiện quy trình gì?",
-                options: ["a. Quy trình xem xét lãnh đạo", "b. Quy trình quản lý sự thay đổi", "c. Quy trình nhận diện mối nguy và đánh giá rủi ro", "d. Tất cả đều đúng"],
-                answer: "b. Quy trình quản lý sự thay đổi"
-            },
-            {
-                id: 35,
-                question: "Nhân viên của đơn vị anh/chị thực hiện nhiệm vụ được giao vận hành phương tiện, trang thiết bị trong khu bay để phục vụ tàu bay, nhưng nhân viên này chưa được huấn luyện về vận hành phương tiện và đơn vị anh chị chưa có quy trình hướng dẫn thực hiện công việc. Nên dẫn tới chạy sai luồng tuyến và chạm với tàu bay. Vậy theo mô hình nguyên nhân tai nạn sai lỗi của nhân viên là:",
-                options: ["a. Sai lỗi do chủ quan cá nhân tạo ra", "b. Sai lỗi do tổ chức tạo ra", "c. Tất cả đều sai", "d. Tất cả đều đúng."],
-                answer: "b. Sai lỗi do tổ chức tạo ra"
-            },
-            {
-                id: 36,
-                question: "Nhân viên tại cảng hàng không trong quá trình điều khiển cầu ống không đúng quy trình gây ra sự cố va chạm với tàu bay. Tàu bay bị hư hại và được đánh giá là mức độ nghiêm trọng là mức C. Theo thống kê trong vòng 20 năm trở lại đây chỉ xảy ra 1 sự cố như vậy. Vậy chỉ số rủi ro là",
-                options: ["a. 3C - Cao", "b. 2C – thấp", "c. 2C – Trung bình", "d. 3C – trung bình"],
-                answer: "c. 2C – Trung bình"
-            },
-            {
-                id: 37,
-                question: "Bộ phận nào chịu trách nhiệm phát hiện và báo cáo mối nguy:",
-                options: ["a. Bộ phận/lãnh đạo bộ phận an toàn", "b. Trưởng bộ phận khai thác", "c. Nhân viên thực hiện nhiệm vụ", "d. Tất cả mọi người thuộc đơn vị"],
-                answer: "d. Tất cả mọi người thuộc đơn vị"
-            },
-            {
-                id: 38,
-                question: "Ba thông tin chủ yếu cần được ghi chú trong bảng QLRR trước khi tiến hành xác định các hành động giảm thiểu rủi ro hoặc các biện pháp bảo vệ:",
-                options: ["a. Mối nguy, Tình tình trạng mất an toàn, và hậu quả cuối cùng", "b. Mối nguy, các biện pháp phòng ngừa, và biện pháp phục hồi", "c. Hậu quả cuối cùng, các biện pháp phòng ngừa, và biện pháp phục hồi", "d. Hậu quả cuối cùng, các biện pháp phòng ngừa, và mối nguy"],
-                answer: "a. Mối nguy, Tình tình trạng mất an toàn, và hậu quả cuối cùng"
-            },
-            {
-                id: 39,
-                question: "Cảng hàng không quốc tế X sắp tới sẽ tiến hành khai thác tàu bay B747 – 8, vậy Hệ thống quản lý an toàn cần sử dụng các quy trình nào của Hệ thống SMS để đánh giá giá an toàn trước khi đưa vào khai thác:",
-                options: ["a. Quy trình quản lý rủi ro (QT14)", "b. Quy trình quản lý sự thay đổi (QT05)", "c. Quy trình xem xét lãnh đạo (QT10)", "d. Cả a và b đều đúng"],
-                answer: "d. Cả a và b đều đúng"
-            },
-            {
-                id: 40,
-                question: "Để thực hiện theo dõi và giám sát mục tiêu an toàn, chất lượng tại cảng, chúng ta sử dụng quy trình nào để thực hiện:",
-                options: ["a. Quy trình giám sát và đo lường (QT09)", "b. Quy trình quản lý rủi ro (QT04)", "c. Quy trình quản lý sự thay đổi (QT05)", "d. Quy trình điều tra an toàn nội bộ (QT06)"],
-                answer: "a. Quy trình giám sát và đo lường (QT09)"
-            },
-            {
-                id: 41,
-                question: "Để thực hiện quản lý rủi ro an toàn tại cảng, chúng ta sử dụng quy trình nào để thực hiện:",
-                options: ["a. Quy trình giám sát và đo lường (QT09)", "b. Quy trình quản lý rủi ro (QT04)", "c. Quy trình quản lý sự thay đổi (QT05)", "d. Quy trình điều tra an toàn nội bộ (QT06)"],
-                answer: "b. Quy trình quản lý rủi ro (QT04)"
-            },
-            {
-                id: 42,
-                question: "Để thực hiện điều tra nguyên nhân các sự cố, vụ việc mất an toàn tại cảng tại cảng, chúng ta sử dụng quy trình nào để thực hiện:",
-                options: ["a. Quy trình giám sát và đo lường (QT09)", "b. Quy trình quản lý rủi ro (QT04)", "c. Quy trình quản lý sự thay đổi (QT05)", "d. Quy trình điều tra an toàn nội bộ (QT06)"],
-                answer: "d. Quy trình điều tra an toàn nội bộ (QT06)"
-            },
-            {
-                id: 43,
-                question: "Hệ thống quản lý an toàn là gì :",
-                options: ["a. Là việc Thiết lập tổ chức để quản lý an toàn Quy định trách nhiệm đối với an toàn, Xây dựng chính sách và các quy trình quản lý an toàn.", "b. Là việc tiếp cận quản lý an toàn một cách có hệ thống, bao gồm: Thiết lập tổ chức để quản lý an toàn, Xây dựng chính sách và các quy trình quản lý an toàn.", "c. Là việc tiếp cận quản lý an toàn một cách có hệ thống, bao gồm: Thiết lập tổ chức để quản lý an toàn, Quy định trách nhiệm đối với an toàn, Xây dựng chính sách và các quy trình quản lý an toàn để đạt mục tiêu an toàn của tổ chức.", "d. Tất cả đều sai"],
-                answer: "c. Là việc tiếp cận quản lý an toàn một cách có hệ thống, bao gồm: Thiết lập tổ chức để quản lý an toàn, Quy định trách nhiệm đối với an toàn, Xây dựng chính sách và các quy trình quản lý an toàn để đạt mục tiêu an toàn của tổ chức."
-            },
-            {
-                id: 44,
-                question: "Ai ban hành chính sách mục tiêu an toàn?",
-                options: ["a. Giám đốc cảng", "b. Phó giám đốc phụ trách an toàn", "c. Phó giám đốc phụ trách chất lượng", "d. Tất cả đều đúng"],
-                answer: "a. Giám đốc cảng"
-            },
-            {
-                id: 45,
-                question: "Để thực hiện đánh giá các ảnh hưởng an toàn khai thác để đưa một công trình sân đỗ mới xây dựng vào khai thác tại cảng, chúng ta sử dụng quy trình nào để thực hiện",
-                options: ["a. Quy trình quản lý sự thay đổi (QT05)", "b. Quy trình quản lý rủi ro (QT04)", "c. Quy trình quản lý sự thay đổi (QT05)", "d. Cả a và b"],
-                answer: "d. Cả a và b"
-            },
-            {
-                id: 46,
-                question: "An toàn là trạng thái mà các rủi ro gây tổn thương/thiệt hại cho người và tài sản được giảm thiểu và duy trì ở ………….. đó thông qua một quy trình nhận diện mối nguy hiểm và quản lý rủi ro liên tục? Điền vào chỗ trống cho đúng",
-                options: ["a. Bằng ở mức độ chấp nhận được", "b. Thấp hơn mức độ chấp nhận được", "c. Cả a và b đều đúng", "d. Cao hơn mức độ chấp nhận được"],
-                answer: "c. Cả a và b đều đúng"
-            },
-            {
-                id: 47,
-                question: "Những biện pháp kiểm soát FOD nào dưới đây mang tính chất giảm thiểu tần suất xảy ra rủi ro an toàn do FOD gây ra",
-                options: ["a. Nhân viên thực hiện kiểm tra, thu nhặt FOD trước khi tàu bay vào vị trí đỗ sau khi tàu bay rời khỏi vị trí đỗ", "b. Động cơ tàu bay được thiết kế với các vật liệu có khả năng chịu đựng được va đập với FOD mà vẫn hoạt động bình thường.", "c. Xây dựng kế hoạch khẩn nguy sân bay", "d. Tất cả đều đúng"],
-                answer: "a. Nhân viên thực hiện kiểm tra, thu nhặt FOD trước khi tàu bay vào vị trí đỗ sau khi tàu bay rời khỏi vị trí đỗ"
-            },
-            {
-                id: 48,
-                question: "Những biện pháp kiểm soát FOD nào dưới đây mang tính chất giảm thiểu khả năng xảy ra và mức độ nghiêm trọng của rủi ro an toàn do FOD gây ra:",
-                options: ["a. Nhân viên thực hiện kiểm tra, thu nhặt FOD trước khi tàu bay vào vị trí đỗ sau khi tàu bay rời khỏi vị trí đỗ", "b. Động cơ tàu bay được thiết kế với các vật liệu có khả năng chịu đựng được va đập với FOD mà vẫn hoạt động bình thường.", "c. Xây dựng kế hoạch khẩn nguy sân bay", "d. Tất cả đều đúng"],
-                answer: "d. Tất cả đều đúng"
-            },
-            {
-                id: 49,
-                question: "Hệ thống quản lý an toàn thực hiện việc kiểm soát tài liệu thông qua quy trình nào",
-                options: ["a. Quy trình kiểm soát tài liệu (QT01)", "b. Quy trình kiểm soát hồ sơ (QT02)", "c. Quy trình quản lý rủi ro (QT04)", "d. Quy trình lập và theo dõi mục tiêu (QT03)"],
-                answer: "a. Quy trình kiểm soát tài liệu (QT01)"
-            },
-            {
-                id: 50,
-                question: "Cải tiến Hệ thống quản lý an toàn được thực hiện thông qua quy trình nào",
-                options: ["a. Quy trình họp xem xét lãnh đạo (QT10)", "b. Quy trình đánh giá nội bộ (QT11)", "c. Quy trình khắc phục và phòng ngừa (QT13)", "d. Tất cả các quy trình trên"],
-                answer: "d. Tất cả các quy trình trên"
-            }
-        ];
+        // === DỮ LIỆU GỐC (RAW DATA) ===
+        // Được WebQ Architect nạp sẵn từ nguồn bạn cung cấp.
+        const rawData = `Câu 1: Theo Annex 14, hệ quy chiếu chung sử dụng trong thiết kế sân bay là gì?
+A.  WGS-72 B.  VN-2000 C.  WGS-84  ✅  D.  ICAO-14 📘 Giải thích:  WGS-84 là hệ quy chiếu toàn cầu được ICAO khuyến cáo sử dụng trong thiết kế và khai thác sân bay.
+Câu 2: Mã hiệu sân bay được xác định dựa trên yếu tố nào?
+A.  Số lượng hành khách B.  Loại tàu bay khai thác C.  Chiều dài đường cất hạ cánh và sải cánh tàu bay  ✅  D.  Vị trí địa lý 📘   Giải thích:  Mã hiệu sân bay gồm 2 phần: số (dựa vào chiều dài CHC) và chữ (dựa vào sải cánh và khoảng cách giữa bánh xe chính).
+Câu 3: Giấy chứng nhận khai thác cảng hàng không, sân bay được cấp bởi:
+A.  Bộ Giao thông Vận tải B.  Cục Hàng không Việt Nam  ✅  C.  ICAO D.  Tổng công ty Quản lý bay 📘   Giải thích:  Theo quy định, Cục Hàng không Việt Nam là cơ quan có thẩm quyền cấp giấy chứng nhận khai thác.
+Câu 4: Quy hoạch sân bay phải đảm bảo nguyên tắc nào sau đây?
+A.  Tối đa hóa diện tích xây dựng B.  Phù hợp với quy hoạch vùng và quốc gia  ✅  C.  Ưu tiên nhà ga hành khách D.  Giảm chi phí đầu tư 📘   Giải thích:  Quy hoạch sân bay phải phù hợp với quy hoạch phát triển kinh tế - xã hội và quy hoạch giao thông quốc gia.
+Câu 5: ICAO Annex 14 Volume I chủ yếu đề cập đến:
+A.  Quản lý bay B.  Thiết kế và khai thác sân bay  ✅  C.  An ninh hàng không D.  Dịch vụ hành khách 📘   Giải thích:  Annex 14 Volume I là tài liệu hướng dẫn thiết kế và khai thác sân bay theo tiêu chuẩn ICAO.
+Câu 6: Theo ANNEX 14, sân bay được phân cấp theo:
+A.  Số lượng chuyến bay B.  Loại hình khai thác C.  Mã hiệu sân bay  ✅  D.  Vị trí địa lý 📘   Giải thích:  Phân cấp sân bay dựa trên mã hiệu ICAO, phản ánh khả năng tiếp nhận tàu bay.
+Câu 7: Quy trình khai thác sân bay phải đảm bảo:
+A.  Tối ưu hóa chi phí B.  Tuân thủ quy định ICAO  ✅  C.  Giảm thiểu nhân lực D.  Tăng doanh thu 📘   Giải thích:  ICAO quy định rõ quy trình khai thác nhằm đảm bảo an toàn và hiệu quả.
+Câu 8: Việc áp dụng ANNEX 14 Volume I là bắt buộc đối với:
+A.  Các sân bay quốc tế B.  Các sân bay nội địa C.  Tất cả các sân bay dân dụng  ✅  D.  Các sân bay quân sự 📘   Giải thích:  ANNEX 14 áp dụng cho toàn bộ sân bay dân dụng tại Việt Nam.
+Câu 8: Điểm quy chiếu sân bay được xác định tại vị trí nào?
+A. Trung tâm nhà ga
+B. Trung tâm sân đỗ
+C. Đặt ở gần tâm hình học ban đầu hoặc tâm hình học thiết kế của sân bay với nguyên tắc không được thay đổi vị trí ban đầu đã chọn  ✅
+D. Đầu đường cất hạ cánh
+📘  Giải thích: Đặt ở gần tâm hình học ban đầu hoặc tâm hình học thiết kế của sân bay với nguyên tắc không được thay đổi vị trí ban đầu đã chọn.
+Câu 9: Mức cao sân bay đối với đường cất hạ cánh tiếp cận chính xác được xác định tại:
+A. Vị trí quy chiếu
+B. Vị trí cao nhất của sân bay
+C. Vị trí thấp nhất của sân bay
+D. Độ cao cuối đường cất hạ cánh và độ cao lớn nhất của vùng chạm bánh  ✅
+📘  Giải thích: ICAO quy định mức cao sân bay độ cao cuối đường cất hạ cánh và độ cao lớn nhất của vùng chạm bánh.
+Câu 10: Nhiệt độ không khí tham chiếu của sân bay được xác định dựa trên :
+A. Nhiệt độ trung bình năm
+B. Nhiệt độ cao nhất trong ngày
+C. Nhiệt độ trung bình của tháng nóng nhất  ✅
+D. Nhiệt độ thấp nhất trong năm
+📘  Giải thích: ICAO yêu cầu sử dụng nhiệt độ trung bình của tháng nóng nhất để thiết kế các hạng mục kỹ thuật.
+Câu 11: Sức chịu tải của mặt đường sân bay được công bố theo phương pháp nào từ ngày 28/11/2024 ?
+A. ACN-PCN
+B. ACR-PCR  ✅
+C. ICAO-Load
+D. VN-Load
+📘  Giải thích: ANNEX 14 quy định chuyển sang phương pháp ACR-PCR để phù hợp với cập nhật của ICAO.
+Câu 12: Các cự ly công bố của đường cất hạ cánh bao gồm:
+A. TORA, TODA, ASDA, LDA  ✅
+B. TORA, TORA, TORA
+C. LDA, MDA, DA
+D. TODA, ASDA, VDA
+📘  Giải thích: Đây là các cự ly liên quan đến hoạt động cất hạ cánh, được ICAO quy định rõ.
+Câu 13: Báo cáo tình trạng mặt đường cất hạ cánh cung cấp cho tổ lái phải được thực hiện khi nào:
+A. Hàng năm
+B. Khi có thay đổi đáng kể  ✅
+C. Theo mùa
+D. Không cần cập nhật
+📘  Giải thích: Việc cập nhật  Báo cáo tình trạng mặt đường cất hạ cánh  giúp đảm bảo an toàn khai thác và thông tin chính xác.
+Câu 14: Hệ thống chỉ thị độ dốc tiếp cận bằng mắt (PAPI) được lắp đặt nhằm :
+A. Trang trí sân bay
+B. Hướng dẫn tàu bay tiếp cận đường CHC  ✅
+C. Cảnh báo thời tiết
+D. Chiếu sáng sân đỗ
+📘  Giải thích: PAPI giúp phi công xác định góc tiếp cận chính xác khi hạ cánh.
+Câu 15: Công tác phối hợp giữa cơ sở thông báo tin tức hàng không và người khai thác sân bay nhằm:
+A. Tăng doanh thu
+B. Đảm bảo an toàn và hiệu quả khai thác  ✅
+C. Giảm chi phí vận hành
+D. Quản lý nhân sự
+📘  Giải thích: Phối hợp thông tin là yếu tố quan trọng để duy trì hoạt động bay an toàn và hiệu quả.
+Câu 16: Chiều rộng tối thiểu của đường cất hạ cánh cho sân bay mã hiệu 4E là :
+A. 30 m
+B. 45 m  ✅
+C. 60 m
+D. 75 m
+📘  Giải thích: Theo ICAO Annex 14, sân bay mã hiệu 4E yêu cầu chiều rộng đường CHC tối thiểu là 45 m.
+Câu 17: Dải bay phải được thiết kế để:
+A. Trang trí cảnh quan
+B. Giảm tiếng ồn
+C. Giảm thiểu thiệt hại khi tàu bay vượt khỏi đường CHC  ✅
+D. Tăng tốc độ cất cánh
+📘  Giải thích: Dải bay là khu vực bao quanh đường CHC, giúp giảm thiệt hại khi tàu bay vượt ra ngoài.
+Câu 18: Khu vực an toàn cuối đường CHC (RESA) có chiều dài khuyến cáo tối thiểu là :
+A. 60 m
+B. 90 m
+C. 120 m
+D. 240 m  ✅
+📘  Giải thích: ICAO khuyến cáo chiều dài tối thiểu của RESA là 240 m để đảm bảo an toàn khi hạ cánh vượt quá.
+Câu 19: Khoảng trống (clearway) được sử dụng để:
+A. Đỗ tàu bay
+B. Tăng cự ly cất cánh  ✅
+C. Giảm độ dốc đường CHC
+D. Làm sân quay đầu
+📘  Giải thích: Clearway là phần không gian không có chướng ngại vật, cho phép tàu bay tăng tốc khi cất cánh.
+Câu 20: Đoạn dừng (stopway) là khu vực:
+A. Dành cho tàu bay quay đầu
+B. Dành cho tàu bay dừng lại khi hủy cất cánh  ✅
+C. Dành cho xe cứu hỏa
+D. Dành cho kiểm tra kỹ thuật
+📘  Giải thích: Stopway là phần mở rộng của đường CHC, giúp tàu bay dừng lại an toàn khi hủy cất cánh.
+Câu 21: Đường lăn phải có chiều rộng tối thiểu đối với tàu bay có khoảng cách mép ngoài của bánh ngoài càng tàu bay từ 9m đến dưới 15m là :
+A. 10 m
+B. 15 m
+C. 23 m  ✅
+D. 25 m
+📘  Giải thích: Tùy theo loại tàu bay, nhưng ICAO quy định chiều rộng tối thiểu phổ biến là 23 m.
+Câu 22: Sân quay đầu đường CHC được thiết kế để:
+A. Tăng tốc độ cất cánh
+B. Giúp tàu bay quay đầu thuận tiện  ✅
+C. Giảm độ dốc đường CHC
+D. Làm điểm kiểm tra kỹ thuật
+📘  Giải thích: Sân quay đầu giúp tàu bay quay đầu tại cuối đường CHC khi không có đường lăn nối.
+Câu 23: Vị trí chờ lên đường CHC phải được đặt cách tim đường CHC có thiết bị tiếp cận chính xác tối thiểu:
+A. 30 m
+B. 90 m  ✅
+C. 75 m
+D. 100 m
+📘  Giải thích: Khoảng cách này đảm bảo tàu bay chờ không ảnh hưởng đến hoạt động trên đường CHC.
+Câu 24: Sân đỗ tàu bay phải đảm bảo:
+A. Có mái che
+B. Có hệ thống làm mát
+C. Có khoảng cách an toàn giữa các tàu bay  ✅
+D. Có hệ thống chiếu sáng liên tục
+📘  Giải thích: Khoảng cách giữa các tàu bay tại sân đỗ là yếu tố quan trọng để đảm bảo an toàn khai thác.
+Câu 25: Vị trí đỗ tàu bay cách ly (biệt lập) được sử dụng khi:
+A. Tàu bay cần bảo dưỡng
+B. Tàu bay có nghi ngờ về an ninh hoặc dịch bệnh, sử dụng trong tình huống khẩn nguy  ✅
+C. Tàu bay VIP
+D. Tàu bay chở hàng
+📘  Giải thích: Vị trí biệt lập dùng để cách ly tàu bay có nguy cơ gây mất an toàn hoặc dịch bệnh
+Câu 26: Bề mặt giới hạn chướng ngại vật (Obstacle Limitation Surfaces - OLS) được thiết kế nhằm:
+A. Tăng khả năng cất cánh
+B. Giảm chi phí xây dựng
+C. Bảo đảm an toàn bay  ✅
+D. Tăng diện tích sân bay
+📘  Giải thích: OLS là các bề mặt tưởng tượng được ICAO quy định để giới hạn chiều cao của vật thể xung quanh sân bay nhằm bảo đảm an toàn bay.
+Câu 27: Bề mặt giới hạn chướng ngại vật bao gồm các loại sau, ngoại trừ:
+A. Bề mặt tiếp cận
+B. Bề mặt chuyển tiếp
+C. Bề mặt ngang trên  ✅
+D. Bề mặt cất cánh
+📘  Giải thích: Bề mặt bảo trì không phải là một phần của OLS. Các bề mặt chính gồm tiếp cận, chuyển tiếp, cất cánh, nội tại và ngoài nội tại.
+Câu 28: Vật thể nằm ngoài (chưa vi phạm) các bề mặt giới hạn chướng ngại vật phải:
+A. Được đánh dấu và chiếu sáng  ✅
+B. Được tháo dỡ
+C. Được di dời
+D. Không cần xử lý
+📘  Giải thích: Nếu vật thể nằm ngoài OLS nhưng có thể gây nguy hiểm, cần được đánh dấu hoặc chiếu sáng để cảnh báo.
+Câu 29: Đối với sân bay có hoạt động bay ban đêm, vật thể chướng ngại phải:
+A. Được sơn màu
+B. Được chiếu sáng  ✅
+C. Được bao phủ
+D. Được di chuyển
+📘  Giải thích: ICAO yêu cầu chiếu sáng các vật thể chướng ngại để đảm bảo nhận biết trong điều kiện ánh sáng yếu.
+Câu 30: Các yêu cầu hạn chế chướng ngại vật trong Annex 14 áp dụng cho:
+A. Tất cả các sân bay dân dụng  ✅
+B. Chỉ sân bay quốc tế
+C. Chỉ sân bay có đường CHC dài hơn 1800 m
+D. Sân bay có hoạt động bay quân sự
+📘  Giải thích: ANNEX 14 áp dụng cho toàn bộ sân bay dân dụng, không phân biệt quy mô hay loại hình khai thác.
+Câu 31: Bề mặt chuyển tiếp có độ dốc tiêu chuẩn là:
+A. 10%
+B. 14.3%  ✅
+C. 20%
+D. 25%
+📘  Giải thích: Theo ICAO Annex 14, độ dốc của bề mặt chuyển tiếp là 14% để đảm bảo giới hạn chiều cao vật thể.
+Câu 32: Bề mặt tiếp cận bắt đầu từ:
+A. Từ trước ngưỡng đường cất hạ cánh, cách ngưỡng 60m  ✅
+B. Cuối đường CHC
+C. Trung tâm sân bay
+D. Vị trí quy chiếu
+📘  Giải thích: Bề mặt tiếp cận bắt đầu từ đầu đường CHC và kéo dài theo hướng hạ cánh để giới hạn vật thể.
+Câu 33: Những vật thể nằm trong khu vực OLS nhưng không thể di dời phải :
+A. Được đánh dấu và chiếu sáng  ✅
+B. Được xây tường bao
+C. Được sơn màu
+D. Được bỏ qua
+📘  Giải thích: ICAO cho phép giữ lại vật thể nếu được đánh dấu và chiếu sáng đúng quy chuẩn.
+Câu 34: Việc đánh giá chướng ngại vật phải được thực hiện :
+A. Một lần khi xây dựng sân bay
+B. Định kỳ hoặc khi có thay đổi  ✅
+C. Khi có sự cố
+D. Khi có yêu cầu từ hãng hàng không
+📘  Giải thích: Đánh giá chướng ngại vật là công việc định kỳ để đảm bảo an toàn khai thác.
+Câu 35: Mục tiêu chính của việc loại bỏ chướng ngại vật là:
+A. Tăng diện tích xây dựng
+B. Giảm chi phí bảo trì
+C. Đảm bảo an toàn hoạt động bay  ✅
+D. Tăng tốc độ khai thác
+📘  Giải thích: Loại bỏ chướng ngại vật giúp giảm nguy cơ va chạm và đảm bảo an toàn cho tàu bay trong quá trình cất/hạ cánh
+Câu 36: Màu sắc của tim đèn đường lăn là:
+A. Đỏ
+B. Vàng
+C. Xanh dương
+D. Xanh lá cây  ✅
+📘  Giải thích: Đèn đường lăn có màu xanh lục để hướng dẫn tàu bay di chuyển trên mặt đất.
+Câu 37: Đèn tiếp cận được lắp đặt nhằm mục đích:
+A. Trang trí sân bay
+B. Hướng dẫn tàu bay trong điều kiện tầm nhìn hạn chế, ban đêm  ✅
+C. Cảnh báo khu vực hạn chế
+D. Chiếu sáng khu vực nhà ga
+📘  Giải thích: Đèn tiếp cận giúp phi công xác định hướng và vị trí đường CHC khi hạ cánh.
+Câu 38: Đèn ngưỡng đường CHC có màu :
+A. Đỏ
+B. Xanh lục  ✅
+C. Trắng
+D. Vàng
+📘  Giải thích: Đèn ngưỡng đường CHC có màu xanh lục để chỉ vị trí bắt đầu hạ cánh.
+Câu 39: Đèn cuối đường CHC có màu:
+A. Đỏ  ✅
+B. Xanh
+C. Vàng
+D. Trắng
+📘  Giải thích: Đèn cuối đường CHC có màu đỏ để cảnh báo giới hạn đường băng.
+Câu 40: Biển báo bắt buộc có nền màu:
+A. Đỏ  ✅
+B. Vàng
+C. Trắng
+D. Xanh
+📘  Giải thích: Biển báo bắt buộc có nền đỏ, chữ trắng để thể hiện tính bắt buộc.
+Câu 41: Đèn đường CHC có thể điều chỉnh cường độ sáng nhằm:
+A. Tiết kiệm điện
+B. Phù hợp với điều kiện thời tiết và tầm nhìn  ✅
+C. Giảm nhiệt độ
+D. Tăng tuổi thọ đèn
+📘  Giải thích: Điều chỉnh cường độ sáng giúp phi công dễ nhận biết trong các điều kiện khác nhau.
+Câu 42: Màu sắc dùng để đánh dấu chướng ngại vật là :
+A. Xanh dương
+B. Đỏ và trắng  ✅
+C. Vàng và đen
+D. Trắng và đen
+📘  Giải thích: ICAO quy định sử dụng màu đỏ và trắng xen kẽ để đánh dấu chướng ngại vật.
+Câu 44: Chiếu sáng chướng ngại vật được yêu cầu khi:
+A. Vật thể cao hơn 15 m
+B. Vật thể nằm gần đường CHC
+C. Có hoạt động bay ban đêm  ✅
+D. Vật thể nằm trong nhà ga
+📘  Giải thích: Chiếu sáng chướng ngại vật là bắt buộc khi có hoạt động bay ban đêm để đảm bảo an toàn.
+Câu 45: Đèn chướng ngại vật thường có màu :
+A. Vàng
+B. Đỏ  ✅
+C. Trắng
+D. Xanh
+📘  Giải thích: Đèn chướng ngại vật có màu đỏ để cảnh báo nguy hiểm.
+Câu 46: Đánh dấu chướng ngại vật bằng mắt nhằm mục đích:
+A. Trang trí
+B. Tăng tính thẩm mỹ
+C. Cảnh báo phi công  ✅
+D. Giảm chi phí
+📘  Giải thích: Mục tiêu chính là cảnh báo phi công về sự hiện diện của vật thể nguy hiểm.
+Câu 47: Vật thể cần đánh dấu phải có chiều cao từ :
+A. 5 m trở lên
+B. 10 m trở lên
+C. 15 m trở lên  ✅
+D. 20 m trở lên
+📘  Giải thích: ICAO quy định vật thể từ 15 m trở lên trong khu vực OLS cần được đánh dấu.
+Câu 48: Đèn chướng ngại vật phải được bố trí:
+A. Ở chân vật thể
+B. Ở giữa vật thể
+C. Ở đỉnh vật thể  ✅
+D. Ở vị trí bất kỳ
+📘  Giải thích: Đèn chướng ngại vật phải đặt ở đỉnh để dễ nhận biết từ xa.
+Câu 49: Khu vực trước ngưỡng đường CHC không sử dụng phải:
+A. Được sơn màu vàng
+B. Được đánh dấu bằng chữ “STOP”
+C. Được đánh dấu bằng hình chữ X  ✅
+D. Được rào chắn
+📘  Giải thích: ICAO quy định sử dụng hình chữ X để đánh dấu khu vực không sử dụng trước ngưỡng đường CHC.
+Câu 50: Kế hoạch khẩn nguy sân bay phải được xây dựng bởi:
+A. Hãng hàng không
+B. Người khai thác cảng  ✅
+C. Cục Hàng không
+D. Đơn vị cứu hỏa
+📘  Giải thích: Đơn vị khai thác sân bay có trách nhiệm xây dựng kế hoạch khẩn nguy phù hợp với thực tế hoạt động.
+Câu 51: Giảm rủi ro do động vật hoang dã là một phần của:
+A. Kế hoạch bảo trì
+B. Kế hoạch khẩn nguy
+C. Kế hoạch an toàn khai thác của người khai thác cảng hàng không  ✅
+D. Kế hoạch môi trường
+📘  Giải thích: Động vật hoang dã có thể gây nguy hiểm cho tàu bay, nên cần có biện pháp kiểm soát.
+Câu 52: Dịch vụ điều hành sân đỗ tàu bay bao gồm:
+A. Điều phối, sắp xếp các vị trí đỗ cho tàu bay  ✅
+B. Kiểm tra hành lý
+C. Phục vụ hành khách
+D. Bảo dưỡng tàu bay
+📘  Giải thích: Điều hành sân đỗ đảm bảo tàu bay được bố trí hợp lý, an toàn và hiệu quả.
+Câu 53: Phương tiện phục vụ mặt đất phải hoạt động:
+A. Tự do trong sân bay
+B. Tuân thủ theo quy trình và quy định an toàn  ✅
+C. Theo yêu cầu của hãng hàng không
+D. Theo thời gian biểu riêng
+📘  Giải thích: Phương tiện mặt đất phải tuân thủ quy trình để đảm bảo an toàn và tránh xung đột với hoạt động bay.
+Câu 54: Hàng rào an ninh sân bay có vai trò:
+A. Trang trí
+B. Phân chia khu vực
+C. Ngăn chặn xâm nhập trái phép  ✅
+D. Giảm tiếng ồn
+📘  Giải thích: Hàng rào an ninh là biện pháp vật lý để bảo vệ khu vực hạn chế.
+Câu 55: Hệ thống cảnh báo xâm nhập đường CHC chủ động (ARIWS) có vai trò:
+A. Cảnh báo thời tiết
+B. Cảnh báo tàu bay không đủ nhiên liệu
+C. Cảnh báo nguy cơ xâm nhập đường CHC  ✅
+D. Cảnh báo mất điện
+📘  Giải thích: ARIWS là hệ thống tự động giúp phát hiện và cảnh báo khi có phương tiện hoặc người xâm nhập đường CHC.
+Câu 56: Việc duy trì điều kiện khai thác sân bay nhằm mục tiêu chính là:
+A. Tăng doanh thu
+B. Đảm bảo an toàn và hiệu quả khai thác  ✅
+C. Giảm chi phí bảo trì
+D. Tăng số lượng hành khách
+📘  Giải thích: Duy trì điều kiện khai thác giúp đảm bảo hoạt động bay diễn ra an toàn, liên tục và hiệu quả.
+Câu 57: Loại bỏ các chất bám trên mặt đường CHC nhằm:
+A. Làm sạch môi trường
+B. Tăng độ ma sát  ✅
+C. Giảm chi phí bảo trì
+D. Trang trí sân bay
+📘  Giải thích: Chất bám như dầu, cao su làm giảm độ ma sát, gây nguy hiểm khi hạ cánh.
+Câu 58: Việc duy trì hệ thống đèn sân bay phải đảm bảo:
+A. Đèn luôn sáng 24/7
+B. Đèn hoạt động đúng chức năng và cường độ  ✅
+C. Đèn có màu sắc đẹp
+D. Đèn tiết kiệm điện
+📘  Giải thích: Đèn phải hoạt động đúng chức năng để đảm bảo dẫn đường và cảnh báo hiệu quả.
+Câu 59 : Trong quá trình kiểm tra sân bay, bạn phát hiện một vật thể cao 18m nằm trong khu vực tiếp cận đường CHC nhưng chưa được đánh dấu. Bạn nên:
+A. Đánh dấu bằng sơn màu xanh
+B. Đánh dấu bằng sơn màu vàng
+C. Báo cáo và yêu cầu tháo dỡ ngay, Lắp đặt đèn cảnh báo và đánh dấu theo quy định  ✅
+D. Không cần xử lý nếu không ảnh hưởng đến hoạt động bay
+📘  Giải thích: Vật thể trong khu vực OLS phải được đánh dấu và chiếu sáng theo quy định ICAO để đảm bảo an toàn.
+Câu 60: Trong điều kiện thời tiết sương mù, hệ thống đèn tiếp cận không hoạt động. Bạn nên:
+A. Tạm ngừng khai thác đường CHC đó  ✅
+B. Cho phép hạ cánh bằng mắt
+C. Chuyển hướng tàu bay đến sân bay khác
+D. Tăng cường chiếu sáng sân đỗ
+📘  Giải thích: Đèn tiếp cận là thiết bị dẫn đường quan trọng trong điều kiện tầm nhìn hạn chế, nếu không hoạt động phải tạm ngừng khai thác.
+Câu 61: Một phương tiện mặt đất đi vào đường CHC khi có tàu bay đang hạ cánh. Hệ thống ARIWS phát cảnh báo. Bạn cần :
+A. Tắt hệ thống cảnh báo
+B. Dừng ngay phương tiện và thông báo khẩn cấp  ✅
+C. Cho phép tiếp tục nếu không có va chạm
+D. Gửi báo cáo sau khi tàu bay hạ cánh
+📘  Giải thích: ARIWS cảnh báo xâm nhập đường CHC, cần xử lý ngay để tránh tai nạn.
+Câu 62: Trong quá trình kiểm tra mặt đường CHC, bạn phát hiện lớp cao su tích tụ dày, hệ số ma sát suy giảm dưới mức tối thiểu. Biện pháp xử lý là :
+A. Đánh dấu khu vực đó
+B. Tạm ngừng khai thác và loại bỏ cao su  ✅
+C. Cho phép khai thác bình thường
+D. Sơn lại mặt đường
+📘  Giải thích: Cao su làm giảm độ ma sát, cần được loại bỏ để đảm bảo an toàn hạ cánh.
+Câu 63: Một khu vực sân bay đang thi công nhưng chưa được đánh dấu bằng mắt. Bạn nên:
+A. Đặt biển báo tạm thời
+B. Dừng thi công
+C. Đánh dấu bằng hình chữ X và đèn đỏ  ✅
+D. Cho phép tiếp tục nếu không ảnh hưởng đến đường CHC
+📘  Giải thích: Khu vực không sử dụng hoặc đang thi công phải được đánh dấu rõ ràng để cảnh báo.
+Câu 64: Trong quá trình khai thác ban đêm, một đèn ngưỡng đường CHC bị hỏng. Bạn nên:
+A. Thay thế ngay hoặc tạm ngừng khai thác  ✅
+B. Cho phép khai thác nếu còn 50% đèn hoạt động
+C. Gửi báo cáo và xử lý sau
+D. Tăng cường chiếu sáng sân đỗ
+📘  Giải thích: Đèn ngưỡng là thiết bị dẫn đường quan trọng, phải đảm bảo hoạt động đầy đủ.
+Câu 65: Một tàu bay lớn hơn cấp sân bay đã công bố xin hạ cánh. Bạn cần :
+A. Từ chối ngay
+B. Cho phép nếu có phương án khai thác đặc biệt được CHKVN phê duyệt  ✅
+C. Chuyển hướng tàu bay
+D. Yêu cầu hãng bay đổi tàu bay
+📘  Giải thích: ANNEX 14 cho phép khai thác tàu bay lớn hơn cấp sân bay nếu có kế hoạch khai thác đặc biệt được phê duyệt.
+Câu 66: Trong quá trình kiểm tra sân bay, bạn phát hiện biển báo bị mờ, không đọc được. Bạn nên :
+A. Gửi báo cáo định kỳ
+B. Thay thế hoặc làm mới biển báo ngay  ✅
+C. Cho phép khai thác bình thường
+D. Đánh dấu biển báo bằng sơn
+📘  Giải thích: Biển báo là phương tiện dẫn đường bằng mắt, phải đảm bảo rõ ràng và dễ nhận biết.
+Câu 67: Một phương tiện mặt đất hoạt động trong sân bay không có giấy phép. Bạn cần:
+A. Cho phép hoạt động nếu có tài xế kinh nghiệm
+B. Yêu cầu rời khỏi khu vực hạn chế ngay  ✅
+C. Gửi cảnh báo sau
+D. Đưa vào khu vực cách ly
+📘  Giải thích: Phương tiện hoạt động trong khu vực hạn chế phải có giấy phép và tuân thủ quy định an toàn`;
 
-        const questionListDiv = document.getElementById('questionList');
-        const searchInput = document.getElementById('searchInput');
-        const emptyMessageDiv = document.getElementById('emptyMessage');
-
-        /**
-         * Renders the list of questions based on the filtered array.
-         * @param {Array} questionsToRender - The array of question objects to display.
-         */
-        function renderQuestions(questionsToRender) {
-            questionListDiv.innerHTML = ''; // Clear previous results
-            
-            if (questionsToRender.length === 0) {
-                emptyMessageDiv.style.display = 'block';
-                return;
-            } else {
-                emptyMessageDiv.style.display = 'none';
-            }
-
-            questionsToRender.forEach(q => {
-                // 1. Build the options list HTML
-                const optionsHtml = q.options.map(option => {
-                    // 2. Check if the current option is the correct answer
-                    const isCorrect = option.trim().toLowerCase() === q.answer.trim().toLowerCase();
-                    
-                    // 3. Apply the red highlight style to the correct answer option
-                    const optionContent = isCorrect
-                        ? `<span class="correct-answer" style="color:var(--danger-color);">${option}</span>`
-                        : option;
-
-                    return `<li class="option-item">${optionContent}</li>`;
-                }).join('');
-
-                // 4. Build the final HTML card
-                const cardHtml = `
-                    <div class="question-card">
-                        <h3>Câu ${q.id}: ${q.question}</h3>
-                        <ul class="options-list">
-                            ${optionsHtml}
-                        </ul>
-                        <span class="answer-label">Đáp án đúng:</span>
-                        <span class="correct-answer">${q.answer}</span>
-                    </div>
-                `;
-                questionListDiv.insertAdjacentHTML('beforeend', cardHtml);
-            });
-        }
-
-        /**
-         * Filters the questions array based on the search keyword.
-         */
-        function filterQuestions() {
-            const keyword = searchInput.value.toLowerCase().trim();
-
-            if (!keyword) {
-                renderQuestions(questionData);
-                return;
-            }
-
-            const filtered = questionData.filter(q => {
-                // Check if the keyword is in the question text
-                const questionMatch = q.question.toLowerCase().includes(keyword);
-
-                // Check if the keyword is in the options or the final answer text
-                const answerMatch = q.options.some(opt => opt.toLowerCase().includes(keyword)) ||
-                                    q.answer.toLowerCase().includes(keyword);
-
-                return questionMatch || answerMatch;
-            });
-
-            renderQuestions(filtered);
-        }
-
-        // --- Event Listeners ---
-        // Filter questions in real-time when the user types
-        searchInput.addEventListener('input', filterQuestions);
-
-        // --- Initial Load ---
-        // Render all questions when the page first loads
+        // === CỖ MÁY XỬ LÝ & RENDER (PARSER ENGINE) ===
         document.addEventListener('DOMContentLoaded', () => {
-            renderQuestions(questionData);
+            const container = document.getElementById('questionContainer');
+            const searchInput = document.getElementById('searchInput');
+            const statsCounter = document.getElementById('statsCounter');
+
+            // Cắt văn bản thành từng khối câu hỏi (dựa vào pattern "Câu [số]:")
+            // Dùng lookahead regex để giữ lại chữ "Câu"
+            const blocks = rawData.split(/(?=Câu \d+\s*:)/g).filter(block => block.trim().length > 0);
+            
+            let totalQuestions = blocks.length;
+            statsCounter.innerText = `Hiển thị ${totalQuestions}/${totalQuestions} câu hỏi`;
+
+            // Hàm phân tích định dạng nội dung từng khối
+            function formatCardContent(text) {
+                let formatted = text.trim();
+
+                // 1. In đậm tiêu đề câu hỏi
+                // Bắt đầu từ đầu chuỗi (hoặc chữ Câu), lấy đến khi gặp ký tự xuống dòng đầu tiên
+                formatted = formatted.replace(/^(Câu \d+\s*:[^\n]*)(\n|$)/i, '<span class="question-title">$1</span>\n');
+
+                // 2. Nhận diện và bôi đỏ đáp án đúng (chứa dấu ✅)
+                // Tìm đoạn văn bản bắt đầu bằng A., B., C., D. cho đến khi gặp dấu ✅ 
+                // Sử dụng cờ 's' (dotAll) để '.' có thể match dấu xuống dòng nếu đáp án dài
+                formatted = formatted.replace(/([A-D][\.\)](?:(?![A-D][\.\)]).)*?✅)/gs, '<span class="correct-answer">$1</span>');
+
+                // 3. Tạo khung cho phần giải thích
+                formatted = formatted.replace(/(📘\s*Giải thích:.*)/g, '<span class="explanation">$1</span>');
+
+                return formatted;
+            }
+
+            // Sinh mã HTML cho tất cả các câu hỏi
+            blocks.forEach((block, index) => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.id = `q-${index}`;
+                // Lưu text thô dạng lowercase vào thuộc tính data để tối ưu tốc độ tìm kiếm
+                card.setAttribute('data-search-content', block.toLowerCase());
+                card.innerHTML = formatCardContent(block);
+                container.appendChild(card);
+            });
+
+            // === TÍNH NĂNG TÌM KIẾM THỜI GIAN THỰC ===
+            searchInput.addEventListener('input', function(e) {
+                const searchTerm = e.target.value.toLowerCase().trim();
+                const allCards = document.querySelectorAll('.card');
+                let visibleCount = 0;
+
+                allCards.forEach(card => {
+                    const content = card.getAttribute('data-search-content');
+                    if (content.includes(searchTerm)) {
+                        card.classList.remove('hidden');
+                        visibleCount++;
+                    } else {
+                        card.classList.add('hidden');
+                    }
+                });
+
+                // Cập nhật thống kê
+                statsCounter.innerText = searchTerm === '' 
+                    ? `Hiển thị ${totalQuestions}/${totalQuestions} câu hỏi`
+                    : `Tìm thấy ${visibleCount} kết quả phù hợp`;
+            });
         });
     </script>
 </body>
