@@ -1,109 +1,1061 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>VCA Visualizer - Phòng TC-KH</title>
-<style>
-    /* --- CẤU HÌNH GIAO DIỆN VCA (ACV STYLE) --- */
-    body, html { margin: 0; padding: 0; height: 100%; font-family: 'Segoe UI', Arial, sans-serif; background: #f5f7fa; display: flex; flex-direction: column;}
-    
-    /* Header */
-    .vca-header {
-        background: #0056b3; /* Xanh ACV */
-        color: white;
-        padding: 12px 20px;
-        border-bottom: 4px solid #d4af37; /* Vàng Gold */
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        flex-shrink: 0;
-    }
-    .vca-top { font-size: 11px; text-transform: uppercase; opacity: 0.8; letter-spacing: 0.5px; }
-    .vca-title { font-size: 18px; font-weight: 700; text-transform: uppercase; margin-top: 2px; }
-    .vca-badge { font-size: 12px; background: rgba(255,255,255,0.2); padding: 2px 8px; border-radius: 4px; display: inline-block; margin-top: 5px;}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ngân hàng câu hỏi ILS/DME</title>
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --primary-hover: #1d4ed8;
+            --bg-color: #f3f4f6;
+            --card-bg: #ffffff;
+            --text-main: #1f2937;
+            --text-muted: #6b7280;
+            --border-color: #e5e7eb;
+            --answer-color: #ef4444;
+        }
 
-    /* Main Container */
-    .main-area { flex-grow: 1; position: relative; overflow: hidden; }
-    
-    /* Mindmap container - Full Size */
-    .markmap { width: 100%; height: 100vh; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-    /* Footer */
-    .vca-footer { 
-        background: #e9ecef; color: #555; text-align: center; 
-        padding: 5px; font-size: 11px; flex-shrink: 0; border-top: 1px solid #ddd;
-    }
-</style>
-<style>.markmap-node-text { font-family: 'Segoe UI'; font-size: 14px; fill: #333; }</style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+        }
+
+        /* Header & Search Bar */
+        header {
+            position: sticky;
+            top: 0;
+            background-color: var(--primary-color);
+            padding: 1.5rem 1rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            color: white;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .search-container {
+            width: 100%;
+            max-width: 800px;
+            position: relative;
+        }
+
+        #searchInput {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 9999px;
+            outline: none;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transition: box-shadow 0.2s ease-in-out;
+        }
+
+        #searchInput:focus {
+            box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.3);
+        }
+
+        .stats {
+            color: #bfdbfe;
+            margin-top: 0.75rem;
+            font-size: 0.9rem;
+        }
+
+        /* Main Content */
+        main {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .question-title {
+            font-weight: 600;
+            font-size: 1.15rem;
+            color: #111827;
+            margin-bottom: 1rem;
+        }
+
+        .options {
+            margin-bottom: 1.25rem;
+        }
+
+        .option {
+            padding: 0.5rem 0.5rem 0.5rem 1.5rem;
+            position: relative;
+            color: #374151;
+        }
+
+        .answer-box {
+            background-color: #fef2f2;
+            border-left: 4px solid var(--answer-color);
+            padding: 1rem;
+            border-radius: 0 0.5rem 0.5rem 0;
+            margin-top: 1rem;
+        }
+
+        .answer-label {
+            font-weight: 600;
+            color: #991b1b;
+            margin-right: 0.5rem;
+        }
+
+        .answer-text {
+            color: var(--answer-color);
+            font-weight: bold;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        #noResults {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-muted);
+            font-size: 1.2rem;
+            background: white;
+            border-radius: 0.75rem;
+            border: 1px dashed #d1d5db;
+        }
+
+        /* Scrollbar for better aesthetic */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
+        }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 1.25rem; }
+            #searchInput { padding: 0.8rem 1.2rem; font-size: 1rem; }
+            .card { padding: 1.25rem; }
+            .question-title { font-size: 1.05rem; }
+        }
+    </style>
 </head>
 <body>
 
-    <div class="vca-header">
-        <div class="vca-top">Tổng công ty Cảng hàng không Việt Nam - CTCP</div>
-        <div class="vca-title">Cảng hàng không quốc tế Cần Thơ</div>
-        <div class="vca-badge">Phòng Tài chính - Kế hoạch | Triển khai văn bản</div>
-    </div>
-
-    <div class="main-area">
-        <div class="markmap">
-            <script type="text/template">
-# NGHỊ ĐỊNH 287/2025/NĐ-CP<br>Quản lý tài sản KCHT Hàng không
-## 1. Quy định chung
-### Phạm vi điều chỉnh
-- Quản lý, khai thác TS KCHT do Nhà nước đầu tư
-- *(Không bao gồm: TS Quốc phòng, Trụ sở CQNN...)*
-### Danh mục tài sản (Điều 3)
-- Công trình bảo đảm bay
-- Kết cấu hạ tầng sân bay (Khu bay: đường băng, sân đỗ...)
-- Nhà ga hành khách, hàng hóa, logistics...
-### Nguyên tắc (Điều 4)
-- Thống kê, kế toán đầy đủ (Hiện vật & Giá trị)
-- Tính hao mòn, khấu hao, bảo trì theo luật định
-
-## 2. Giao quản lý tài sản (ACV/VATM)
-### Các hình thức giao
-- **Tính thành vốn Nhà nước:** Công trình bảo đảm bay (VATM); Nhà ga, hạ tầng ngoài khu bay (ACV)
-- **Không tính thành vốn Nhà nước:** Hạ tầng khu bay (ACV)
-### Thẩm quyền & Chuyển đổi
-- Bộ trưởng Bộ Xây dựng quyết định giao
-- Có quy trình chuyển đổi từ "Không tính vốn" sang "Tính vốn"
-
-## 3. Kế toán & Khai thác (Trọng tâm TC-KH)
-### Kế toán tài sản (Điều 10)
-- Mở sổ kế toán, báo cáo tăng/giảm, hao mòn
-- **Nguyên giá:** Lấy theo giá quyết toán, hoặc thuê thẩm định giá nếu chưa có
-### Bảo trì (Điều 11)
-- Kinh phí do Ngân sách Nhà nước (NSNN) đảm bảo
-- *Sự cố khẩn cấp:* ACV ứng trước kinh phí từ nguồn thu khai thác, sau đó hoàn trả từ NSNN
-### Khai thác & Doanh thu (Điều 13-15)
-- ACV trực tiếp tổ chức cung cấp dịch vụ
-- **Nộp NSNN:** Nguồn thu sau khi trừ chi phí trực tiếp & gián tiếp
-- **Thời hạn nộp:** Hàng quý (ngày 15 tháng đầu quý sau) & Quyết toán năm (trong vòng 90 ngày)
-
-## 4. Xử lý tài sản
-### Các hình thức (Điều 16)
-- Thu hồi / Điều chuyển / Chuyển giao địa phương
-- Thanh lý (Phá dỡ, hủy bỏ, xử lý vật tư)
-- Xử lý tài sản mất/hủy hoại do thiên tai, sự cố
-### Tài chính khi xử lý (Điều 22)
-- Toàn bộ tiền thu (bán vật tư, bảo hiểm bồi thường...) nộp NSNN
-- Được trừ các chi phí: Kiểm kê, tháo dỡ, thẩm định giá...
-
-## 5. Báo cáo & CSDL
-### Chế độ báo cáo (Điều 24)
-- **Báo cáo kê khai:** Trong 30 ngày kể từ khi có biến động/nhận tài sản
-- **Báo cáo định kỳ hằng năm:** Gửi Bộ Xây dựng trước ngày 28/02 năm sau
-### Cơ sở dữ liệu (Điều 25)
-- ACV có trách nhiệm nhập, duyệt dữ liệu vào CSDL về TS KCHT Hàng không
-            </script>
+    <header>
+        <h1>120 Nghiệp vụ Khai thác, Bảo dưỡng Hệ thống ILS/DME</h1>
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Nhập từ khóa để tìm kiếm câu hỏi hoặc đáp án..." autocomplete="off">
         </div>
-    </div>
+        <div class="stats" id="statsDisplay">Đang tải dữ liệu...</div>
+    </header>
 
-    <div class="vca-footer">
-        Hệ thống hỗ trợ triển khai văn bản nội bộ - VCA
-    </div>
+    <main>
+        <div id="questionsContainer">
+            <!-- Câu hỏi sẽ được JavaScript tạo tự động ở đây -->
+        </div>
+        <div id="noResults" class="hidden">
+            <svg style="width:48px;height:48px;margin:0 auto 1rem auto;color:#9ca3af" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            Không tìm thấy câu hỏi nào phù hợp với từ khóa của bạn.
+        </div>
+    </main>
 
-    <!-- Đã fix đường dẫn thư viện để đảm bảo hoạt động -->
-    <script src="https://cdn.jsdelivr.net/npm/markmap-autoloader@0.15.4"></script>
+    <!-- Lưu trữ dữ liệu thô để phân tích -->
+    <script id="rawData" type="text/template">
+Câu 1: Đặc tính của ILS cấp I (Catergory I) là một hệ thống ILS cung cấp thông tin chỉ dẫn từ giới hạn phủ sóng của ILS đến điểm mà tại đó đường hướng đài LOC cắt đường trượt đài GP ở độ cao:
+a. 15m hoặc thấp hơn trên mặt phẳng ngang chứa thềm đường CHC.
+b. 60m hoặc thấp hơn trên mặt phẳng ngang chứa thềm đường CHC.
+c. 10m hoặc thấp hơn trên mặt phẳng ngang chứa thềm đường CHC.
+Đáp án: b. 60m hoặc thấp hơn trên mặt phẳng ngang chứa thềm đường CHC.
 
+Câu 2: Đặc tính của ILS cấp II (Catergory II) là một hệ thống ILS cung cấp thông tin chỉ dẫn từ giới hạn phủ sóng của ILS đến điểm mà tại đó đường hướng đài LOC cắt đường trượt đài GP ở độ cao:
+a. 15m hoặc thấp hơn trên mặt phẳng ngang chứa thềm đường CHC.
+b. 60m hoặc thấp hơn trên mặt phẳng ngang chứa thềm đường CHC.
+c. 10m hoặc thấp hơn trên mặt phẳng ngang chứa thềm đường CHC.
+Đáp án: a. 15m hoặc thấp hơn trên mặt phẳng ngang chứa thềm đường CHC.
+
+Câu 3: Đặc tính của ILS cấp III (Catergory III) là một hệ thống ILS cung cấp thông tin chỉ dẫn từ giới hạn phủ sóng của ILS đến điểm mà tại đó đường hướng đài LOC cắt đường trượt đài GP:
+a. ở độ cao 15m hoặc thấp hơn trên mặt phẳng ngang chứa thềm đường CHC.
+b. ở độ cao 6m hoặc thấp hơn trên mặt phẳng ngang chứa thềm đường CHC.
+c. đến và dọc theo bề mặt đường CHC.
+Đáp án: c. đến và dọc theo bề mặt đường CHC.
+
+Câu 4: Tính liên tục của dịch vụ hướng dẫn hạ cánh (ILS continuity of service) là:
+a. Chất lượng liên quan đến sự hiếm khi gián đoạn tín hiệu phát xạ. Mức liên tục dịch vụ của đài Localizer hoặc Glide path được diễn tả bằng xác suất không mất tín hiệu chỉ dẫn được phát xạ.
+b. Chất lượng liên quan đến sự hiếm khi gián đoạn tín hiệu phát xạ. Mức liên tục dịch vụ của đài Localizer hoặc Glide path được diễn tả bằng xác suất mất tín hiệu chỉ dẫn được phát xạ.
+Đáp án: a. Chất lượng liên quan đến sự hiếm khi gián đoạn tín hiệu phát xạ. Mức liên tục dịch vụ của đài Localizer hoặc Glide path được diễn tả bằng xác suất không mất tín hiệu chỉ dẫn được phát xạ.
+
+Câu 5: Đài chỉ hướng hạ cánh 2 tần số (TWO – Frequency Localizer system) là:
+a. Một đài LOC trong đó vùng phủ sóng đạt được bằng cách sử dụng hai giản đồ trường phát xạ độc lập phân cách trên hai tần số sóng mang tách biệt trong một kênh tần số đài LOC cụ thể.
+b. Một đài LOC trong đó vùng phủ sóng đạt được bằng cách sử dụng hai giản đồ trường phát xạ độc lập trong một kênh tần số đài LOC cụ thể.
+c. Một đài LOC trong đó vùng phủ sóng đạt được bằng cách sử dụng hai giản đồ trường phát xạ độc lập trên hai kênh tần số đài LOC cụ thể.
+Đáp án: a. Một đài LOC trong đó vùng phủ sóng đạt được bằng cách sử dụng hai giản đồ trường phát xạ độc lập phân cách trên hai tần số sóng mang tách biệt trong một kênh tần số đài LOC cụ thể.
+
+Câu 6: ILS phải được lắp đặt và điều chỉnh làm sao cho:
+a. Tại một cự ly cụ thể từ ngưỡng đường CHC, chỉ thị bằng thiết bị tương tự trên tàu bay tượng trưng cho cự ly từ tàu bay đến đài LOC.
+b. Tại một cự ly cụ thể từ ngưỡng đường CHC, chỉ thị bằng thiết bị tương tự trên tàu bay tượng trưng cho sai lệch từ đường hướng hoặc đường trượt một cách thích hợp, không kể một đài cụ thể nào trên mặt đất.
+c. Tại một cự ly cụ thể từ ngưỡng đường CHC, chỉ thị bằng thiết bị tương tự trên tàu bay tượng trưng cho cự ly từ tàu bay đến ngưỡng đường CHC.
+Đáp án: b. Tại một cự ly cụ thể từ ngưỡng đường CHC, chỉ thị bằng thiết bị tương tự trên tàu bay tượng trưng cho sai lệch từ đường hướng hoặc đường trượt một cách thích hợp, không kể một đài cụ thể nào trên mặt đất.
+
+Câu 7: Đài LOC là một đài mà khi người quan sát đứng đối diện với đài từ đầu tiếp cận của đường CHC thì Độ sâu điều chế sóng mang vô tuyến bởi âm tần 150 Hz so với độ sâu điều chế sóng mang vô tuyến bởi âm tần 90 Hz sẽ:
+a. Vượt trội về bên tay phải.
+b. Vượt trội về bên tay trái.
+c. Bằng nhau.
+Đáp án: a. Vượt trội về bên tay phải.
+
+Câu 8: Đài LOC là một đài mà khi người quan sát đứng đối diện với đài từ đầu tiếp cận của đường CHC thì độ sâu điều chế sóng mang vô tuyến bởi âm tần 90 Hz so với độ sâu điều chế sóng mang vô tuyến bởi âm tần 150 Hz sẽ:
+a. Vượt trội về bên tay phải.
+b. Vượt trội về bên tay trái.
+c. Bằng nhau.
+Đáp án: b. Vượt trội về bên tay trái.
+
+Câu 9: Để đảm bảo đủ tín hiệu cho tàu bay hoạt động có hiệu quả trong phân khu vùng phủ sóng ILS (GP và LOC), vùng phủ sóng của đài LOC phải mở rộng từ tâm hệ thống ăng ten LOC đến cự ly:
+a. 46,3 km trong ± 10° từ đường hướng phía trước.
+b. 31,5 km trong ± 10° từ đường hướng phía trước.
+c. 18,5 km trong ± 10° từ đường hướng phía trước.
+Đáp án: a. 46,3 km trong ± 10° từ đường hướng phía trước.
+
+Câu 10: Để đảm bảo đủ tín hiệu cho tàu bay hoạt động có hiệu quả trong phân khu vùng phủ sóng ILS (GP và LOC), vùng phủ sóng của đài LOC phải mở rộng từ tâm hệ thống ăng ten LOC đến cự ly:
+a. 46,3 km trongphạm vi giữa 10° và 35° từ đường hướng phía trước.
+b. 31,5 km trong phạm vigiữa 10° và 35° từ đường hướng phía trước.
+c. 18,5 km trong phạm vi giữa 10° và 35° từ đường hướng phía trước.
+Đáp án: b. 31,5 km trong phạm vigiữa 10° và 35° từ đường hướng phía trước.
+
+Câu 11: Để đảm bảo đủ tín hiệu cho một thiết bị cụ thể trên tàu bay hoạt động có hiệu quả trong phân khu vùng phủ sóng của GP và LOC, vùng phủ sóng của đài LOC phải mở rộng từ tâm hệ thống ăng ten LOC đến cự ly:
+a. 46,3 km bên ngoài + 35° hoặc - 35° nếu được phủ sóng.
+b. 31,5 km bên ngoài + 35° hoặc - 35° nếu được phủ sóng.
+c. 18,5 km bên ngoài + 35° hoặc - 35° nếu được phủ sóng.
+Đáp án: c. 18,5 km bên ngoài + 35° hoặc - 35° nếu được phủ sóng.
+
+Câu 12: Đài LOC ILS Cat 1, cường độ từ trường tối thiểu trên đường trượt GP và trong phân khu hướng đài LOC từ cự ly 18,5 km đến độ cao 60 m trên mặt phẳng ngang chứa thềm đường CHC phải:
+a. Không được nhỏ hơn 90 microvolts/m.
+b. Khôngđược nhỏ hơn 100 microvolts/m.
+c. Không đượclớn hơn 90 microvolts/m.
+Đáp án: a. Không được nhỏ hơn 90 microvolts/m.
+
+Câu 13: Đài LOC ILS Cat 2, cường độ từ trường tối thiểu trên đường trượt GP và trong phân khu hướng đài LOC phải:
+a. Không được nhỏ hơn 90 microvolts/m ở cự ly 18,5 km.
+b. Không được nhỏ hơn 100 microvolts/m ở cự ly 18,5 km.
+c. Không đượclớn hơn 90 microvolts/m ở cự ly 18,5 km.
+Đáp án: b. Không được nhỏ hơn 100 microvolts/m ở cự ly 18,5 km.
+
+Câu 14: Độ sâu điều chế danh định của sóng mang tần số vô tuyến bởi mỗi một âm tần 90 Hz và 150 Hz (đài LOC) sẽ phải là:
+a. 20 % dọc theo đường hướng.
+b. 40 % dọc theo đường hướng.
+c. 22 % dọc theo đường hướng.
+Đáp án: a. 20 % dọc theo đường hướng.
+
+Câu 15: Đối với ILS Cat 1 dung sai tần số âm tần điều chế (đài LOC) phải là:
+a. 90 Hz và 150 Hz ± 2,5%.
+b. 90 Hz và 150 Hz ± 1,5%.
+c. 90 Hz và 150 Hz ± 1%.
+Đáp án: a. 90 Hz và 150 Hz ± 2,5%.
+
+Câu 16: Độ sâu điều chế của sóng mang tần số vô tuyến bởi mỗi một âm tần 90 Hz và 150 Hz (đài LOC) sẽ phải trong giới hạn:
+a. 18% đến 22%.
+b. 37,5% đến 42,5%.
+c. 20% và 40%.
+Đáp án: a. 18% đến 22%.
+
+Câu 17: Đài LOC hoạt động trong dải tần số:
+a. 108MHz – 111,975 MHz.
+b. 328,6 MHz – 335,4 MHz.
+c. 108 MHz –112 MHz.
+Đáp án: a. 108MHz – 111,975 MHz.
+
+Câu 18: Độ ổn định tần số sóng mang vô tuyến của đài LOC (hai tần số) phải không vượt quá:
+a. ± 0,002%.
+b. ± 0,005%.
+c. ± 0,001%.
+Đáp án: a. ± 0,002%.
+
+Câu 19: Theo ICAO: độ chính xác đường hướng trung bình (mean course line) của đài LOC Hệ thống ILS Cat 1 phải được điều chỉnh và duy trì ở mức sai lệch từ đường tâm đường CHC tại mốc tham chiếu ILS là:
+a. ± 10,5 m.
+b. ± 4,5 m.
+c. ± 3 m.
+Đáp án: a. ± 10,5 m.
+
+Câu 20: Theo ICAO: độ nhạy dịch chuyển về 2 bên (Lateral displacement sensitivity) đường hướng của đài LOC Hệ thống ILS Cat 1,Cat 2 phải được điều chỉnh và duy trì:
+a. Trong giới hạn ± 10% giá trị danh định.
+b. Trong giới hạn ± 20% giá trị danh định.
+c. Trong giới hạn ± 17% giá trị danh định.
+Đáp án: c. Trong giới hạn ± 17% giá trị danh định.
+
+Câu 21: Theo Độ nhạy dịch chuyển về 2 bên (Lateral displacement sensitivity) đường hướngcủa đài LOC Hệ thống ILS Cat 3 phải được điều chỉnh và duy trì:
+a. Trong giới hạn ± 10% giá trị danh định.
+b. Trong giới hạn ± 20% giá trị danh định.
+c. Trong giới hạn ± 17% giá trị danh định.
+Đáp án: a. Trong giới hạn ± 10% giá trị danh định.
+
+Câu 22: Âm tần sử dụng để phát tín hiệu nhận dạng đài LOC là:
+a. 3400 Hz ± 50 Hz.
+b. 400 Hz ± 50 Hz.
+c. 1020 Hz ± 50 Hz.
+Đáp án: c. 1020 Hz ± 50 Hz.
+
+Câu 23: Độ sâu điều chế tín hiệu nhận dạng đài LOC sẽ phải là giữa các giới hạn:
+a. 5% và 15%.
+b. 10% và 15%.
+c. 5% và 10%.
+Đáp án: a. 5% và 15%.
+
+Câu 24: Theo ICAO: hệ thống Monitor tự độngđài LOC/ILS Cat 1 phải khởi phát báo động khi có một sự lệch đường hướng trung bình so với tâm đường cất hạ cánh tương đương:
+a. Hơn 6 m.
+b. Hơn 7,5m.
+c. Hơn 10,5m.
+Đáp án: c. Hơn 10,5m.
+
+Câu 25: Theo ICAO: Hệ thống Monitor tự độngđài LOC/ILS Cat 2 phải khởi phát báo động khi có một sự lệch đường hướng trung bình so với tâm đường cất hạ cánh tương đương:
+a. Hơn 6 m.
+b. Hơn 7,5m.
+c. Hơn 10,5m.
+Đáp án: b. Hơn 7,5m.
+
+Câu 26: Theo ICAO: Hệ thống Monitor tự độngđài LOC/ILS Cat 3 phải khởi phát báo động khi có một sự lệch đường hướng trung bình so với tâm đường cất hạ cánh tương đương:
+a. Hơn 6 m.
+b. Hơn 7,5m.
+c. Hơn 10,5m.
+Đáp án: a. Hơn 6 m.
+
+Câu 27: Đài GP của ệ thống ILS có:
+a. Tín hiệu âm tần 150 Hz vượt trội bên dưới đường trượt GP.
+b. Tín hiệu âm tần 90 Hz vượt trội bên trên đường trượt GP.
+c. Cả a) và b) đều đúng.
+Đáp án: c. Cả a) và b) đều đúng.
+
+Câu 28: Thiết bị đài GP hệ thống ILS theo ICAO khuyến cáo nên có khả năng điều chỉnh góc đường trượt:
+a. Từ 2° đến 4°.
+b. Từ 3° đến 4°.
+c. Từ 2° đến 3°.
+Đáp án: a. Từ 2° đến 4°.
+
+Câu 29: Góc đườngtrượt đài GP hệ thống theo ICAO khuyến cáo nên:
+a. 2°.
+b. 4°.
+c. 3°.
+Đáp án: c. 3°.
+
+Câu 30: Góc đường trượt đài GP hệ thống ILS Cat 1, Cat 2 phải có khả năng điều chỉnh và duy trì trong khoảng:
+a. ±0,04θ từ giá trị góc danh định θ.
+b. ±0,075θ từ giá trị góc danh địnhθ.
+c. ±0,05θ từ giá trị góc danh đinh θ.
+Đáp án: b. ±0,075θ từ giá trị góc danh địnhθ.
+
+Câu 31: Băng tần hoạt động của đài GP thuộc hệ thống ILS:
+a. Từ 328,6MHz đến 335,4MHz.
+b. Từ 328,6KHz đến 335,4KHz.
+c. Từ 328MHz đến 335MHz.
+Đáp án: a. Từ 328,6MHz đến 335,4MHz.
+
+Câu 32: Đài GP hệ thống ILS sử dụng hai tần số sóng mang thì độ ổn định tần số phải:
+a. ±0,001%.
+b. ±0,005%.
+c. ±0,002%.
+Đáp án: c. ±0,002%.
+
+Câu 33: Đài GP phải cung cấp tín hiệu đủ để cho phép thiết bị trên tàu bay khai thác thoả mãn:
+a. Trong phân khu 18° phương vị về mỗi một phía tâm đường trượt GP đến cự ly ít nhất 18,5 km lên đến 1,75 góc θ danh định và xuống đến 0,45 góc θ danh định trên đường nằm ngang hoặc đến góc thấp hơn, 0,30 θ.
+b. Trong phân khu 8° phương vị về mỗi một phía tâm đường trượt GP đến cự ly ít nhất 18,5 km lên đến 1,75 góc θ danh định và xuống đến 0,45 góc θ danh định trên đường nằm ngang hoặc đến góc thấp hơn, 0,30 θ.
+Đáp án: b. Trong phân khu 8° phương vị về mỗi một phía tâm đường trượt GP đến cự ly ít nhất 18,5 km lên đến 1,75 góc θ danh định và xuống đến 0,45 góc θ danh định trên đường nằm ngang hoặc đến góc thấp hơn, 0,30 θ.
+
+Câu 34: Đài GP hệ thống ILS, độ sâu điều chế danh định của sóng mang vô tuyến đối với mỗi một âm tần 90 Hz và 150 Hz dọc theo đường trượt GP phải là:
+a. 42,5%.
+b. 20%.
+c. 40%.
+Đáp án: c. 40%.
+
+Câu 35: Đài GP hệ thống ILS, độ sâu điều chế của sóng mang đối với mỗi một âm tần 90 Hz và 150 Hz dọc theo đường trượt GP không được sai lệch quá giới hạn:
+a. 37,5% đến 42,5%.
+b. 37,5% đến 40%.
+c. 40% đến 42,5%.
+Đáp án: a. 37,5% đến 42,5%.
+
+Câu 36: Đài GP ILS Cat 2, độ nhạy dịch chuyển góc danh định phải tương ứng một DDM 0,0875 ở một dịch chuyển góc:
+a. 0,12 góc danh định θ dưới đường trượt với dung sai ± 0,01θ.
+b. 0,12 góc danh định θ dưới đường trượt với dung sai ± 0,02θ.
+c. 0,14 góc danh định θ dưới đường trượt với dung sai ± 0,02θ.
+Đáp án: b. 0,12 góc danh định θ dưới đường trượt với dung sai ± 0,02θ.
+
+Câu 37: Đài GP ILS Cat 2, độ nhạy dịch chuyển góc danh định phải tương ứng một DDM = 0,0875 ở một dịch chuyển góc:
+a. 0,12 góc danh định θ trên đường trượt với cộng hoặc trừ 0,01 θ.
+b. 0,12 góc danh định θ trên đường trượt với cộng 0,02 θ hoặc trừ 0,05 θ.
+c. 0,14 góc danh định θ trên đường trượt với cộng 0,02 θ hoặc trừ 0,05 θ.
+Đáp án: b. 0,12 góc danh định θ trên đường trượt với cộng 0,02 θ hoặc trừ 0,05 θ.
+
+Câu 38: Front course sector là:
+a. Phân khu hướng ở cùng một bên củađài LOC với đường CHC.
+b. Phân khu hướng nằm phía sau đài LOC.
+c. Phân khu hướng nằm ngang trên đường CHC.
+Đáp án: a. Phân khu hướng ở cùng một bên củađài LOC với đường CHC.
+
+Câu 39: Course Sector là:
+a. Một phân khu trong mặt phẳng đứng chứa đường hướng và bị giới hạn bởi quỹ tích các điểm gần đường hướng nhất mà tại đó DDM = 0,175.
+b. Một phân khu trong mặt phẳng ngang chứa đường hướng và bị giới hạn bởi quỹ tích các điểm gần đường hướng nhất mà tại đó DDM = 0,155.
+c. Một phân khu trong mặt phẳng ngang chứa đường hướng và bị giới hạn bởi quỹ tích các điểm gần đường hướng nhất mà tại đó DDM = 0.
+Đáp án: b. Một phân khu trong mặt phẳng ngang chứa đường hướng và bị giới hạn bởi quỹ tích các điểm gần đường hướng nhất mà tại đó DDM = 0,155.
+
+Câu 40: Displacement sensitivity (localizer) là:
+a. Tỷ số DDM đo được đối với sai lệch về 2 bên tương ứng so với đường quy chiếu thích hợp.
+b. Tỷ số DDM đo được trên tâm đường CHC.
+c. Tỷ số DDM đo được đối với sai lệch hướng tại lề đường CHC.
+Đáp án: a. Tỷ số DDM đo được đối với sai lệch về 2 bên tương ứng so với đường quy chiếu thích hợp.
+
+Câu 41: Couse line là:
+a. Quỹ tích các điểm gần đường CHC nhất.
+b. Quỹ tích các điểm gần đường tâm đường CHC nhất trong mặt phẳng ngang tại đó DDM = 0
+c. Quỹ tích các điểm gần đường tâm đường CHC nhất trong mặt phẳng đứng tại đó DDM = 0
+Đáp án: b. Quỹ tích các điểm gần đường tâm đường CHC nhất trong mặt phẳng ngang tại đó DDM = 0
+
+Câu 42: Back couse Sector là phân khu hướng:
+a. Ở bên phía đối diện của đài LOC so với đường CHC.
+b. Nằm trên phía đối diện của đài GP từ đường CHC.
+c. Nằm cùng phía đài LOC với đường CHC.
+Đáp án: a. Ở bên phía đối diện của đài LOC so với đường CHC.
+
+Câu 43: Half course sector là:
+a. Phân khu trong mặt phẳng ngang chứa đường hướng và bị giới hạn bởi quỹ tích các điểm gần đường hướng nhất tại đó DDM = 0,155.
+b. Phân khu trong mặt phẳng đứng chứa đường hướng và bị giới hạn bởi quỹ tích các điểm gần đường hướng nhất tạo đó DDM = 0,0775.
+c. Phân khu trong mặt phẳng ngang chứa đường hướng và bị giới hạn bởi quỹ tích các điểm gần đường hướng nhất tạo đó DDM = 0,0775.
+Đáp án: c. Phân khu trong mặt phẳng ngang chứa đường hướng và bị giới hạn bởi quỹ tích các điểm gần đường hướng nhất tạo đó DDM = 0,0775.
+
+Câu 44: Half ILS Glide path sector là:
+a. Phân khu trong mặt phẳng đứng chứa đường trượt đài GP/ILS và bị giới hạn bởi quỹ tích các điểm gần đường trượt GP nhất tại đó DDM = 0,0875.
+b. Phân khu trong mặt phẳng đứng chứa đường trượt đài GP/ ILS và bị giới hạn bởi quỹ tích các điểm gần đường trượt GP nhất tại đó DDM = 0,175.
+c. Phân khu trong mặt phẳng ngang chứa đường trượt đài GP/ ILS và bị giới hạn bởi quỹ tích các điểm gần đường trượt GP nhất tại đó DDM = 0,0875.
+Đáp án: a. Phân khu trong mặt phẳng đứng chứa đường trượt đài GP/ILS và bị giới hạn bởi quỹ tích các điểm gần đường trượt GP nhất tại đó DDM = 0,0875.
+
+Câu 45: ILS Glide path là:
+a. Quỹ tích các điểm trong mặt phẳng đứng chứa đường tâm đường CHC tại đó DDM = 0, các quỹ tích đó ở gần mặt phẳng ngang nhất.
+b. Quỹ tích các điểm trong mặt phẳng đứng chứa đường tâm đường CHC tại đó DDM là 0DDM
+c. Quỹ tích các điểm trong mặt phẳng ngang chứa đường tâm đường CHC tại đó DDM là 0DDM
+Đáp án: a. Quỹ tích các điểm trong mặt phẳng đứng chứa đường tâm đường CHC tại đó DDM = 0, các quỹ tích đó ở gần mặt phẳng ngang nhất.
+
+Câu 46: ILS glide path angle là:
+a. Góc giữa một đường thẳng tượng trưng cho đường trượt glide path và đường thẳng đướng.
+b. Góc giữa một đường thẳng tượng trưng cho đường hướng và đường nằm ngang.
+c. Góc giữa một đường thẳng tượng trưng cho giá trị trung bình của đường trượt ILS và mặt phẳng nằm ngang.
+Đáp án: c. Góc giữa một đường thẳng tượng trưng cho giá trị trung bình của đường trượt ILS và mặt phẳng nằm ngang.
+
+Câu 47: ILS Glide path sector là:
+a. Phân khu trong mặt phẳng ngang chứa đường trượt ILS và bị giới hạn bởi quỹ tích các điểm gần đường trượt glide path nhất tại đó DDM = 0,175.
+b. Phân khu trong mặt phẳng đứng chứa đường trượt ILS và bị giới hạn bởi quỹ tích các điểm gần đường trượt glide path nhất tại đó DDM = 0,175.
+c. Phân khu trong mặt phẳng đứng chứa đường trượt ILSvà bị giới hạn bởi quỹ tích các điểm gần đường trượt nhất tại đó DDM = 0,0875.
+Đáp án: b. Phân khu trong mặt phẳng đứng chứa đường trượt ILS và bị giới hạn bởi quỹ tích các điểm gần đường trượt glide path nhất tại đó DDM = 0,175.
+
+Câu 48: Tín hiệu nhận dạng của đài Glide path theo tiêu chuẩn ICAO bao gồm:
+a. 2 ký tự.
+b. 2 hoặc 3 ký tự.
+c. 3 ký tự.
+d. không có tín hiệu nhận dạng.
+Đáp án: d. không có tín hiệu nhận dạng.
+
+Câu 49: Khoảng cách xung của DME ở chế độ X là?
+a. 12μs.
+b. 18μs.
+c. 24μs.
+d. 20μs.
+Đáp án: a. 12μs.
+
+Câu 50: Thời gian giữ chậm của DME ở chế độ X là?
+a. 50μs.
+b. 56μs.
+c. 60μs.
+d. 190μs.
+Đáp án: a. 50μs.
+
+Câu 51: Dải tần số hoạt động của DME theo quy định ICAO?
+a. (900 – 960)MHz.
+b. (960 – 1215)MHz.
+c. (1215 – 1310)MHz.
+d. (1216 – 1335)MHz.
+Đáp án: b. (960 – 1215)MHz.
+
+Câu 52: Hãy cho biết dải tần số trả lời và tần số hỏi của DME hoạt động ở chế độ X?
+a. Tần số trả lời từ (962 – 1024)MHz, tần số hỏi từ (1025 – 1087)MHz.
+b. Tần số trả lời từ (1151 – 1213)MHz, tần số hỏi từ (1088 – 1150)MHz.
+c. Tần số trả lời từ (1025 – 1087)MHz, tần số hỏi từ (1088 – 1150)MHz.
+d. Cả a) và b).
+Đáp án: d. Cả a) và b).
+
+Câu 53: Tổng số kênh của DME trong chế độ X là:
+a. 64.
+b. 126.
+c. 252.
+d. 63.
+Đáp án: b. 126.
+
+Câu 54: Độ sai lệch tần số giữa xung hỏi và xung trả lời là:
+a. 60MHz.
+b. 61MHz.
+c. 62MHz.
+d. 63MHz.
+Đáp án: d. 63MHz.
+
+Câu 55: DME có khoảng cách tần số giữa các kênh kế cận nhau là:
+a. 1MHz.
+b. 2MHz.
+c. 3MHz.
+d. 4MHz.
+Đáp án: a. 1MHz.
+
+Câu 56: Hiệu suất trả lời của bộ phát đápDME/N tối thiểu phải là:
+a. 50%.
+b. 70%.
+c. 80%.
+d. 90%.
+Đáp án: b. 70%.
+
+Câu 57: Theo tiêu chuẩn ICAO, tốc độ phát tối thiểu của DME/N phải đạt được:
+a. 600ppps.
+b. 700ppps.
+c. 2700ppps.
+d. 5000ppps.
+Đáp án: b. 700ppps.
+
+Câu 58: Khi thiết bị DME phục vụ cho tiếp cận chính xác, hạ cánh thì sai số cự ly tổng cộng của toàn bộ hệ thống không được vượt quá?
+a. ± 0,10 NM.
+b. ± 0,20 NM.
+c. ± 0,25 NM.
+d. ± 0,30 NM.
+Đáp án: b. ± 0,20 NM.
+
+Câu 59: Các yếu tố quyết định về kích thước của vùng giới hạn và vùng nhạy cảm của hệ thống ILS là:
+a. Kích thước của tàu bay, chiều dài đường CHC.
+b. Thiết bị một tần số/hai tần số, cấp hoạt động của hệ thống.
+c. Dạng anten, góc mở anten củađài Localizer.
+d. Tất cả các yếu tố trên.
+Đáp án: d. Tất cả các yếu tố trên.
+
+Câu 60: Khi dùng thiết bị DME-DME thì tàu bay xác định được:
+a. Hướng, khoảng cách tới thiết bị.
+b. Tọa độ tàu bay trong hệ tọa độ WGS-84.
+c. Khoảng cách tới từng thiết bị DME.
+Đáp án: b. Tọa độ tàu bay trong hệ tọa độ WGS-84.
+
+Câu 61: Hệ tọa độ WGS-84 dùng để:
+a. Dẫn đường mặt đất.
+b. Dẫn đường mặt đất và trên tàu bay.
+c. Khảo sát và đo tọa độ WGS-84.
+Đáp án: b. Dẫn đường mặt đất và trên tàu bay.
+
+Câu 62: Hệ thống vệ tinh (GPS, GLONAS,…) dùng trong dẫn đường hàng không cho mục đích:
+a. Tiếp cận chính xác và hạ cánh.
+b. Tiếp cận chính xác và hạ cánh khi có thêm hệ thống dẫn đường tăng cường trên mặt đất.
+c. Thay thế hệ thống ILS.
+Đáp án: b. Tiếp cận chính xác và hạ cánh khi có thêm hệ thống dẫn đường tăng cường trên mặt đất.
+
+Câu 63: Hệ thống thiết bị dẫn đường mặt đất mà Việt Nam đang sử dụng:
+a. Hệ thống ILS/DME, Markers, DME/VOR, NDB.
+b. Hệ thống LOC, GP, DME, Markers, DME/VOR, NDB.
+c. LOC, GP, DME, VOR, NDB.
+Đáp án: a. Hệ thống ILS/DME, Markers, DME/VOR, NDB.
+
+Câu 64: Thiết bị DME khi được lắp đặt và khai thác sử dụng cùng với ILS có thể được thay thế cho:
+a. Các đài Markers.
+b. Các đài NDB.
+c. Hệ thống ILS.
+Đáp án: a. Các đài Markers.
+
+Câu 65: Hệ thống ILS dùng để?
+a. Giúp tàu bay xác định khoảng cách đến 1 trạm mặt đất.
+b. Giúp tàu bay xác định hướng đến 1 trạm mặt đất.
+c. Giúp tàu bay xác định trục đường CHCvà góc đáp thích hợp.
+d. Tất cả đều đúng.
+Đáp án: c. Giúp tàu bay xác định trục đường CHCvà góc đáp thích hợp.
+
+Câu 66: Phát xạ từ hệ thống ăng ten đài LOC sẽ tạo ra một giản đồ từ trường tổng hợp được:
+a. Điều chế biên độ bởi âm tần 150 Hz và 90 Hz.
+b. Điều chế tần số bởi âm tần 150 Hz và 90 Hz.
+c. Điều chế pha bởi âm tần 150 Hz và 90 Hz.
+Đáp án: a. Điều chế biên độ bởi âm tần 150 Hz và 90 Hz.
+
+Câu 67: Pha VHF của tín hiệu SBO ở 2 bên phải và trái của tâm đường cất hạ cánh:
+a. Trùng pha nhau.
+b. Ngược pha nhau.
+c. Vuông góc với nhau.
+d. Pha bất kỳ.
+Đáp án: b. Ngược pha nhau.
+
+Câu 68: Phát xạ từ đài LOC sẽ phải là:
+a. Phân cực thẳng đứng.
+b. Phân cực nằm ngang.
+c. Phân cực hình êlíp.
+Đáp án: b. Phân cực nằm ngang.
+
+Câu 69: Phát xạ của thiết bị đài GP phải là:
+a. Phân cực đứng.
+b. Phân cực ngang.
+c. Phân cực tròn.
+d. Phân cực hình êlíp.
+Đáp án: b. Phân cực ngang.
+
+Câu 70: Sóng đài LOC truyền dẫn theo phương thức:
+a. Sóng đất.
+b. Sóng theo tầm nhìn thẳng.
+c. Sóng đất và sóng trời.
+Đáp án: b. Sóng theo tầm nhìn thẳng.
+
+Câu 71: Khi sử dụng kết hợp với hệ thống ILS, tần số hoạt động của DME được chọn như thế nào?
+a. Được chọn theo cặp tần số với tần số của đài Localizer.
+b. Được chọn theo tần số của đài Glide path.
+c. Được chọn theo tần số của đài Marker.
+d. Tùy chọn.
+Đáp án: a. Được chọn theo cặp tần số với tần số của đài Localizer.
+
+Câu 72: Tín hiệu nhận dạng ident của hệ thống ILS/DME được đặt ở chế độ “LOC master, DME slave”, khi thiết bị DME xảy ra sự cố tắt máy thì đài LOC sẽ:
+a. Vẫn hoạt động bình thường.
+b. Shutdown theo.
+c. Mất tín hiệu ident nhưng vẫn hoạt động bình thường.
+Đáp án: a. Vẫn hoạt động bình thường.
+
+Câu 73: Hệ thống monitor của ILS có nhiệm vụ:
+a. Thu nhận các tín hiệu cơ bản cần được giám sát của hệ thống ILS (NF, CL, DS, CLR...).
+b. Kiểm tra, phân tích, so sánh thông số của các tín hiệu này với giá trị ngưỡng được cài đặt trước tùy theo cấp hoạt động của thiết bị.
+c. Tạo tín hiệu báo động khi các thông số kỹ thuật của ILS ở ngoài giới hạn cho phép.
+d. Tất cả đều đúng.
+Đáp án: d. Tất cả đều đúng.
+
+Câu 74: Máy thu trên tàu bay sử dụng hiệu ứng (capture effect) để thu tín hiệu dẫn đường của hệ thống nào sau đây?
+a. NDB.
+b. ILS 2 tần số.
+c. ILS 1 tần số.
+d. DME.
+Đáp án: b. ILS 2 tần số.
+
+Câu 75: Một máy thu ILS nằm trong vùng phủ sóng có hai tín hiệu Course và Clearance chồng chập lẫn nhau thì hiệu ứng “Capture”trên máy thu dựa vào yếu tố nào để loại bỏ tín hiệu yếu hơn?
+a. Sự khác nhau về biên độ giữa 2 tín hiệu Course và Clearance.
+b. Đặc tính bộ tách sóng của máy thu.
+c. Sự khác nhau về tần số giữa 2 tín hiệu Course và Clearance.
+d. Cả a) và b).
+Đáp án: d. Cả a) và b).
+
+Câu 76: Máy thu ILS và đồng hồ chỉ thị trên tàu bay dựa vào thông số đặc trưng nào để xác định vị trí của tàu bay?
+a. Tần số của hệ thống ILS.
+b. Sự khác biệt độ sâu điều chế.
+c. Tổng độ sâu điều chế.
+d. Tất cả các ý trên.
+Đáp án: b. Sự khác biệt độ sâu điều chế.
+
+Câu 77: Trường phát xạ không gian của một hệ thống ILS có độ sâu điều chế âm tần 90 Hz vượt trội hơn so với độ sâu điều chế âm tần 150 Hz thì sự khác biệt độ sâu điều chế DDM sẽ như thế nào?
+a. DDM < 0.
+b. DDM > 0.
+c. DDM = 0
+Đáp án: a. DDM < 0.
+
+Câu 78: Máy phát đài LOC 2 tần số tạo ra các tín hiệu nào sau đây?
+a. CSB Course, SBO Course.
+b. CSB Clearance, SBO Clearance.
+c. CSB Course, SBO Course, CSB Clearance.
+d. Cả a) và b).
+Đáp án: d. Cả a) và b).
+
+Câu 79: Máy phát đài GP 2 tần số cấu hình tiêu chuẩn tạo ra các tín hiệu nào sau đây?
+a. CSB Clearance, SBO Clearance,SBO Course.
+b. CSB Course, SBO Course, SBO Clearance.
+c. CSB Course, SBO Course, CSB Clearance.
+d. CSB Clearance, SBO Clearance, CSB Course.
+Đáp án: c. CSB Course, SBO Course, CSB Clearance.
+
+Câu 80: Máy phát đài Localizer 1 tần số có bao nhiêu tín hiệu ra RF cung cấp cho bộ phân phối tín hiệu ra anten?
+a. 2.
+b. 3.
+c. 4.
+d. 5.
+Đáp án: a. 2.
+
+Câu 81: Máy phát đài GP 2 tần số có bao nhiêu tín hiệu ra RF cung cấp cho bộ phân phối tín hiệu ra anten?
+a. 2.
+b. 3.
+c. 4.
+d. 5
+Đáp án: b. 3.
+
+Câu 82: Ưu điểm chính của hệ thống ILS 2 tần số so với ILS 1 tần số là:
+a. Tăng tầm phủ sóng.
+b. Giúp tăng độ an toàn của hệ thống và được dùng ở các nơi có nhiều chướng ngại vật xung quanh.
+c. Giúp tàu bay hạ cánh chính xác hơn.
+d. Tất cả đều đúng.
+Đáp án: b. Giúp tăng độ an toàn của hệ thống và được dùng ở các nơi có nhiều chướng ngại vật xung quanh.
+
+Câu 83: Biên độ âm tần 90 Hz và 150 Hz của tín hiệu CSB Course đài Localizer ở bên phía tay phải theo hướng hạ cánh sẽ như thế nào?
+a. Biên độ âm tần 90 Hz nhỏ hơn 150 Hz.
+b. Biên độ âm tần 90 Hz lớn hơn 150 Hz.
+c. Hai biên độ âm tần bằng nhau.
+Đáp án: c. Hai biên độ âm tần bằng nhau.
+
+Câu 84: Khi CSB và SBO đồng pha, biên độ âm tần 90 Hz và 150 Hz của tín hiệu CSB bằng với biên độ âm tần 90 Hz và 150 Hz của tín hiệu SBO thì:
+a. DDM = 0
+b. DDM sẽ nhỏ nhất và thành phần 90 Hz bị triệt tiêu khỏi tín hiệu tổng hợp ngõ ra.
+c. DDM sẽ nhỏ nhất và thành phần 150 Hz bị triệt tiêu khỏi tín hiệu tổng hợp ngõ ra.
+d. DDM sẽ lớn nhất và thành phần 90 Hz bị triệt tiêu khỏi tín hiệu tổng hợp ngõ ra.
+Đáp án: d. DDM sẽ lớn nhất và thành phần 90 Hz bị triệt tiêu khỏi tín hiệu tổng hợp ngõ ra.
+
+Câu 85: Hệ thống ILS có thể thực hiện điều chế để tạo ra tín hiệu CSB và SBO theo cách nào?
+a. Cộng và trừ các âm tần 90Hz và 150Hz để tạo ra âm tần (90+150)Hz và (90-150)Hz, sau đó điều chế biên độ các tín hiệu này với sóng mang.
+b. Điều chế riêng biệt từng âm tần 90 Hz và 150 Hz với sóng mang, sau đó sử dụng cầu lai quay pha 900 (900 – Hybrid) để tạo ra các tín hiệu cần thiết.
+c. Cả a) và b).
+Đáp án: c. Cả a) và b).
+
+Câu 86: Đài LOC có cung hướng (Course sector) là 4º, DDM tại góc phương vị 0,5º so với trục tâm đường CHC sẽ bằng:
+a. ±18,75µA.
+b. ±37,5µA.
+c. ±75,0µA.
+d. ±150µA.
+Đáp án: b. ±37,5µA.
+
+Câu 87: Thiết bị đo cự ly bao gồm hai thành phần cơ bản:
+a. Máy phát (Transmitter) trên tàu bay và máy thu (Receiver) trên mặt đất.
+b. Máy phát (Transmitter) trên tàu bay và máy phát đáp (Transponder) trên mặt đất.
+c. Máy hỏi (Interrogator) trên tàu bay và máy phát đáp (Transponder) trên mặt đất.
+d. Máy hỏi (Interrogator) trên tàu bay và máy thu (Receiver) trên mặt đất.
+Đáp án: c. Máy hỏi (Interrogator) trên tàu bay và máy phát đáp (Transponder) trên mặt đất.
+
+Câu 88: Hệ thống DME trên mặt đất và trên tàu bay dùng để?
+a. Giúp tàu bay xác định khoảng cách đến 1 trạm mặt đất.
+b. Giúp tàu bay xác định hướng đến 1 trạm mặt đất.
+c. Giúp tàu bay xác định trục đường băng và góc đáp thích hợp.
+d. Tất cả đều đúng.
+Đáp án: a. Giúp tàu bay xác định khoảng cách đến 1 trạm mặt đất.
+
+Câu 89: Trình tự hoạt động cơ bản của 1 thiết bị DME là?
+a. Nhận xung hỏi, giải mã, mã hóa, phát xung trả lời.
+b. Nhận xung hỏi, giữ chậm, giải mã, mã hóa, phát xung trả lời.
+c. Nhận xung hỏi, giải mã, giữ chậm, mã hóa, phát xung trả lời.
+d. Nhận xung hỏi, mã hóa, giữ chậm, phát xung trả lời.
+Đáp án: c. Nhận xung hỏi, giải mã, giữ chậm, mã hóa, phát xung trả lời.
+
+Câu 90: Hãy cho biết công thức xác định khoảng cách của DME? Trong đó: c là vận tốc ánh sáng, t là khoảng thời gian từ lúc phát xung hỏi cho đến khi nhận được xung trả lời, ζ là thời gian giữ chậm.
+a. D = c.t/2.
+b. D = c.ζ/2.
+c. D = c.(t + ζ)/2.
+d. D = c.(t - ζ)/2.
+Đáp án: d. D = c.(t - ζ)/2.
+
+Câu 91: Thiết bị DME là viết tắt của cụm từ:
+a. Distant Measurement Equipment.
+b. Distant Measuring Equipment.
+c. Distance Measurement Equipment.
+d. Distance Measuring Equipment.
+Đáp án: d. Distance Measuring Equipment.
+
+Câu 92: Hãy cho biết các xung nào được DME tạo ra trong quá trình hoạt động của mình?
+a. Xung hỏi, xung trả lời, xung nhận dạng.
+b. Xung trả lời, xung nhận dạng, xung giả ngẫu nhiên squitter.
+c. Xung trả lời, xung hỏi, xung giả ngẫu nhiên squitter.
+d. Xung nhận dạng, xung giả ngẫu nhiên squitter, xung hỏi.
+Đáp án: b. Xung trả lời, xung nhận dạng, xung giả ngẫu nhiên squitter.
+
+Câu 93: Tình trạng xảy ra khi máy hỏi trên tàu bay “khóa” (lock) chặt các xung trả lời tương ứng với các xung hỏi riêng của nó và liên tục cung cấp khoảng cách đo được cho phi công được gọi là gì?
+a. Chế độ hoạt động “tìm kiếm” (Search) của máy hỏi trên tàu bay.
+b. Chế độ hoạt động “theo dõi” (Track) của máy hỏi trên tàu bay.
+c. Tình trạng bão hòa của DME (Saturation).
+d. Tất cả đều sai.
+Đáp án: b. Chế độ hoạt động “theo dõi” (Track) của máy hỏi trên tàu bay.
+
+Câu 94: Hãy cho biết thứ tự ưu tiên của các xung trong quá trình phát của DME?
+a. 1: xung nhận dạng, 2: xung trả lời, 3: xung giả ngẫu nhiên squitter.
+b. 1: xung trả lời, 2: xung nhận dạng, 3: xung giả ngẫu nhiên squitter.
+c. 1: xung nhận dạng, 2: xung hỏi, 3: xung giả ngẫu nhiên squitter.
+d. 1: xung trả lời, 2: xung nhận dạng, 3: xung hỏi.
+Đáp án: a. 1: xung nhận dạng, 2: xung trả lời, 3: xung giả ngẫu nhiên squitter.
+
+Câu 95: Để chống lại sự bão hoà khi có quá nhiều xung hỏi từ tàu bay, DME có đặc tính sau:
+a. Độ rộng xung được giữ rất nhỏ.
+b. Tín hiệu hỏi từ tàu bay có 2 tốc độ: nhanh, chậm.
+c. Các xung hỏi từ các tàu bay khác nhau không đồng bộ với nhau.
+d. Tất cả các đặc tính trên.
+Đáp án: d. Tất cả các đặc tính trên.
+
+Câu 96: Thiết bị DME kết hợp với ILS sử dụng ở chế độ hạ cánh khi an-ten DME được đặt riêng rẽ một bên của đường cất hạ cánh sau vị trí ngưỡng được gọi là gì?
+a. In-line.
+b. En-route.
+c. Off-set.
+d. Tất cả đều sai.
+Đáp án: c. Off-set.
+
+Câu 97: Khi thiết bị DME ở trạng thái bão hòa thì tần số lặp lại xung PRF sẽ tự động giảm xuống còn bao nhiêu cặp xung/giây (ppps)?
+a. 20 ppps.
+b. 30 ppps.
+c. 50 ppps.
+d. Tất cả đều sai.
+Đáp án: b. 30 ppps.
+
+Câu 98: Tốc độ phát tín hiệu nhận dạng (ident rate) của thiết bị DME:
+a. 700 cặp xung/giây (pulse pair per second).
+b. 1350 xung/giây (pulse per second).
+c. 400Hz.
+d. 1020Hz.
+Đáp án: b. 1350 xung/giây (pulse per second).
+
+Câu 99: Khi DME rơi vào trạng thái bão hòa, đối với những tàu bay ở xa thì thông tin mà nó có thể nhận được là gì?
+a. Nếu nhận được ident thì sẽ nhận được thông tin về cự ly.
+b. Có thể nhận được ident nhưng không nhận được thông tin về cự ly.
+c. Không nhận được ident nhưng nhận được thông tin về cự ly.
+Đáp án: b. Có thể nhận được ident nhưng không nhận được thông tin về cự ly.
+
+Câu 100: Khoảng cách tối đa mà DME cung cấp cho tàu bay phụ thuộc vào yếu tố nào?
+a. Công suất phát của DME.
+b. Độ cao của tàu bay.
+c. Địa hình xung quanh DME.
+d. Tất cả đều đúng.
+Đáp án: d. Tất cả đều đúng.
+
+Câu 101: Bộ giám sát của thiết bị DME sẽ làm cho hệ thống chuyển đổi hoặc tắt máy nếu thông số nào sau đây vượt quá sai số cho phép:
+a. Thời gian trễ của xung (Delay).
+b. Khoảng cách xung (Pulse spacing).
+c. Cả a) và b).
+Đáp án: c. Cả a) và b).
+
+Câu 102: Khi dùng thiết bị DME kết hợp với ILS có độ chính xác so với dùng thiết bị DME kết hợp VOR:
+a. Độ chính xác cao hơn so với DME kết hợp với VOR.
+b. Độ chính xác thấp hơn so với DME kết hợp với VOR.
+c. Độ chính xác bằng với DME kết hợp với VOR.
+Đáp án: a. Độ chính xác cao hơn so với DME kết hợp với VOR.
+
+Câu 103: Trong hệ thống ILS NORMARC và DME FERNAU, tín hiệu nhận dạng ident của DME và LOC được đặt ở chế độ nào?
+a. Độc lập với nhau.
+b. LOC master, DME slave.
+c. LOC slave, DME master.
+d. Tất cả đều sai.
+Đáp án: b. LOC master, DME slave.
+
+Câu 104: DME2020 FERNAU cấu hình 100W có tốc độ phát tối đa là:
+a. 680ppps.
+b. 1400ppps.
+c. 2700ppps.
+d. 5000ppps.
+Đáp án: d. 5000ppps.
+
+Câu 105: Xét trong điều kiện lý tưởng, ở tốc độ phát 5000ppps DME 2020 FERNAU có thể trả lời cho bao nhiêu tàu bay?
+a. 100.
+b. 200.
+c. 300.
+d. 500.
+Đáp án: b. 200.
+
+Câu 106: Nguồn DC dự phòng cho hệ thống đài ILS - Selex 2100 là:
+a. Battery 12V.
+b. Battery 24V.
+c. Battery 48V.
+d. Tất cả đều sai.
+Đáp án: b. Battery 24V.
+
+Câu 107: Bộ điều khiển pha và biên độ APCU của đài Glideslope Selex thực hiện việc điều khiển pha cho các anten:
+a. Anten trên và anten dưới.
+b. Anten trên và anten giữa.
+c. Anten giữa và anten dưới.
+d. Cả 3 anten.
+Đáp án: a. Anten trên và anten dưới.
+
+Câu 108: Độ sâu điều chế thành phần 90 Hz của tín hiệu Clearance ở đài Glideslope Selex là:
+a. 20 %.
+b. 40 %.
+c. 80 %.
+d. Tất cả đều sai.
+Đáp án: d. Tất cả đều sai.
+
+Câu 109: Chức năng bộ giám sát của DME Selex 1118A là?
+a. Giám sát (đánh giá các tham số trả lời), chuyển đổi/tắt máy.
+b. Giám sát (đánh giá các tham số trả lời), chuyển đổi/tắt máy, hiển thị trạng thái thiết bị.
+c. Kích hỏi máy phát đáp, giám sát (đánh giá các tham số trả lời).
+d. Kích hỏi máy phát đáp, giám sát (đánh giá các tham số trả lời), chuyển đổi/tắt máy.
+Đáp án: c. Kích hỏi máy phát đáp, giám sát (đánh giá các tham số trả lời).
+
+Câu 110: DME Selex 1118A cấu hình 100W có tốc độ phát tối đa là:
+a. 700ppps.
+b. 2700ppps.
+c. 5000ppps.
+d. 5400ppps.
+Đáp án: d. 5400ppps.
+
+Câu 111: Khi muốn thay đổi course width của đài LOC và GP ta phải làm gì?
+a. Thay đổi mức công suất phát ra của SBO.
+b. Thay đổi mức công suất phát ra của CSB.
+c. Thay đổi độ sâu điều chế của 90Hz.
+d. Thay đổi độ sâu điều chế của 150Hz.
+Đáp án: a. Thay đổi mức công suất phát ra của SBO.
+
+Câu 112: Nếu hệ thống ILS là hệ thống hai tần số, thì anten sử dụng cho đài GP phải là dạng:
+a. Chuẩn không (Null reference) và Chuẩn biên tần (Sideband reference).
+b. Chuẩn không và M-array.
+c. M-array và Chuẩn biên tần.
+d. Chỉ có M-array.
+Đáp án: d. Chỉ có M-array.
+
+Câu 113: Giả sử đài GP sử dụng anten M-array có góc hạ cánh thực tế nhỏ hơn góc hạ cánh danh định, ta phải làm thế nào để hiệu chỉnh?
+a. Giảm độ cao của tất cả các anten.
+b. Tăng độ cao của tất cả các anten.
+c. Chỉ cần giảm độ cao của anten giữa.
+d. Chỉ cần tăng độ cao của anten giữa.
+Đáp án: a. Giảm độ cao của tất cả các anten.
+
+Câu 114: Khi thu tín hiệu đài LOC, chỉ thị trên máy thu cho biết DDM=-150μA, vị trí của máy thu ở:
+a. Bên phải đường cất hạ cánh theo hướng hạ cánh.
+b. Bên trái đường cất hạ cánh theo hướng hạ cánh.
+c. Ở tâm đường cất hạ cánh.
+d. Không có vị trí này trên thực tế.
+Đáp án: b. Bên trái đường cất hạ cánh theo hướng hạ cánh.
+
+Câu 115: Giả sử hệ thống monitor tốt, khi có báo động trên hệ thống monitor ta cần làm gì?
+a. Có thể điều chỉnh mở rộng giới hạn báo động trên monitor để hết báo động.
+b. Có thể tách rời hệ thống monitor để máy phát làm việc.
+c. Không được điều chỉnh để mở rộng giới hạn báo động và tiến hành kiểm tra sửa chữa máy phát.
+d. Tất cả đều không đúng.
+Đáp án: c. Không được điều chỉnh để mở rộng giới hạn báo động và tiến hành kiểm tra sửa chữa máy phát.
+
+Câu 116: Khi khai thác thiết bị theo đúng quy trình kỹ thuật, bạn không được tự ý thực hiện:
+a. Hiệu chỉnh các thông số hoạt động của thiết bị.
+b. Đo đạc các tham số kỹ thuật của thiết bị.
+c. Kiểm tra hệ thống điều hòa nhiệt độ.
+d. Kiểm tra nguồn điện cung cấp và các thiết bị chống sét.
+Đáp án: a. Hiệu chỉnh các thông số hoạt động của thiết bị.
+
+Câu 117: Tín hiệu giám sát đường chỉ hướng hoặc chỉ góc hạ cánh danh định của hệ thống ILS gồm các thông số sau:
+a. DDM, SDM, mức RF.
+b. Độ lệch tần số.
+c. Công suất phát, tần số sóng mang.
+d. Cả b) và c).
+Đáp án: a. DDM, SDM, mức RF.
+
+Câu 118: Điểm mốc phải kiểm tra trường xa đài LOC là:
+a. Center line, full course width 90hz, full course width 150Hz.
+b. Full course width 90hz, full course width 150Hz.
+c. Center line, half course width 90Hz.
+d. Center line, half course width 150Hz.
+Đáp án: a. Center line, full course width 90hz, full course width 150Hz.
+
+Câu 119: Khi sửa chữa đài LOC hay GP phải thay thế một số dây phi-đơ cao tần từ tủ máy ra anten:
+a. Cần thiết phải điều chỉnh pha cao tần giữa CSB và SBO.
+b. Không cần phải điều chỉnh pha cao tần giữa CSB và SBO.
+c. Phải điều chỉnh mức công suất của CSB.
+d. Phải điều chỉnh mức công suất SBO.
+Đáp án: a. Cần thiết phải điều chỉnh pha cao tần giữa CSB và SBO.
+
+Câu 120: Khi kiểm tra trường đài LOC ta sử dụng 1 đoạn dây cáp đồng trục λ/4 để kiểm tra pha giữa tín hiệu SBO và CSB course, hãy cho biết giá trị DDM chuẩn tại vị trí Far Field Width nếu 2 tín hiệu này có quan hệ pha chính xác?
+a. DDM = 0
+b. DDM = +150μA.
+c. DDM = -150μA.
+d. DDM = 275μA.
+Đáp án: a. DDM = 0
+    </script>
+
+    <!-- Logic Xử lý & Hiển thị -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            // Lấy dữ liệu thô từ thẻ script ẩn
+            const rawText = document.getElementById("rawData").textContent;
+            
+            // Tách dữ liệu thành từng cụm câu hỏi (split theo chữ "Câu X:")
+            const blocks = rawText.split(/\n(?=Câu \d+:)/).map(b => b.trim()).filter(b => b.length > 0);
+            
+            const container = document.getElementById("questionsContainer");
+            const searchInput = document.getElementById("searchInput");
+            const noResults = document.getElementById("noResults");
+            const statsDisplay = document.getElementById("statsDisplay");
+            
+            let allCardsData = [];
+
+            // Phân tích và tạo HTML cho từng câu hỏi
+            blocks.forEach((block) => {
+                const lines = block.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+                
+                let qTitle = lines[0]; // Chứa nội dung câu hỏi
+                let optionsHtml = '';
+                let answerText = '';
+
+                for(let i = 1; i < lines.length; i++) {
+                    if(lines[i].startsWith("Đáp án:")) {
+                        // Tách phần Đáp án
+                        answerText = lines[i].substring("Đáp án:".length).trim();
+                    } else {
+                        // Các lựa chọn a, b, c, d
+                        optionsHtml += `<div class="option">${lines[i]}</div>`;
+                    }
+                }
+
+                // Tạo Card Container
+                const cardElement = document.createElement("div");
+                cardElement.className = "card";
+                cardElement.innerHTML = `
+                    <div class="question-title">${qTitle}</div>
+                    <div class="options">
+                        ${optionsHtml}
+                    </div>
+                    <div class="answer-box">
+                        <span class="answer-label">Đáp án:</span>
+                        <span class="answer-text">${answerText}</span>
+                    </div>
+                `;
+
+                container.appendChild(cardElement);
+
+                // Lưu trữ để dùng cho tính năng Search
+                allCardsData.push({
+                    element: cardElement,
+                    searchText: block.toLowerCase() // Ghép toàn bộ text vào để dễ tìm kiếm (case-insensitive)
+                });
+            });
+
+            const totalQuestions = allCardsData.length;
+            statsDisplay.textContent = `Hiển thị ${totalQuestions}/${totalQuestions} câu hỏi`;
+
+            // Tính năng Search Real-time
+            searchInput.addEventListener("input", (e) => {
+                const term = e.target.value.toLowerCase().trim();
+                let visibleCount = 0;
+
+                allCardsData.forEach(item => {
+                    // Nếu chuỗi chứa từ khóa, hiển thị. Ngược lại, ẩn đi.
+                    if(item.searchText.includes(term)) {
+                        item.element.classList.remove("hidden");
+                        visibleCount++;
+                    } else {
+                        item.element.classList.add("hidden");
+                    }
+                });
+
+                // Cập nhật thống kê và trạng thái không tìm thấy
+                statsDisplay.textContent = `Hiển thị ${visibleCount}/${totalQuestions} câu hỏi`;
+                
+                if(visibleCount === 0) {
+                    noResults.classList.remove("hidden");
+                } else {
+                    noResults.classList.add("hidden");
+                }
+            });
+        });
+    </script>
 </body>
 </html>
