@@ -790,9 +790,39 @@ let secondsElapsed = 0;
 let isSubmitted = false;
 let currentScore = 0;
 
-// Hàm hỗ trợ loại bỏ dấu tiếng Việt để tìm kiếm dễ hơn
+// Hàm hỗ trợ loại bỏ dấu tiếng Việt để tìm kiếm dễ hơn (Đảm bảo độ dài chuỗi không đổi)
 function removeAccents(str) {
-    return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+    let nStr = str.toLowerCase();
+    nStr = nStr.replace(/[àáạảãâầấậẩẫăằắặẳẵ]/g, "a");
+    nStr = nStr.replace(/[èéẹẻẽêềếệểễ]/g, "e");
+    nStr = nStr.replace(/[ìíịỉĩ]/g, "i");
+    nStr = nStr.replace(/[òóọỏõôồốộổỗơờớợởỡ]/g, "o");
+    nStr = nStr.replace(/[ùúụủũưừứựửữ]/g, "u");
+    nStr = nStr.replace(/[ỳýỵỷỹ]/g, "y");
+    nStr = nStr.replace(/đ/g, "d");
+    return nStr;
+}
+
+// Hàm highlight text trùng khớp
+function highlightText(text, query) {
+    if (!query) return text;
+    const normalizedText = removeAccents(text);
+    const queryLen = query.length;
+    let result = '';
+    let currentIndex = 0;
+    let matchIndex = normalizedText.indexOf(query, currentIndex);
+
+    if (matchIndex === -1) return text;
+
+    while (matchIndex !== -1) {
+        result += text.substring(currentIndex, matchIndex);
+        // Bọc thẻ mark để tô highlight vàng
+        result += `<mark class="bg-yellow-300 text-black px-0.5 rounded shadow-sm">` + text.substring(matchIndex, matchIndex + queryLen) + `</mark>`;
+        currentIndex = matchIndex + queryLen;
+        matchIndex = normalizedText.indexOf(query, currentIndex);
+    }
+    result += text.substring(currentIndex);
+    return result;
 }
 
 // Parser chuyển Raw Text thành Array Object
@@ -856,51 +886,53 @@ function shuffleArray(array) {
 // Tìm kiếm câu hỏi bên tab Ôn Tập
 function searchQuestions() {
     const query = removeAccents(document.getElementById('search-input').value.trim());
-    
-    allQuestions.forEach((q, index) => {
-        const box = document.getElementById(`sqbox-${index}`);
-        if (!box) return;
-        
-        const qText = removeAccents(q.question);
-        const aText = removeAccents(q.options.map(o => o.text).join(" "));
-        
-        if (qText.includes(query) || aText.includes(query)) {
-            box.style.display = 'block';
-        } else {
-            box.style.display = 'none';
-        }
-    });
+    renderStudyTab(query);
 }
 
-// Khởi tạo Study Tab (Hiển thị 120 câu gốc + highlight đáp án)
+// Khởi tạo Study Tab
 function initStudy() {
+    renderStudyTab('');
+}
+
+// Render Tab Ôn Tập hỗ trợ Highlight
+function renderStudyTab(searchQuery = '') {
     const container = document.getElementById('study-container');
     container.innerHTML = '';
 
     allQuestions.forEach((q, index) => {
+        const qTextNorm = removeAccents(q.question);
+        const aTextNorm = removeAccents(q.options.map(o => o.text).join(" "));
+
+        // Lọc câu hỏi nếu không khớp từ khóa
+        if (searchQuery && !qTextNorm.includes(searchQuery) && !aTextNorm.includes(searchQuery)) {
+            return;
+        }
+
         const div = document.createElement('div');
         div.id = `sqbox-${index}`;
         div.className = "bg-white rounded shadow-sm border border-gray-200 p-3";
         
         let optionsHTML = '';
         q.options.forEach(opt => {
+            const hlOptText = highlightText(opt.text, searchQuery);
             if(opt.isCorrect) {
                 optionsHTML += `
                     <div class="p-1.5 my-1 rounded bg-green-100 border border-green-400 font-semibold text-green-900 flex items-start gap-1.5 text-sm">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-600 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
-                        <span>${opt.text}</span>
+                        <span>${hlOptText}</span>
                     </div>`;
             } else {
                 optionsHTML += `
                     <div class="p-1.5 my-1 rounded border border-gray-100 bg-gray-50 text-gray-700 flex items-start gap-1.5 text-sm">
                         <div class="w-4 flex-shrink-0"></div> <!-- spacing to align with checkmark -->
-                        <span>${opt.text}</span>
+                        <span>${hlOptText}</span>
                     </div>`;
             }
         });
 
+        const hlQText = highlightText(q.question, searchQuery);
         div.innerHTML = `
-            <h3 class="font-bold text-sm md:text-base mb-2 text-blue-900"><span class="text-blue-600">Câu ${index + 1}:</span> ${q.question}</h3>
+            <h3 class="font-bold text-sm md:text-base mb-2 text-blue-900"><span class="text-blue-600">Câu ${index + 1}:</span> ${hlQText}</h3>
             <div class="pl-1 md:pl-2">
                 ${optionsHTML}
             </div>
