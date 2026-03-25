@@ -2782,4 +2782,54 @@ d. Sau khi tính ưu đãi, nếu các hồ sơ dự thầu xếp hạng ngang n
                     const optDiv = document.createElement('div');
                     let optTextHtml = highlightText(opt.text, searchRegex);
 
-                    if (opt.
+                    if (opt.id === q.correctId) {
+                        optDiv.className = "p-2 rounded bg-blue-50 border border-blue-200 text-blue-900 font-semibold flex items-start";
+                        optDiv.innerHTML = `<span class="mr-2 text-blue-600 font-bold">${opt.id}.</span> <span class="flex-1">${optTextHtml}</span> <span class="text-green-600 ml-1">✔️</span>`;
+                    } else {
+                        optDiv.className = "p-2 rounded bg-gray-50 border border-gray-100 text-gray-500 flex items-start";
+                        optDiv.innerHTML = `<span class="mr-2 font-bold">${opt.id}.</span> <span class="flex-1">${optTextHtml}</span>`;
+                    }
+                    optList.appendChild(optDiv);
+                });
+
+                qDiv.appendChild(optList);
+                fragment.appendChild(qDiv);
+            });
+            
+            container.appendChild(fragment);
+        }
+
+        function handleSearch() {
+            const query = document.getElementById('searchInput').value.trim();
+            if (!query) {
+                renderReview(null, null);
+                return;
+            }
+
+            const searchRegex = createHighlightRegex(query);
+            const normalizedQuery = removeDiacritics(query).toLowerCase();
+
+            const filtered = allQuestions.filter(q => {
+                const qTextNorm = removeDiacritics(q.text).toLowerCase();
+                if (qTextNorm.includes(normalizedQuery)) return true;
+
+                for (let opt of q.options) {
+                    const optTextNorm = removeDiacritics(opt.text).toLowerCase();
+                    if (optTextNorm.includes(normalizedQuery)) return true;
+                }
+                return false;
+            });
+
+            renderReview(filtered, searchRegex);
+        }
+
+        // ================= 8. KHỞI TẠO (INITIALIZATION) =================
+        window.onload = function() {
+            allQuestions = parseQuestions(rawTextData);
+            console.log("Tổng số câu hỏi đã parse:", allQuestions.length);
+            startQuiz(); // Mặc định mở tab thi thử trước
+            renderReview(); // Pre-render tab ôn tập
+        };
+    </script>
+</body>
+</html>
