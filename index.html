@@ -1,109 +1,575 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>VCA Visualizer - Phòng TC-KH</title>
-<style>
-    /* --- CẤU HÌNH GIAO DIỆN VCA (ACV STYLE) --- */
-    body, html { margin: 0; padding: 0; height: 100%; font-family: 'Segoe UI', Arial, sans-serif; background: #f5f7fa; display: flex; flex-direction: column;}
-    
-    /* Header */
-    .vca-header {
-        background: #0056b3; /* Xanh ACV */
-        color: white;
-        padding: 12px 20px;
-        border-bottom: 4px solid #d4af37; /* Vàng Gold */
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        flex-shrink: 0;
-    }
-    .vca-top { font-size: 11px; text-transform: uppercase; opacity: 0.8; letter-spacing: 0.5px; }
-    .vca-title { font-size: 18px; font-weight: 700; text-transform: uppercase; margin-top: 2px; }
-    .vca-badge { font-size: 12px; background: rgba(255,255,255,0.2); padding: 2px 8px; border-radius: 4px; display: inline-block; margin-top: 5px;}
-
-    /* Main Container */
-    .main-area { flex-grow: 1; position: relative; overflow: hidden; }
-    
-    /* Mindmap container - Full Size */
-    .markmap { width: 100%; height: 100vh; }
-
-    /* Footer */
-    .vca-footer { 
-        background: #e9ecef; color: #555; text-align: center; 
-        padding: 5px; font-size: 11px; flex-shrink: 0; border-top: 1px solid #ddd;
-    }
-</style>
-<style>.markmap-node-text { font-family: 'Segoe UI'; font-size: 14px; fill: #333; }</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Quiz & Ôn Tập - An Toàn Đường CHC</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Tối ưu UI/UX theo yêu cầu: line-height thấp, font gọn */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            background-color: #f3f4f6;
+            line-height: 1.2;
+        }
+        .tab-btn.active {
+            border-bottom: 3px solid #2563eb;
+            color: #2563eb;
+            font-weight: bold;
+        }
+        /* Custom scrollbar cho đẹp */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #a8a8a8; }
+        
+        mark {
+            background-color: #fde047;
+            color: #000;
+            padding: 0 2px;
+            border-radius: 2px;
+        }
+        
+        .radio-custom:checked + div {
+            border-color: #3b82f6;
+            background-color: #eff6ff;
+        }
+        
+        /* Toast Notification */
+        #toast {
+            visibility: hidden;
+            min-width: 250px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 8px;
+            padding: 12px;
+            position: fixed;
+            z-index: 100;
+            left: 50%;
+            bottom: 30px;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s, bottom 0.3s;
+        }
+        #toast.show {
+            visibility: visible;
+            opacity: 1;
+            bottom: 50px;
+        }
+    </style>
 </head>
-<body>
+<body class="text-gray-800 text-sm md:text-base antialiased">
 
-    <div class="vca-header">
-        <div class="vca-top">Tổng công ty Cảng hàng không Việt Nam - CTCP</div>
-        <div class="vca-title">Cảng hàng không quốc tế Cần Thơ</div>
-        <div class="vca-badge">Phòng Tài chính - Kế hoạch | Triển khai văn bản</div>
+    <!-- Container chính -->
+    <div class="max-w-3xl mx-auto bg-white min-h-screen shadow-md relative pb-16">
+        
+        <!-- Header -->
+        <header class="bg-blue-600 text-white p-3 md:p-4 sticky top-0 z-40 shadow-sm">
+            <div class="text-xs md:text-sm italic text-blue-100 mb-1">Huấn luyện Đào tạo Cảng HKQT Cần Thơ</div>
+            <h1 class="text-lg md:text-xl font-bold uppercase leading-tight">An Toàn Đường Cất Hạ Cánh</h1>
+            
+            <!-- Tabs -->
+            <div class="flex mt-3 bg-white rounded-t-lg overflow-hidden text-gray-700 font-medium text-sm">
+                <button id="tab-test" class="tab-btn active flex-1 py-2 text-center transition-colors" onclick="switchTab('test')">Thi Thử (40)</button>
+                <button id="tab-review" class="tab-btn flex-1 py-2 text-center transition-colors" onclick="switchTab('review')">Ôn Tập (Full)</button>
+            </div>
+        </header>
+
+        <!-- NỘI DUNG TAB 1: THI THỬ -->
+        <main id="view-test" class="p-2 md:p-4">
+            <!-- Test Controls Top -->
+            <div class="flex justify-between items-center bg-gray-50 p-2 rounded border border-gray-200 mb-3 sticky top-[100px] z-30 shadow-sm">
+                <div class="flex items-center gap-3">
+                    <div class="font-bold text-red-600 text-lg flex items-center gap-1">
+                        ⏱ <span id="timer">00:00</span>
+                    </div>
+                    <div class="text-xs text-gray-500 font-medium" id="high-score">Điểm cao: 0/40</div>
+                </div>
+                <div class="flex gap-2">
+                    <button id="btn-submit-top" class="bg-green-600 text-white px-3 py-1.5 rounded font-bold shadow-sm active:bg-green-700" onclick="submitTest()">Nộp Bài</button>
+                    <button id="btn-retry-top" class="bg-blue-600 text-white px-3 py-1.5 rounded font-bold shadow-sm active:bg-blue-700" onclick="startTest()">Làm Lại</button>
+                    <button id="btn-share-top" class="hidden bg-purple-600 text-white px-3 py-1.5 rounded font-bold shadow-sm active:bg-purple-700" onclick="shareResult()">Chia Sẻ</button>
+                </div>
+            </div>
+
+            <div id="test-result-summary" class="hidden mb-3 p-3 rounded font-bold text-center text-lg"></div>
+
+            <div id="test-container" class="space-y-3">
+                <!-- Câu hỏi thi thử sẽ render ở đây -->
+            </div>
+
+            <!-- Test Controls Bottom -->
+            <div class="flex justify-center gap-3 mt-4 border-t pt-4">
+                <button id="btn-submit-bottom" class="bg-green-600 text-white px-6 py-2 rounded font-bold shadow-sm active:bg-green-700 text-base" onclick="submitTest()">Nộp Bài</button>
+                <button id="btn-retry-bottom" class="bg-blue-600 text-white px-6 py-2 rounded font-bold shadow-sm active:bg-blue-700 text-base" onclick="startTest()">Làm Lại</button>
+                <button id="btn-share-bottom" class="hidden bg-purple-600 text-white px-6 py-2 rounded font-bold shadow-sm active:bg-purple-700 text-base" onclick="shareResult()">Chia Sẻ</button>
+            </div>
+        </main>
+
+        <!-- NỘI DUNG TAB 2: ÔN TẬP -->
+        <main id="view-review" class="p-2 md:p-4 hidden">
+            <!-- Search Bar (Sticky) -->
+            <div class="sticky top-[95px] z-30 bg-white pb-3 pt-1">
+                <div class="relative">
+                    <input type="text" id="search-input" class="w-full border-2 border-blue-300 rounded-lg pl-3 pr-10 py-2 focus:outline-none focus:border-blue-600 shadow-sm" placeholder="Tìm kiếm câu hỏi, đáp án..." oninput="handleSearch()">
+                    <span class="absolute right-3 top-2.5 text-gray-400">🔍</span>
+                </div>
+                <div id="search-count" class="text-xs text-gray-500 mt-1 ml-1"></div>
+            </div>
+
+            <div id="review-container" class="space-y-3 mt-1">
+                <!-- Câu hỏi ôn tập sẽ render ở đây -->
+            </div>
+        </main>
+
     </div>
 
-    <div class="main-area">
-        <div class="markmap">
-            <script type="text/template">
-# NGHỊ ĐỊNH 287/2025/NĐ-CP<br>Quản lý tài sản KCHT Hàng không
-## 1. Quy định chung
-### Phạm vi điều chỉnh
-- Quản lý, khai thác TS KCHT do Nhà nước đầu tư
-- *(Không bao gồm: TS Quốc phòng, Trụ sở CQNN...)*
-### Danh mục tài sản (Điều 3)
-- Công trình bảo đảm bay
-- Kết cấu hạ tầng sân bay (Khu bay: đường băng, sân đỗ...)
-- Nhà ga hành khách, hàng hóa, logistics...
-### Nguyên tắc (Điều 4)
-- Thống kê, kế toán đầy đủ (Hiện vật & Giá trị)
-- Tính hao mòn, khấu hao, bảo trì theo luật định
+    <!-- Toast Component -->
+    <div id="toast">Đã copy kết quả vào khay nhớ tạm!</div>
 
-## 2. Giao quản lý tài sản (ACV/VATM)
-### Các hình thức giao
-- **Tính thành vốn Nhà nước:** Công trình bảo đảm bay (VATM); Nhà ga, hạ tầng ngoài khu bay (ACV)
-- **Không tính thành vốn Nhà nước:** Hạ tầng khu bay (ACV)
-### Thẩm quyền & Chuyển đổi
-- Bộ trưởng Bộ Xây dựng quyết định giao
-- Có quy trình chuyển đổi từ "Không tính vốn" sang "Tính vốn"
+<script>
+// --- 1. DỮ LIỆU RAW (Template String) ---
+const rawData = `Câu 1: Mục đích chính của chương trình an toàn đường cất hạ cánh tại cảng hàng không là gì? a. Tăng doanh thu khai thác b. Đảm bảo các hoạt động cất cánh, hạ cánh và di chuyển diễn ra an toàn c. Tăng số chuyến bay d. Nâng cao dịch vụ thương mại Đáp án: B 
+Câu 2: Khi một tàu bay trượt ra ngoài đường cất hạ cánh trong quá trình hạ cánh, đây là loại sự cố nào? a. Va chạm trên không b. Xâm nhập đường cất hạ cánh c. Tàu bay xông ra ngoài đường cất hạ cánh d. Nhầm đường cất hạ cánh Đáp án: C 
+Câu 3: Một phương tiện phục vụ mặt đất đi vào khu vực đường cất hạ cánh khi chưa được phép kiểm soát viên không lưu. Tình huống này được phân loại là gì? a. Va chạm chim b. Xâm nhập đường cất hạ cánh c. Va chạm trên mặt đất d. Mất kiểm soát trên không Đáp án: B 
+Câu 4: Khi tàu bay sử dụng nhầm đường cất hạ cánh so với chỉ dẫn của kiểm soát viên không lưu, đây là loại sự cố gì? a. Sử dụng Nhầm đường cất hạ cánh b. Xâm nhập đường cất hạ cánh c. Va chạm chướng ngại vật d. Mất kiểm soát Đáp án: A 
+Câu 5: Một chuyến bay hạ cánh quá xa điểm chạm bánh quy định. Đây là dạng sự cố nào? a. Hạ cánh sai vị trí khu vực chạm bánh b. Va chạm mặt đất c. [Không rõ chữ] d. [Không rõ chữ] Đáp án: A 
+Câu 6: Mục tiêu quan trọng nhất của việc quản lý an toàn đường cất hạ cánh là gì? a. Tăng tốc độ khai thác b. Giảm thiểu tai nạn và sự cố liên quan đến an toàn đường CHC c. Tăng lợi nhuận d. Tăng số chuyến bay Đáp án: B 
+Câu 7: Trong một tình huống tàu bay vẫn kiểm soát được nhưng va chạm địa hình, đây là loại rủi ro gì? a. Va chạm giữa các tàu bay b. Mất kiểm soát trên không c. Va chạm địa hình có kiểm soát d. Va chạm mặt đất Đáp án: C 
+Câu 8: Khi tàu bay mất kiểm soát trong quá trình bay, tình huống này được gọi là gì? a. Va chạm địa hình b. Mất kiểm soát trên không c. Va chạm chim d. Va chạm phương tiện Đáp án: B 
+Câu 9: Việc thành lập Tổ an toàn đường cất hạ cánh tại các cảng hàng không nhằm mục đích gì? a. Quản lý tài chính b. Phối hợp đảm bảo an toàn khai thác c. Quản lý hành khách d. Quản lý thương mại Đáp án: B 
+Câu 10: Trong thành phần Tổ an toàn đường cất hạ cánh, ai giữ vai trò tổ trưởng? a. Đại diện hãng hàng không b. Giám đốc cảng hàng không c. Đại diện địa phương d. Nhân viên kỹ thuật Đáp án: B 
+Câu 11: Hoạt động họp định kỳ của Tổ an toàn đường cất hạ cánh nhằm mục đích gì? a. Bán vé b. Phân tích và đánh giá rủi ro c. Kiểm tra hành khách d. Quảng bá thương hiệu Đáp án: B 
+Câu 12: Khi phát hiện điểm nguy cơ cao trên khu bay, cần thực hiện biện pháp nào? a. Bỏ qua b. Ghi nhận và đánh giá rủi ro và đề xuất biện pháp kiểm soát rủi ro c. Tăng chuyến bay d. Giảm nhân lực Đáp án: B 
+Câu 13: Một vật thể lạ trên đường cất hạ cánh có thể gây ra nguy cơ gì? a. Tăng tốc độ bay b. Hư hại tàu bay c. Tăng hiệu suất d. Không ảnh hưởng Đáp án: B 
+Câu 14: Khi có chim xuất hiện gần đường cất hạ cánh, nguy cơ chính là gì? a. Va chạm chim b. Va chạm phương tiện c. Va chạm mặt đất d. Không có nguy cơ Đáp án: A 
+Câu 15: Việc áp dụng hệ thống quản lý an toàn giúp đạt được điều gì? a. Tăng chi phí b. Kiểm soát và giảm rủi ro c. Tăng nhân lực d. Tăng thời gian khai thác Đáp án: B 
+Câu 16: Trong một tình huống máy bay bị trượt khi cất cánh do đường trơn, nguyên nhân chính có thể là gì? a. Thời tiết và tình trạng mặt đường b. Hành khách c. Dịch vụ d. Giá vé Đáp án: A 
+Câu 17: Một điểm giao cắt phức tạp trên khu bay được gọi là gì? a. Điểm thương mại b. Điểm nguy cơ cao (Hot spot) c. Điểm check-in d. Điểm dịch vụ Đáp án: B 
+Câu 18: Khi xây dựng sơ đồ các điểm nguy cơ cao nhằm mục đích gì? a. Trang trí b. Cảnh báo và phòng ngừa sự cố c. Quảng cáo d. Tăng doanh thu Đáp án: B 
+Câu 19: Khi thực hiện đánh giá rủi ro, bước đầu tiên là gì? a. Giảm rủi ro b. Nhận diện mối nguy c. Báo cáo d. Kiểm tra tài chính Đáp án: B 
+Câu 20: Một phương tiện va chạm với tàu bay khi đang lăn bánh, đây là loại sự cố gì? a. Va chạm trên mặt đất b. Va chạm trên không c. Va chạm chim d. Mất kiểm soát Đáp án: A 
+Câu 21: Khi xây dựng kế hoạch giảm thiểu rủi ro, cần dựa trên yếu tố nào? a. Dữ liệu và phân tích rủi ro b. Ý kiến cá nhân c. Doanh thu d. Thời tiết Đáp án: A 
+Câu 22: Việc phối hợp giữa các đơn vị trong sân bay nhằm mục tiêu gì? a. Tăng lợi nhuận b. Đảm bảo an toàn đồng bộ giữa các đơn vị c. Giảm chi phí d. Tăng chuyến bay Đáp án: B 
+Câu 24: Việc áp dụng quy trình tiêu chuẩn giúp đạt được điều gì? a. Tăng rủi ro b. Đảm bảo tuân thủ và an toàn c. Tăng chi phí d. Giảm nhân lực Đáp án: B 
+Câu 25: Khi một tàu bay hạ cánh trước ngưỡng đường CHC, đây là dạng gì? a. Hạ cánh sớm b. Va chạm chim c. Va chạm phương tiện d. Không phải sự cố Đáp án: A 
+Câu 26: Vai trò của công nghệ trong an toàn đường cất hạ cánh là gì? a. Tăng chi phí b. Hỗ trợ giám sát và kiểm soát rủi ro c. Không có vai trò d. Tăng hành khách Đáp án: B 
+Câu 27: Khi xảy ra sự cố, bước quan trọng tiếp theo là gì? a. Bỏ qua b. Phân tích nguyên nhân và khắc phục c. Tăng chuyến bay d. Giảm nhân lực Đáp án: B 
+Câu 28: Việc đào tạo nhân viên nhằm mục đích gì? a. Tăng lương b. Nâng cao nhận thức an toàn c. Tăng chi phí d. Giảm nhân lực Đáp án: B 
+Câu 29: Một tàu bay va chạm với chim khi cất cánh có thể dẫn đến hậu quả gì? a. Không ảnh hưởng b. Hư hỏng động cơ c. Tăng tốc d. Giảm chi phí Đáp án: B 
+Câu 30: Trong quá trình khai thác tại cảng hàng không, xảy ra tình huống: tàu bay hạ cánh trong điều kiện mưa lớn, mặt đường ướt, rủi ro an toàn nào có thể xảy ra? a. Tàu bay xông ra ngoài đường CHC b. Tàu bay xâm nhập vào đường CHC c. Tàu bay hạ nhầm đường CHC d. Tàu bay va chạm với đường CHC Đáp án: A 
+Câu 31: Trong quá trình khai thác tại cảng hàng không, xảy ra tình huống: tổ lái hiểu nhầm chỉ dẫn và đi vào sai đường CHC. Rủi ro an toàn nào có thể xảy ra? a. Tàu bay xông ra ngoài đường CHC b. Tàu bay xâm nhập vào đường CHC c. Tàu bay hạ nhầm đường CHC d. Tàu bay va chạm với đường CHC Đáp án: B 
+Câu 32: Trong quá trình khai thác tại cảng hàng không, xảy ra tình huống: xe follow-me dẫn tàu bay trong điều kiện sương mù dày, tầm nhìn thấp. Theo anh chị thực hiện biện pháp nào để đảm bảo an toàn? a. Tắt đèn xoay trên mui xe b. Giữ liên lạc hai chiều với Đài Kiểm soát không lưu c. Tạm dừng dẫn tàu bay d. Tăng tốc để kết thúc sớm quá trình dẫn tàu bay Đáp án: B 
+Câu 33: Hậu quả của việc tàu bay xông ra ngoài đường CHC a. Tử vong hoặc bị thương đối với người trên tàu bay b. Hư hỏng tàu bay c. Tử vong hoặc bị thương đối với người ngoài tàu bay d. Tất cả đều đúng Đáp án: D 
+Câu 34: Tàu bay hạ cánh không thể dừng lại trước khi hết chiều dài đường CHC do các nguyên nhân sau a. Tốc độ chạm bánh (touchdown speed) quá cao; hoặc b. Độ cao khi qua ngưỡng đường CHC (threshold) quá lớn và/hoặc điểm chạm bánh nằm ngoài vùng chạm bánh tiêu chuẩn (touchdown zone); hoặc c. Khối lượng tàu bay vượt quá giới hạn cho phép trong điều kiện khai thác hiện tại d. Tất cả đều đúng Đáp án: D 
+Câu 35: Tàu bay xông ra ngoài đường CHC, các nguyên nhân không liên quan đến cảng hàng không gồm: a. Ma sát mặt đường CHC không đảm bảo Đường CHC ướt, trơn hoặc bị nhiễm bẩn (nước, cao su, dị vật...) b. Chiều dài đường CHC hạn chế / không phù hợp điều kiện khai thác c. Tàu bay tiếp cận không ổn định d. Thông tin về tình trạng đường CHC (GRF, braking action) không chính xác hoặc chậm cập nhật Đáp án: C 
+Câu 36: Định nghĩa RI là: Bất kỳ sự kiện nào tại cảng hàng không liên quan đến việc ........... không đúng quy định lên khu vực được bảo vệ của bề mặt được chỉ định cho hoạt động cất cánh và hạ cánh của tàu bay. Điều thông tin đúng a. Tàu bay, phương tiện hoặc con người xuất hiện không đúng quy định b. Chiều dài đường CHC hạn chế / không phù hợp điều kiện khai thác c. Tàu bay tiếp cận không ổn định d. Phương tiện Đáp án: A 
+Câu 37: Phương tiện hoặc tàu bay cắt ngang phía trước tàu bay đang cất cánh hoặc hạ cánh. Tình huống này thuộc sự cố nào a. RE b. RI c. RC d. MAC Đáp án: B 
+Câu 38: Phương tiện hoặc tàu bay di chuyển phía sau một tàu bay chưa rời khỏi đường CHC. Tình huống này thuộc sự cố nào a. RE b. RI c. RC d. MAC Đáp án: B 
+Câu 39: Tàu bay hoặc phương tiện vượt qua vị trí chờ trước đường CHC (Runway Holding Position). Tình huống này thuộc sự cố nào a. RE b. RI c. RC d. MAC Đáp án: B 
+Câu 40: Tàu bay cắt ngang phía trước tàu bay khác đang cất cánh hoặc hạ cánh. Tình huống này thuộc sự cố nào a. RE b. RI c. RC d. MAC Đáp án: B 
+Câu 41: Xây dựng yêu cầu chương trình đào tạo lái xe khu bay; định kỳ đánh giá giấy phép lái xe khu bay, chương trình đào tạo và kiểm tra năng lực lái xe. Thuộc giải pháp ngăn ngừa sự cố nào a. RE b. RI c. RC d. MAC Đáp án: B 
+Câu 42: Mục tiêu hàng đầu của RST là gì a. Đảm bảo rằng các hoạt động cất cánh và hạ cánh diễn ra an toàn, không để xảy ra tai nạn hoặc sự cố liên quan đến đường cất hạ cánh. b. Đảm bảo kinh doanh phù hợp c. Đảm bảo an toàn cho người d. Đảm bảo an toàn cho phương tiện khu bay Đáp án: A 
+Câu 41: Người khai thác cảng hàng không, sân bay phải xác định các cự ly công bố của đường cất hạ cánh trong Tài liệu khai thác sân bay và thực hiện quy trình thông báo cho cơ sở cung cấp dịch vụ thông báo tin tức hàng không. Thuộc giải pháp ngăn ngừa sự cố nào a. RE b. RI c. RC d. Tất cả Đáp án: D 
+Câu 42: Bạn là nhân viên điều phối khai thác khu bay. Trong điều kiện mưa lớn kéo dài, hệ thống thoát nước hoạt động kém khiến bề mặt đường CHC xuất hiện lớp nước đọng. Một tàu bay khi hạ cánh có dấu hiệu giảm tốc chậm hơn bình thường. Nhận định nào dưới đây là phù hợp nhất? a. Không có rủi ro vì tàu bay đã hạ cánh thành công b. Đây là nguy cơ tàu bay trượt khỏi đường CHC do giảm ma sát c. Đây chỉ là vấn đề khai thác thông thường d. Không liên quan đến an toàn đường CHC Đáp án: B 
+Câu 43: Bạn là lái xe follow-me. Trong điều kiện tầm nhìn hạn chế do sương mù, bạn dẫn một tàu bay di chuyển gần khu vực giao cắt giữa đường lăn và đường CHC có mật độ khai thác cao. Hành động nào là phù hợp nhất để đảm bảo an toàn? a. Tiếp tục di chuyển nhanh để tiết kiệm thời gian b. Dừng lại, xác nhận vị trí và liên lạc rõ ràng với kiểm soát không lưu trước khi tiếp tục c. Bỏ qua vì đã quen đường d. Di chuyển theo kinh nghiệm cá nhân Đáp án: B 
+Câu 44: Một tàu bay đang trong giai đoạn tiếp cận cuối để hạ cánh xuống đường CHC, trong khi đó một xe phục vụ mặt đất do không nắm rõ vị trí đã dừng chờ ngay tại khu vực giao cắt giữa đường lăn và đường CHC. Hành động nào dưới đây là phù hợp nhất để đảm bảo an toàn? a. Giữ nguyên hiện trạng vì xe chưa đi vào đường CHC b. Yêu cầu xe rời ngay khu vực nguy hiểm và thông báo kiểm soát không lưu c. Đợi tàu bay hạ cánh xong rồi xử lý d. Không cần xử lý vì xe đã dừng Đáp án: B 
+Câu 45: Trong điều kiện mưa lớn ban đêm, bạn là nhân viên điều phối và nhận thấy đèn mép đường CHC tại một đoạn bị tắt hoàn toàn. Hành động phù hợp nhất là gì? a. Tiếp tục khai thác vì các đoạn khác vẫn hoạt động b. Báo cáo ngay và xem xét hạn chế hoặc tạm dừng khai thác khu vực đó c. Chờ đến sáng xử lý d. Không cần xử lý vì phi công có thể tự quan sát Đáp án: B`;
 
-## 3. Kế toán & Khai thác (Trọng tâm TC-KH)
-### Kế toán tài sản (Điều 10)
-- Mở sổ kế toán, báo cáo tăng/giảm, hao mòn
-- **Nguyên giá:** Lấy theo giá quyết toán, hoặc thuê thẩm định giá nếu chưa có
-### Bảo trì (Điều 11)
-- Kinh phí do Ngân sách Nhà nước (NSNN) đảm bảo
-- *Sự cố khẩn cấp:* ACV ứng trước kinh phí từ nguồn thu khai thác, sau đó hoàn trả từ NSNN
-### Khai thác & Doanh thu (Điều 13-15)
-- ACV trực tiếp tổ chức cung cấp dịch vụ
-- **Nộp NSNN:** Nguồn thu sau khi trừ chi phí trực tiếp & gián tiếp
-- **Thời hạn nộp:** Hàng quý (ngày 15 tháng đầu quý sau) & Quyết toán năm (trong vòng 90 ngày)
+// --- 2. LOGIC XỬ LÝ DỮ LIỆU ---
+let allQuestions = [];
+let testQuestions = [];
+let userAnswers = {}; // { questionId: selectedIndex }
+let timerInterval = null;
+let secondsElapsed = 0;
+let isSubmitted = false;
+let testScore = 0;
 
-## 4. Xử lý tài sản
-### Các hình thức (Điều 16)
-- Thu hồi / Điều chuyển / Chuyển giao địa phương
-- Thanh lý (Phá dỡ, hủy bỏ, xử lý vật tư)
-- Xử lý tài sản mất/hủy hoại do thiên tai, sự cố
-### Tài chính khi xử lý (Điều 22)
-- Toàn bộ tiền thu (bán vật tư, bảo hiểm bồi thường...) nộp NSNN
-- Được trừ các chi phí: Kiểm kê, tháo dỡ, thẩm định giá...
+// Parse dữ liệu từ Text
+function parseData() {
+    // Tách các câu dựa vào chữ "Câu [số]:" hoặc "Câu [số]"
+    const blocks = rawData.split(/Câu\s+\d+\s*:/g).filter(b => b.trim() !== '');
+    
+    blocks.forEach((block, index) => {
+        try {
+            // Lấy đáp án đúng (A, B, C, hoặc D)
+            const ansMatch = block.match(/Đáp án:\s*([A-D])/i);
+            const rawCorrectAns = ansMatch ? ansMatch[1].toUpperCase() : 'A';
+            
+            // Xóa phần "Đáp án: X" ra khỏi block để parse text và options
+            let content = block.replace(/Đáp án:\s*[A-D]/i, '').trim();
+            
+            // Tìm vị trí các option a. b. c. d.
+            const idxA = content.indexOf('a.');
+            const idxB = content.indexOf('b.');
+            const idxC = content.indexOf('c.');
+            const idxD = content.indexOf('d.');
+            
+            const qText = content.substring(0, idxA).trim();
+            const optA = content.substring(idxA + 2, idxB !== -1 ? idxB : content.length).trim();
+            const optB = content.substring(idxB + 2, idxC !== -1 ? idxC : content.length).trim();
+            const optC = content.substring(idxC + 2, idxD !== -1 ? idxD : content.length).trim();
+            const optD = content.substring(idxD + 2).trim();
 
-## 5. Báo cáo & CSDL
-### Chế độ báo cáo (Điều 24)
-- **Báo cáo kê khai:** Trong 30 ngày kể từ khi có biến động/nhận tài sản
-- **Báo cáo định kỳ hằng năm:** Gửi Bộ Xây dựng trước ngày 28/02 năm sau
-### Cơ sở dữ liệu (Điều 25)
-- ACV có trách nhiệm nhập, duyệt dữ liệu vào CSDL về TS KCHT Hàng không
-            </script>
-        </div>
-    </div>
+            const options = [
+                { text: optA, isCorrect: rawCorrectAns === 'A' },
+                { text: optB, isCorrect: rawCorrectAns === 'B' },
+                { text: optC, isCorrect: rawCorrectAns === 'C' },
+                { text: optD, isCorrect: rawCorrectAns === 'D' }
+            ];
 
-    <div class="vca-footer">
-        Hệ thống hỗ trợ triển khai văn bản nội bộ - VCA
-    </div>
+            allQuestions.push({
+                id: index,
+                questionText: qText,
+                options: options
+            });
+        } catch (e) {
+            console.error("Lỗi parse câu hỏi:", block, e);
+        }
+    });
+}
 
-    <!-- Đã fix đường dẫn thư viện để đảm bảo hoạt động -->
-    <script src="https://cdn.jsdelivr.net/npm/markmap-autoloader@0.15.4"></script>
+// Hàm xáo trộn mảng
+function shuffleArray(array) {
+    let curId = array.length;
+    while (0 !== curId) {
+        let randId = Math.floor(Math.random() * curId);
+        curId -= 1;
+        let tmp = array[curId];
+        array[curId] = array[randId];
+        array[randId] = tmp;
+    }
+    return array;
+}
 
+// Bỏ dấu tiếng Việt
+function removeVietnameseTones(str) {
+    str = str.replace(/à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ/g, "a");
+    str = str.replace(/è|é|ẹ|ẻ|ẽ|ê|ề|ế|ệ|ể|ễ/g, "e");
+    str = str.replace(/ì|í|ị|ỉ|ĩ/g, "i");
+    str = str.replace(/ò|ó|ọ|ỏ|õ|ô|ồ|ố|ộ|ổ|ỗ|ơ|ờ|ớ|ợ|ở|ỡ/g, "o");
+    str = str.replace(/ù|ú|ụ|ủ|ũ|ư|ừ|ứ|ự|ử|ữ/g, "u");
+    str = str.replace(/ỳ|ý|ỵ|ỷ|ỹ/g, "y");
+    str = str.replace(/đ/g, "d");
+    str = str.replace(/À|Á|Ạ|Ả|Ã|Â|Ầ|Ấ|Ậ|Ẩ|Ẫ|Ă|Ằ|Ắ|Ặ|Ẳ|Ẵ/g, "A");
+    str = str.replace(/È|É|Ẹ|Ẻ|Ẽ|Ê|Ề|Ế|Ệ|Ể|Ễ/g, "E");
+    str = str.replace(/Ì|Í|Ị|Ỉ|Ĩ/g, "I");
+    str = str.replace(/Ò|Ó|Ọ|Ỏ|Õ|Ô|Ồ|Ố|Ộ|Ổ|Ỗ|Ơ|Ờ|Ớ|Ợ|Ở|Ỡ/g, "O");
+    str = str.replace(/Ù|Ú|Ụ|Ủ|Ũ|Ư|Ừ|Ứ|Ự|Ử|Ữ/g, "U");
+    str = str.replace(/Ỳ|Ý|Ỵ|Ỷ|Ỹ/g, "Y");
+    str = str.replace(/Đ/g, "D");
+    return str;
+}
+
+// --- 3. UI TAB THI THỬ ---
+
+function startTest() {
+    isSubmitted = false;
+    userAnswers = {};
+    secondsElapsed = 0;
+    
+    // UI Reset
+    document.getElementById('test-result-summary').classList.add('hidden');
+    document.getElementById('btn-share-top').classList.add('hidden');
+    document.getElementById('btn-share-bottom').classList.add('hidden');
+    
+    // Cập nhật điểm cao
+    const highScore = localStorage.getItem('quiz_hs') || 0;
+    document.getElementById('high-score').innerText = `Điểm cao: ${highScore}/40`;
+
+    // Chọn 40 câu ngẫu nhiên và xáo trộn đáp án
+    let shuffledQ = shuffleArray([...allQuestions]);
+    testQuestions = shuffledQ.slice(0, 40).map(q => {
+        return {
+            ...q,
+            options: shuffleArray([...q.options])
+        };
+    });
+
+    renderTest();
+    startTimer();
+    window.scrollTo(0, 0);
+}
+
+function renderTest() {
+    const container = document.getElementById('test-container');
+    container.innerHTML = '';
+    
+    testQuestions.forEach((q, index) => {
+        let optionsHtml = '';
+        const labels = ['A', 'B', 'C', 'D'];
+        
+        q.options.forEach((opt, optIdx) => {
+            optionsHtml += `
+                <label class="block relative mb-1.5 cursor-pointer tap-highlight-transparent">
+                    <input type="radio" name="q_${index}" value="${optIdx}" class="radio-custom sr-only" onchange="selectAnswer(${index}, ${optIdx})">
+                    <div class="border rounded p-2 text-sm bg-gray-50 hover:bg-gray-100 transition-colors flex gap-2 items-start" id="opt_ui_${index}_${optIdx}">
+                        <span class="font-bold text-gray-600 mt-0.5">${labels[optIdx]}.</span>
+                        <span class="flex-1">${opt.text}</span>
+                        <span id="icon_${index}_${optIdx}" class="text-lg w-5 h-5 flex items-center justify-center"></span>
+                    </div>
+                </label>
+            `;
+        });
+
+        container.innerHTML += `
+            <div class="bg-white rounded border border-gray-200 p-3 shadow-sm" id="q_card_${index}">
+                <div class="font-bold text-blue-700 mb-2 leading-tight">Câu ${index + 1}: <span class="text-gray-800 font-semibold">${q.questionText}</span></div>
+                <div>${optionsHtml}</div>
+            </div>
+        `;
+    });
+}
+
+function selectAnswer(qIndex, optIdx) {
+    if(isSubmitted) return;
+    userAnswers[qIndex] = optIdx;
+}
+
+function startTimer() {
+    clearInterval(timerInterval);
+    updateTimerDisplay();
+    timerInterval = setInterval(() => {
+        secondsElapsed++;
+        updateTimerDisplay();
+    }, 1000);
+}
+
+function updateTimerDisplay() {
+    const m = Math.floor(secondsElapsed / 60).toString().padStart(2, '0');
+    const s = (secondsElapsed % 60).toString().padStart(2, '0');
+    document.getElementById('timer').innerText = `${m}:${s}`;
+}
+
+function submitTest() {
+    if (isSubmitted) return;
+    
+    // Confirm nếu chưa làm hết
+    const answeredCount = Object.keys(userAnswers).length;
+    if (answeredCount < testQuestions.length) {
+        if(!confirm(`Bạn mới làm ${answeredCount}/${testQuestions.length} câu. Bạn có chắc chắn muốn nộp bài?`)) return;
+    }
+
+    clearInterval(timerInterval);
+    isSubmitted = true;
+    testScore = 0;
+
+    testQuestions.forEach((q, qIndex) => {
+        const selectedIdx = userAnswers[qIndex];
+        let correctIdx = q.options.findIndex(o => o.isCorrect);
+
+        // Disable tất cả input
+        const inputs = document.getElementsByName(`q_${qIndex}`);
+        inputs.forEach(inp => inp.disabled = true);
+
+        // Hiển thị kết quả từng câu
+        q.options.forEach((opt, optIdx) => {
+            const uiBox = document.getElementById(`opt_ui_${qIndex}_${optIdx}`);
+            const iconBox = document.getElementById(`icon_${qIndex}_${optIdx}`);
+            
+            if (optIdx === correctIdx) {
+                uiBox.classList.replace('bg-gray-50', 'bg-green-100');
+                uiBox.classList.replace('hover:bg-gray-100', 'bg-green-100');
+                uiBox.classList.add('border-green-400');
+                iconBox.innerHTML = '✔️';
+            }
+            
+            if (selectedIdx == optIdx) {
+                if (optIdx === correctIdx) {
+                    testScore++;
+                } else {
+                    uiBox.classList.replace('bg-gray-50', 'bg-red-100');
+                    uiBox.classList.replace('hover:bg-gray-100', 'bg-red-100');
+                    uiBox.classList.add('border-red-400');
+                    iconBox.innerHTML = '✖️';
+                }
+            }
+        });
+    });
+
+    // Lưu LocalStorage
+    const currentHS = parseInt(localStorage.getItem('quiz_hs') || '0');
+    if (testScore > currentHS) {
+        localStorage.setItem('quiz_hs', testScore);
+        document.getElementById('high-score').innerText = `Điểm cao: ${testScore}/40`;
+    }
+
+    // Hiện thông báo điểm
+    const summary = document.getElementById('test-result-summary');
+    const timeStr = document.getElementById('timer').innerText;
+    summary.classList.remove('hidden');
+    
+    if (testScore >= 32) {
+        summary.className = "mb-3 p-3 rounded font-bold text-center text-lg bg-green-100 text-green-800 border border-green-300";
+        summary.innerHTML = `🎉 ĐẠT! Điểm: ${testScore}/40<br><span class="text-sm font-normal">Thời gian: ${timeStr}</span>`;
+    } else {
+        summary.className = "mb-3 p-3 rounded font-bold text-center text-lg bg-red-100 text-red-800 border border-red-300";
+        summary.innerHTML = `⚠️ KHÔNG ĐẠT. Điểm: ${testScore}/40<br><span class="text-sm font-normal">Cố gắng hơn nhé! Thời gian: ${timeStr}</span>`;
+    }
+
+    // Hiện nút Share
+    document.getElementById('btn-share-top').classList.remove('hidden');
+    document.getElementById('btn-share-bottom').classList.remove('hidden');
+    
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function shareResult() {
+    const timeStr = document.getElementById('timer').innerText;
+    const textToShare = `✈️ Kết quả sát hạch An Toàn Khu Bay:\nĐiểm số: ${testScore}/40\nThời gian: ${timeStr}\nCố gắng lên nhé! 🛫`;
+    
+    const el = document.createElement('textarea');
+    el.value = textToShare;
+    document.body.appendChild(el);
+    el.select();
+    document.execCommand('copy');
+    document.body.removeChild(el);
+    
+    showToast();
+}
+
+// --- 4. UI TAB ÔN TẬP ---
+
+function renderReview(questionsToRender) {
+    const container = document.getElementById('review-container');
+    container.innerHTML = '';
+    
+    document.getElementById('search-count').innerText = `Hiển thị ${questionsToRender.length}/${allQuestions.length} câu.`;
+
+    questionsToRender.forEach((q) => {
+        let optionsHtml = '';
+        const labels = ['A', 'B', 'C', 'D'];
+        
+        q.options.forEach((opt, optIdx) => {
+            if(opt.isCorrect) {
+                optionsHtml += `
+                    <div class="border border-green-400 bg-green-50 rounded p-2 text-sm mb-1.5 flex gap-2 items-start">
+                        <span class="font-bold text-green-700 mt-0.5">${labels[optIdx]}.</span>
+                        <span class="flex-1 font-semibold text-green-900">${opt.highlightedText || opt.text}</span>
+                        <span class="text-green-600">✔️</span>
+                    </div>
+                `;
+            } else {
+                optionsHtml += `
+                    <div class="border border-gray-100 bg-gray-50 rounded p-2 text-sm text-gray-500 mb-1.5 flex gap-2 items-start">
+                        <span class="font-bold mt-0.5">${labels[optIdx]}.</span>
+                        <span class="flex-1">${opt.highlightedText || opt.text}</span>
+                    </div>
+                `;
+            }
+        });
+
+        container.innerHTML += `
+            <div class="bg-white rounded border border-gray-200 p-3 shadow-sm">
+                <div class="font-bold text-blue-700 mb-2 leading-tight">Câu ${q.originalIndex}: <span class="text-gray-800 font-semibold">${q.highlightedQuestion || q.questionText}</span></div>
+                <div>${optionsHtml}</div>
+            </div>
+        `;
+    });
+}
+
+function handleSearch() {
+    const keyword = document.getElementById('search-input').value.trim();
+    if (!keyword) {
+        // Reset highlight
+        const pureQuestions = allQuestions.map((q, i) => ({...q, originalIndex: i+1}));
+        renderReview(pureQuestions);
+        return;
+    }
+
+    const keywordNoTone = removeVietnameseTones(keyword).toLowerCase();
+    
+    const filtered = [];
+    
+    allQuestions.forEach((q, index) => {
+        const qTextNoTone = removeVietnameseTones(q.questionText).toLowerCase();
+        let matchInQ = qTextNoTone.includes(keywordNoTone);
+        let matchInOpts = false;
+        
+        // Tạo bản copy để thêm thẻ mark
+        let highlightedQ = q.questionText;
+        let highlightedOpts = q.options.map(opt => ({...opt}));
+
+        // Hàm highlight an toàn
+        const applyHighlight = (originalText, noToneText) => {
+            const startIdx = noToneText.indexOf(keywordNoTone);
+            if(startIdx !== -1) {
+                const endIdx = startIdx + keywordNoTone.length;
+                return originalText.substring(0, startIdx) + 
+                       '<mark>' + originalText.substring(startIdx, endIdx) + '</mark>' + 
+                       originalText.substring(endIdx);
+            }
+            return originalText;
+        };
+
+        if (matchInQ) {
+            highlightedQ = applyHighlight(q.questionText, qTextNoTone);
+        }
+
+        highlightedOpts.forEach(opt => {
+            const optNoTone = removeVietnameseTones(opt.text).toLowerCase();
+            if (optNoTone.includes(keywordNoTone)) {
+                matchInOpts = true;
+                opt.highlightedText = applyHighlight(opt.text, optNoTone);
+            } else {
+                opt.highlightedText = opt.text; // Giữ nguyên
+            }
+        });
+
+        if (matchInQ || matchInOpts) {
+            filtered.push({
+                ...q,
+                originalIndex: index + 1,
+                highlightedQuestion: highlightedQ,
+                options: highlightedOpts
+            });
+        }
+    });
+
+    renderReview(filtered);
+}
+
+
+// --- 5. TIỆN ÍCH ---
+
+function switchTab(tab) {
+    const testBtn = document.getElementById('tab-test');
+    const reviewBtn = document.getElementById('tab-review');
+    const testView = document.getElementById('view-test');
+    const reviewView = document.getElementById('view-review');
+
+    if (tab === 'test') {
+        testBtn.classList.add('active');
+        reviewBtn.classList.remove('active');
+        testView.classList.remove('hidden');
+        reviewView.classList.add('hidden');
+    } else {
+        testBtn.classList.remove('active');
+        reviewBtn.classList.add('active');
+        testView.classList.add('hidden');
+        reviewView.classList.remove('hidden');
+        // Render ôn tập lần đầu
+        if(document.getElementById('review-container').innerHTML.trim() === '') {
+            const pureQuestions = allQuestions.map((q, i) => ({...q, originalIndex: i+1}));
+            renderReview(pureQuestions);
+        }
+    }
+}
+
+function showToast() {
+    const toast = document.getElementById("toast");
+    toast.className = "show";
+    setTimeout(function(){ toast.className = toast.className.replace("show", ""); }, 3000);
+}
+
+// Khởi chạy App
+window.onload = () => {
+    parseData();
+    startTest(); // Mặc định vào tab Thi thử
+};
+
+</script>
 </body>
 </html>
