@@ -550,8 +550,9 @@ function switchTab(tab) {
         reviewBtn.classList.add('active');
         testView.classList.add('hidden');
         reviewView.classList.remove('hidden');
-        // Render ôn tập lần đầu
-        if(document.getElementById('review-container').innerHTML.trim() === '') {
+        
+        // Render ôn tập lần đầu (Sửa lỗi kiểm tra vùng chứa bằng children.length)
+        if(document.getElementById('review-container').children.length === 0) {
             const pureQuestions = allQuestions.map((q, i) => ({...q, originalIndex: i+1}));
             renderReview(pureQuestions);
         }
