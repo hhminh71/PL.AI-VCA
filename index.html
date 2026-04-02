@@ -1,110 +1,320 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>VCA Visualizer - Phòng TC-KH</title>
-<style>
-    /* --- CẤU HÌNH GIAO DIỆN VCA (ACV STYLE) --- */
-    body, html { margin: 0; padding: 0; height: 100%; font-family: 'Segoe UI', Arial, sans-serif; background: #f5f7fa; display: flex; flex-direction: column;}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Báo cáo Tổng hợp Hiện đại</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     
-    /* Header */
-    .vca-header {
-        background: #0056b3; /* Xanh ACV */
-        color: white;
-        padding: 12px 20px;
-        border-bottom: 4px solid #d4af37; /* Vàng Gold */
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        flex-shrink: 0;
-    }
-    .vca-top { font-size: 11px; text-transform: uppercase; opacity: 0.8; letter-spacing: 0.5px; }
-    .vca-title { font-size: 13px; font-weight: 700; text-transform: uppercase; margin-top: 2px; }
-    .vca-badge { font-size: 12px; background: rgba(255,255,255,0.2); padding: 2px 8px; border-radius: 4px; display: inline-block; margin-top: 5px;}
-
-    /* Main Container */
-    .main-area { flex-grow: 1; position: relative; overflow: hidden; }
-    
-    /* Mindmap container - Full Size */
-    .markmap { width: 100%; height: 100vh; }
-
-    /* Footer */
-    .vca-footer { 
-        background: #e9ecef; color: #555; text-align: center; 
-        padding: 5px; font-size: 11px; flex-shrink: 0; border-top: 1px solid #ddd;
-    }
-</style>
-<style>.markmap-node-text { font-family: 'Segoe UI'; font-size: 14px; fill: #333; }</style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f8fafc',
+                            100: '#f1f5f9',
+                            500: '#3b82f6',
+                            600: '#0f172a', /* Đổi màu brand chính sang xanh đen sang trọng */
+                            900: '#020617',
+                        },
+                        'special-purple': '#fcfaff',
+                        'special-purple-text': '#7e22ce',
+                    },
+                    boxShadow: {
+                        'subtle': '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+                        'card': '0 0 0 1px rgba(15, 23, 42, 0.05), 0 1px 3px 0 rgba(15, 23, 42, 0.05)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #fafafa;
+        }
+        /* Tinh chỉnh thanh cuộn siêu mỏng, tinh tế */
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #cbd5e1; }
+        
+        /* Hiệu ứng mượt mà cho bảng */
+        tbody tr { transition: background-color 0.15s ease; }
+    </style>
 </head>
-<body>
+<body class="text-slate-800 antialiased min-h-screen flex flex-col">
 
-    <div class="vca-header">
-        <div class="vca-top">Tổng công ty Cảng hàng không Việt Nam - CTCP</div>
-        <div class="vca-title">Cảng hàng không quốc tế Cần Thơ</div>
-        <div class="vca-badge">Phòng Tài chính - Kế hoạch | Triển khai văn bản</div>
-    </div>
+    <!-- Top Navigation Hạng Sang -->
+    <header class="bg-white border-b border-slate-200/80 sticky top-0 z-50">
+        <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-14">
+                <!-- Logo & Brand -->
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 bg-brand-600 rounded-lg flex items-center justify-center text-white">
+                        <i class="fas fa-plane text-sm"></i>
+                    </div>
+                    <span class="font-bold text-lg text-slate-900 tracking-tight">AirportDev</span>
+                </div>
 
-    <div class="main-area">
-        <div class="markmap">
-            <script type="text/template">
-# BÁO CÁO PHÂN TÍCH CHUYÊN SÂU
-## So sánh QĐ 1171/2026 với QĐ 1211/2025 & QĐ 3177/2025
+                <!-- Desktop Menu -->
+                <nav class="hidden md:flex h-full ml-10 flex-1">
+                    <a href="#" class="inline-flex items-center px-3 border-b-2 border-slate-900 text-sm font-semibold text-slate-900">
+                        Tổng quan Dashboard
+                    </a>
+                </nav>
 
-### 1. Sự chuyển dịch về Nền tảng Pháp lý
-- **Giai đoạn 2025 (QĐ 1211 & QĐ 3177)**
-  - Căn cứ trọng tâm: **Thông tư 31/2025/TT-BCA**.
-  - Tính chất: Tập trung quản lý hình thức, tiêu chuẩn của Thẻ, Giấy phép và Chứng nhận năng định cá nhân.
-- **Giai đoạn 2026 (QĐ 1171) - BƯỚC NGOẶT**
-  - Căn cứ trọng tâm: **Thông tư 14/2026/TT-BCA**.
-  - Tính chất: Nâng cấp quản lý lên tầm vĩ mô, tập trung vào **Chương trình ANHK và Kiểm soát chất lượng**.
-
-### 2. Biến động về Phạm vi Thủ tục (Danh mục TTHC)
-- **QĐ 1211/2025 (Khởi tạo)**
-  - Công bố **13 TTHC mới** phủ rộng: Thẻ, Giấy phép, Năng định, Chương trình an ninh, Cơ sở đào tạo.
-- **QĐ 3177/2025 (Sửa đổi lần 1)**
-  - Sửa đổi **07 TTHC** (Chỉ tập trung vào 3 Thẻ, 3 Giấy phép và 1 Năng định nhân viên).
-- **QĐ 1171/2026 (Sửa đổi lần 2 - Hiện tại)**
-  - Sửa đổi **08 TTHC**.
-  - **Giữ nguyên**: 06 thủ tục về Thẻ và Giấy phép (nhưng thay đổi biểu mẫu/công nghệ).
-  - **Lược bỏ**: Không còn sửa đổi thủ tục Năng định nhân viên trong đợt này.
-  - **Bổ sung mới vào diện sửa đổi**: 02 TTHC cốt lõi về **Phê duyệt/Chấp thuận** và **Sửa đổi/Bổ sung Chương trình ANHK**.
-
-### 3. Nâng cấp Kỹ thuật & Công nghệ (Điểm nhấn QĐ 1171)
-- **Cải tiến Biểu mẫu (Phụ lục IA - TT 14/2026)**
-  - Thay thế toàn bộ form cũ: Mẫu 1A (Công văn), Mẫu 2A/4A/5A (Danh sách trích ngang), Mẫu 3A (Tờ khai cá nhân).
-  - *Lưu ý:* Tờ khai yêu cầu chi tiết hơn về khu vực hoạt động (chia nhỏ 17 khu vực) và đánh dấu cụ thể Cảng HK đăng ký.
-- **Đột phá Công nghệ Kiểm soát (Phôi thẻ/Giấy phép mới)**
-  - **Thẻ cá nhân (Dài/Ngắn hạn)**: Mặt trước bắt buộc tích hợp **Mã BE Code chứa khuôn mặt đã mã hóa**. 
-    - *Mục đích:* So khớp nhận diện sinh trắc học tự động bằng thiết bị.
-  - **Giấy phép phương tiện**: Mặt trước tích hợp **Mã BE Code chứa thông tin kèm chữ ký số**.
-    - *Mục đích:* Chống làm giả, kiểm tra nhanh qua thiết bị quét mã.
-
-### 4. Chuẩn hóa Đề cương Chương trình ANHK (Chỉ có tại QĐ 1171)
-- **Đóng gói quy chuẩn chi tiết cho từng nhóm đối tượng:**
-  - **Nhóm 1**: Người khai thác Cảng HK, Sân bay (Gồm 5 Chương chi tiết về Hạ tầng, Biện pháp phòng ngừa, Đối phó can thiệp...).
-  - **Nhóm 2**: Hãng hàng không / Người khai thác tàu bay VN.
-  - **Nhóm 3**: Quy trình ANHK bổ sung cho Hãng HK Nước ngoài tại VN.
-  - **Nhóm 4**: Doanh nghiệp cung cấp dịch vụ Không lưu.
-  - **Nhóm 5**: Doanh nghiệp Dịch vụ Khác (Xử lý hàng hóa, Sửa chữa bảo dưỡng, Suất ăn, Xăng dầu, Phục vụ mặt đất).
-  - **Nhóm 6**: Đơn vị kiểm soát ANHK chuyên trách.
-
-### 5. KẾ HOẠCH HÀNH ĐỘNG CHO PHÒNG TC-KH (CẢNG HKQT CẦN THƠ)
-- **Công tác Kế hoạch - Dự toán (Quan trọng):**
-  - **Lệ phí TTHC**: Không thay đổi (Thẻ dài hạn 150k, Giấy phép dài hạn 100k, Ngắn hạn 20k). Tiếp tục áp dụng TT 193/2016/TT-BTC -> *Dòng tiền ngân sách TTHC ổn định*.
-  - **Dự toán thiết bị MỚI**: Cần tham mưu lập dự toán mua sắm/nâng cấp **Hệ thống máy quét (Scanner) có khả năng đọc mã BE Code sinh trắc học và chữ ký số** tại các điểm kiểm tra an ninh (Cổng/Cửa) để tương thích với phôi thẻ mới của Bộ Công an.
-- **Công tác Triển khai Hành chính:**
-  - Lập tức ban hành thông báo nội bộ: **Đình chỉ sử dụng các biểu mẫu xin cấp thẻ cũ**. Áp dụng bộ Mẫu 1A, 2A, 3A, 4A, 5A theo QĐ 1171.
-- **Công tác Phối hợp Chuyên môn:**
-  - Tham mưu Ban Giám đốc Cảng chỉ đạo Đội An ninh Hàng không rà soát lại **"Chương trình ANHK Cảng HKQT Cần Thơ"**.
-  - Bắt buộc phải viết lại/điều chỉnh theo đúng **khung đề cương mới tại mục 7.12.2** của QĐ 1171 để trình Cục Quản lý Xuất nhập cảnh (Bộ Công an) phê duyệt lại (nếu có yêu cầu chuyển tiếp).
-            </script>
+                <!-- Tools & Profile -->
+                <div class="flex items-center gap-5">
+                    <div class="relative hidden sm:block">
+                        <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                        <input type="text" placeholder="Tìm kiếm dự án..." class="pl-8 pr-3 py-1.5 border border-slate-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-slate-900 focus:border-slate-900 w-56 bg-slate-50 transition-all">
+                    </div>
+                    <div class="w-8 h-8 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center font-bold text-xs border border-slate-200 cursor-pointer hover:bg-slate-200 transition-colors">
+                        QA
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
+    </header>
 
-    <div class="vca-footer">
-        Hệ thống hỗ trợ triển khai văn bản nội bộ - VCA
-    </div>
+    <!-- Main Content -->
+    <main class="flex-1 max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+        
+        <!-- Page Header -->
+        <div class="mb-8 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+            <div>
+                <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Báo Cáo Tiến Độ Dự Án</h1>
+                <p class="text-slate-500 mt-1 text-sm">Tổng hợp tình hình thực hiện các hạng mục đầu tư và sửa chữa</p>
+            </div>
+            <div class="flex gap-2">
+                <button class="px-4 py-2 bg-white border border-slate-200 text-slate-700 text-sm font-medium rounded-lg hover:bg-slate-50 transition-colors shadow-subtle flex items-center gap-2">
+                    <i class="fas fa-cloud-download-alt text-slate-400"></i> Xuất dữ liệu
+                </button>
+            </div>
+        </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/markmap-autoloader@0.15.4"></script>
+        <!-- KPI Cards Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <div class="bg-white rounded-xl p-5 shadow-card">
+                <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Tổng hạng mục</p>
+                <div class="flex items-end justify-between">
+                    <h3 class="text-2xl font-bold text-slate-900">29</h3>
+                    <i class="fas fa-layer-group text-slate-300 text-xl"></i>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-xl p-5 shadow-card">
+                <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Tổng TMĐT (Ước tính)</p>
+                <div class="flex items-end justify-between">
+                    <h3 class="text-2xl font-bold text-slate-900">34.5<span class="text-sm font-medium text-slate-500 ml-1">Tỷ</span></h3>
+                    <i class="fas fa-wallet text-slate-300 text-xl"></i>
+                </div>
+            </div>
 
+            <div class="bg-white rounded-xl p-5 shadow-card">
+                <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Đang Quyết toán</p>
+                <div class="flex items-end justify-between">
+                    <h3 class="text-2xl font-bold text-slate-900">1</h3>
+                    <div class="px-2 py-1 bg-purple-50 text-purple-700 text-xs font-semibold rounded">Cần theo dõi</div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl p-5 shadow-card">
+                <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Chuẩn bị thực hiện</p>
+                <div class="flex items-end justify-between">
+                    <h3 class="text-2xl font-bold text-slate-900">12</h3>
+                    <i class="fas fa-spinner text-slate-300 text-xl"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Data Table Section -->
+        <div class="bg-white rounded-xl shadow-card overflow-hidden flex flex-col">
+            <!-- Table Toolbar -->
+            <div class="px-5 py-4 border-b border-slate-100 flex justify-between items-center bg-white">
+                <h2 class="text-base font-semibold text-slate-900">Bảng Kê Chi Tiết</h2>
+                <button class="text-sm text-slate-500 hover:text-slate-800 transition-colors">
+                    <i class="fas fa-filter text-xs mr-1"></i> Bộ lọc
+                </button>
+            </div>
+            
+            <!-- Table -->
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm whitespace-nowrap md:whitespace-normal">
+                    <thead class="bg-slate-50/50">
+                        <tr>
+                            <th class="px-5 py-3 w-12 text-center text-[11px] uppercase tracking-wider font-semibold text-slate-500 border-b border-slate-200">STT</th>
+                            <th class="px-5 py-3 min-w-[280px] text-[11px] uppercase tracking-wider font-semibold text-slate-500 border-b border-slate-200">Hạng mục</th>
+                            <th class="px-5 py-3 w-36 text-right text-[11px] uppercase tracking-wider font-semibold text-slate-500 border-b border-slate-200">TMĐT (VNĐ)</th>
+                            <th class="px-5 py-3 min-w-[180px] text-[11px] uppercase tracking-wider font-semibold text-slate-500 border-b border-slate-200">Tiến độ hiện tại</th>
+                            <th class="px-5 py-3 min-w-[180px] text-[11px] uppercase tracking-wider font-semibold text-slate-500 border-b border-slate-200">Thời gian dự kiến</th>
+                            <th class="px-5 py-3 min-w-[160px] text-[11px] uppercase tracking-wider font-semibold text-slate-500 border-b border-slate-200">Ghi chú</th>
+                        </tr>
+                    </thead>
+                    <tbody id="projectData" class="divide-y divide-slate-100/80">
+                        <!-- Dữ liệu render bằng JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+    </main>
+
+    <script>
+        // Đã bổ sung đầy đủ các hạng mục từ báo cáo gốc
+        const rawData = [
+            { type: 'header', text: 'I. ACV - ĐẦU TƯ' },
+            { id: 1, title: 'Hệ thống máy tính phục vụ công tác kiểm soát xuất nhập cảnh', cost: '5.800.000.000', progress: 'Chuẩn bị thực hiện Dự án', timeline: ['Trình BCMS: ngày 28/3/2026', 'Hoàn thành LCNT: ngày 30/4/2026', 'Hoàn thành DA: ngày 7/2026'], note: 'Chờ phê duyệt' },
+            { id: 2, title: 'Máy trạm xử lý khuôn mặt AI', cost: '250.000.000', progress: 'Chuẩn bị thực hiện Dự án', timeline: ['Trình BCMS: ngày 13/3/2026', 'Hoàn thành LCNT: ngày 25/3/2025', 'Hoàn thành DA: 6/2026'], note: '' },
+            { id: 3, title: 'Lắp đặt tủ Coupler chuyển đổi nguồn 2 MPD C32 Nhà ga hành khách & MPD C3512 ME Outhouse...', cost: '1.850.000.000', progress: 'Chuẩn bị thực hiện Dự án', timeline: ['Trình BCMS: ngày 25/3/2026', 'Hoàn thành LCNT: ngày 25/3/2026', 'Hoàn thành DA: 5/2026'], note: '' },
+            { id: 4, title: 'Thay thế 06 máy in thẻ lên tàu/hành lý Fujitsu F9850', cost: '260.000.000', progress: 'Chuẩn bị thực hiện Dự án', timeline: ['Trình BCMS: ngày 15/3/2026', 'Hoàn thành LCNT: ngày 25/3/2026', 'Hoàn thành DA: 6/2026'], note: '' },
+
+            { type: 'header', text: 'II. ACV - SỬA CHỮA TÀI SẢN' },
+            { id: 1, title: 'Thay trần nhôm khu vực kiểm tra soi chiếu hành lý ký gửi QN & QT ga đi tại tầng lầu', cost: '250.000.000', progress: 'Lập Báo cáo bảo trì', timeline: ['Trình BCBT: ngày ......', 'Hoàn thành LCNT: ngày ......', 'Hoàn thành DA: ngày ......'], note: '' },
+            { id: 2, title: 'Sửa chữa ron mái kính skylight Nhà ga hành khách', cost: '1.890.000.000', progress: 'Chuẩn bị thực hiện', timeline: ['Trình BCBT: ngày 15/3/2026', 'Hoàn thành LCNT: 4/2026', 'Hoàn thành DA: 5/2026'], note: 'Triển khai sau mùa mưa' },
+            { id: 3, title: 'Sửa chữa đường công vụ cổng 1 (CHUYỂN TIẾP)', cost: '3.410.000.000', progress: 'Đang Quyết toán', timeline: 'Hoàn thành', special: 'purple', note: 'Dự án chuyển tiếp' },
+            { id: 4, title: 'Sửa chữa góc cua đường khẩn nguy chữa cháy phía Tây Sân đỗ tàu bay', cost: '160.000.000', progress: 'Chuẩn bị thực hiện', timeline: ['Trình BCBT: ngày ......', 'Hoàn thành LCNT: ngày ......', 'Hoàn thành DA: ngày ......'], note: '' },
+            { id: 5, title: 'Sửa chữa các nhà trực chốt gác tại cổng 1 và cổng 2', cost: '150.000.000', progress: 'Tờ trình triển khai 06/03', timeline: ['Trình BCBT: ngày ......', 'Hoàn thành LCNT: ngày ......', 'Hoàn thành DA: ngày ......'], note: '' },
+            { id: 6, title: 'Sửa chữa khu vực trạm nguồn', cost: '570.000.000', progress: 'Đã tiến hành Khảo sát', timeline: ['Trình BCMS: ngày 24/3/2026', 'Hoàn thành LCNT: 4/2026', 'Hoàn thành DA: 7/2026'], note: 'Ưu tiên xử lý sớm' },
+            { id: 7, title: 'Sửa chữa cảnh quan 02 hồ nước cảnh phía trước nhà ga hành khách', cost: '1.950.000.000', progress: 'Chuẩn bị thực hiện', timeline: ['Trình BCBT: ngày ......', 'Hoàn thành LCNT: ngày ......', 'Hoàn thành DA: ngày ......'], note: '' },
+            { id: 8, title: 'Sửa chữa màng xối mái che lối đi nhà xe máy nội bộ, nhà xe máy hành khách', cost: '470.000.000', progress: 'Tờ trình triển khai 03/03', timeline: ['Trình BCBT: ngày ......', 'Hoàn thành LCNT: ngày ......', 'Hoàn thành DA: ngày ......'], note: '' },
+            { id: 9, title: 'Sửa chữa thay thế PLC điều khiển và Safety Shoe cho nhánh cầu dẫn khách VCA 102.02', cost: '300.000.000', progress: 'Đã trình tờ trình 27/1', timeline: ['Trình BCMS: 3/2026', 'Hoàn thành LCNT: 3/2026', 'Hoàn thành DA: 5/2026'], note: 'Dự kiến tháng 5/2026 giao hàng' },
+            { id: 10, title: 'Sửa chữa thay thế các con lăn, gối đỡ của 02 nhánh VCA 102.04, VCA 102.02', cost: '2.000.000.000', progress: 'Trình tờ trình 3/3/2026', timeline: ['Trình BCMS: ngày 10/3/2026', 'Hoàn thành LCNT: 4/2026', 'Hoàn thành DA: ngày 5/2026'], note: '' },
+            { id: 11, title: 'Sửa chữa thay thế các van cấp nước, các bồn cầu cho ga quốc nội', cost: '680.000.000', progress: 'Chuẩn bị thực hiện', timeline: ['Trình BCMS: 3/2026', 'Hoàn thành LCNT: 3/2026', 'Hoàn thành DA: 5/2026'], note: '' },
+            { id: 12, title: 'Rèm chỉ cho máy soi kho hàng HS 145180-2is', cost: '430.000.000', progress: 'Đã trình tờ trình 23/2', timeline: 'Gửi HS về lại Phòng Kỹ thuật', note: 'Dự kiến giao hàng 22 tuần' },
+            { id: 13, title: 'Sửa chữa thay thế ắc quy cho 03 UPS Riello', cost: '120.000.000', progress: 'Đang trình ký hợp đồng', timeline: 'Dự kiến trong tháng 03 hoàn thành', note: '' },
+            { id: 14, title: 'Sửa chữa hệ thống chống sét cho 07 trụ đèn Apron-Sân đỗ tàu bay (CHUYỂN TIẾP)', cost: '1.200.000.000', progress: 'Đã mời 2 đơn vị khảo sát', timeline: ['Trình BCMS: ngày 26/3/2026', 'Hoàn thành LCNT: 4/2026', 'Hoàn thành DA: 5/2026'], note: '' },
+            { id: 15, title: 'Thay thế hệ thống đường ống công nghệ và các phụ kiện', cost: '490.000.000', progress: 'Chuẩn bị thực hiện', timeline: ['Trình BCMS: ngày ......', 'Hoàn thành LCNT: ngày ......', 'Hoàn thành DA: ngày ......'], note: '' },
+            { id: 16, title: 'Thay thế 01 xylanh chấn chống xe kéo đẩy hàng TLD model TMX 450-41', cost: '1.030.000.000', progress: 'Trình chủ trương 2/3/2026', timeline: ['Trình BCMS: ngày 20/3/2026', 'Hoàn thành LCNT: 3/2026', 'Hoàn thành DA: 6/2026'], note: '' },
+            { id: 17, title: 'Sửa chữa xe kéo đẩy tàu bay không dùng cần TLD/TPX200S biển số VCA-11803', cost: '460.000.000', progress: 'Trình chủ trương 4/3/2026', timeline: ['Trình BCMS: ngày 20/3/2026', 'Hoàn thành LCNT: 3/2026', 'Hoàn thành DA: 6/2026'], note: '' },
+            { id: 18, title: 'Sửa chữa xe cấp điện MAX GPU 140KVA biển số VCA -11402', cost: '1.000.000.000', progress: 'Trình chủ trương 4/3/2026', timeline: ['Trình BCMS: ngày 20/3/2026', 'Hoàn thành LCNT: 3/2026', 'Hoàn thành DA: 6/2026'], note: '' },
+            { id: 19, title: 'Thay thế cao su giảm chấn 2 xe cứu hỏa VCA 12103, VCA 12104', cost: '210.000.000', progress: 'Trình chủ trương 1/3/2026', timeline: ['Trình BCMS: ngày 20/3/2026', 'Hoàn thành LCNT: 3/2026', 'Hoàn thành DA: 6/2026'], note: '' },
+
+            { type: 'header', text: 'III. KHU BAY - SỬA CHỮA ĐỊNH KỲ' },
+            { type: 'header', text: 'Công trình trong năm' },
+            { id: 1, title: 'Sửa chữa vùng RESA 06', cost: '3.226.000.000', progress: 'Xin điều chỉnh TMĐT', timeline: '-', note: 'Vướng mắc vật tư' },
+            { id: 2, title: 'Sửa chữa vùng RESA 24', cost: '1.490.000.000', progress: 'Xin điều chỉnh TMĐT', timeline: '-', note: '' },
+            
+            { type: 'header', text: 'Chuẩn bị đầu tư' },
+            { id: 1, title: 'Sửa chữa đường công vụ khẩn nguy - Cảng HKQT Cần Thơ', cost: '8.756.000.000', progress: 'Chuẩn bị trình tờ trình triển khai', timeline: ['20/03/2026 hoàn tất lựa chọn nhà thầu', '30/03/2026 tổng hợp kết quả trình CĐT'], note: 'Gói 1, Gói 2, Gói 3' },
+            { id: 2, title: 'Sửa chữa, san lấp đoạn rạch chùa (phía sau đài GP) - Cảng HKQT Cần Thơ', cost: '4.684.000.000', progress: 'Chuẩn bị trình tờ trình triển khai', timeline: ['20/03/2026 hoàn tất lựa chọn nhà thầu', '30/03/2026 tổng hợp kết quả trình CĐT'], note: '' },
+            { id: 3, title: 'Sửa chữa đường vành đai, tuần tra hàng rào an ninh khu bay - Cảng HKQT...', cost: '12.276.000.000', progress: 'Chuẩn bị trình tờ trình triển khai', timeline: ['20/03/2026 hoàn tất lựa chọn nhà thầu', '30/03/2026 tổng hợp kết quả trình CĐT'], note: '' },
+            { id: 4, title: 'Sửa chữa đèn chùm lề đường cất hạ cánh thuộc hệ thống đèn đêm đường...', cost: '625.000.000', progress: 'Đã có 01 báo giá, đang lập BCMS', timeline: '16/03/2026 trình duyệt BCKTKT', note: '' },
+            { id: 5, title: 'Sửa chữa hệ thống biển báo thuộc hệ thống đèn đêm đường cất hạ cánh', cost: '2.716.000.000', progress: 'Đã có báo giá trong nước, đang lập BCKTKT', timeline: '16/03/2026 trình duyệt BCKTKT', note: '' }
+        ];
+
+        // Thiết kế phẳng (Flat design) cho badges
+        function getProgressBadge(progressStr) {
+            let bgColor, textColor;
+            let strLower = progressStr.toLowerCase();
+
+            if (strLower.includes('chuẩn bị') || strLower.includes('đã khảo sát')) {
+                bgColor = 'bg-blue-50'; textColor = 'text-blue-600';
+            } else if (strLower.includes('đang quyết toán') || strLower.includes('tờ trình')) {
+                bgColor = 'bg-purple-50'; textColor = 'text-purple-600';
+            } else if (strLower.includes('lập báo cáo')) {
+                bgColor = 'bg-amber-50'; textColor = 'text-amber-600';
+            } else if (strLower.includes('điều chỉnh')) {
+                bgColor = 'bg-slate-100'; textColor = 'text-slate-600';
+            } else {
+                bgColor = 'bg-slate-50'; textColor = 'text-slate-600';
+            }
+
+            return `<span class="inline-flex items-center px-2 py-0.5 rounded text-[13px] font-medium ${bgColor} ${textColor}">${progressStr}</span>`;
+        }
+
+        function getTimelineBadge(timelineData, isSpecial) {
+            if(!timelineData || timelineData === '-') return '<span class="text-slate-300">-</span>';
+            
+            // Xử lý nếu dữ liệu là một chuỗi đơn (ví dụ: "Hoàn thành")
+            if (typeof timelineData === 'string') {
+                if (timelineData.toLowerCase() === 'hoàn thành') {
+                     return `<span class="inline-flex items-center text-[13px] font-semibold text-emerald-600"><i class="fas fa-check-circle mr-1.5"></i>${timelineData}</span>`;
+                }
+                let colorClass = isSpecial ? 'text-special-purple-text' : 'text-slate-600';
+                return `<span class="text-[13px] ${colorClass}">${timelineData}</span>`;
+            }
+
+            // Xử lý nếu dữ liệu là một mảng (nhiều dòng)
+            if (Array.isArray(timelineData)) {
+                let colorClass = isSpecial ? 'text-special-purple-text' : 'text-blue-700 font-medium'; // Thêm màu xanh giống trong hình
+                let listItems = timelineData.map(item => 
+                    `<div class="text-[12px] ${colorClass} whitespace-nowrap flex gap-1 items-start">
+                        <span class="opacity-70 mt-0.5">-</span> 
+                        <span>${item}</span>
+                    </div>`
+                ).join('');
+                return `<div class="flex flex-col gap-1">${listItems}</div>`;
+            }
+        }
+
+        function renderTable() {
+            const tableBody = document.getElementById('projectData');
+            if (!tableBody) return; // Bảo vệ an toàn nếu chưa tải xong DOM
+
+            let tableHTML = '';
+
+            rawData.forEach(row => {
+                if (row.type === 'header') {
+                    // Cập nhật colspan="6" do đã thêm cột Ghi chú
+                    tableHTML += `
+                        <tr class="bg-slate-50">
+                            <td colspan="6" class="px-5 py-3 font-bold text-slate-800 text-[13px] border-y border-slate-200 shadow-[inset_3px_0_0_0_#0f172a]">
+                                ${row.text}
+                            </td>
+                        </tr>
+                    `;
+                } else {
+                    let isSpecial = row.special === 'purple';
+                    
+                    let rowClass = isSpecial 
+                        ? 'bg-special-purple hover:bg-purple-50/50' 
+                        : 'bg-white hover:bg-slate-50';
+                        
+                    let textClass = isSpecial ? 'text-special-purple-text' : 'text-slate-500';
+                    let titleClass = isSpecial ? 'font-semibold text-special-purple-text' : 'font-medium text-slate-800';
+                    
+                    // Xử lý hiển thị ghi chú (nếu rỗng thì in dấu - mờ)
+                    let noteDisplay = row.note ? `<span class="text-[13px] text-slate-500">${row.note}</span>` : `<span class="text-slate-300">-</span>`;
+
+                    tableHTML += `
+                        <tr class="${rowClass} group">
+                            <td class="px-5 py-3.5 text-center text-slate-400 text-[13px] font-medium">${row.id}</td>
+                            <td class="px-5 py-3.5 ${titleClass} whitespace-normal leading-snug">
+                                ${row.title}
+                            </td>
+                            <td class="px-5 py-3.5 text-right font-medium text-[13px] ${isSpecial ? 'text-special-purple-text' : 'text-slate-700'}">
+                                ${row.cost === '-' ? '-' : row.cost}
+                            </td>
+                            <td class="px-5 py-3.5 whitespace-normal">
+                                ${isSpecial ? `<span class="font-semibold text-[13px] text-special-purple-text">${row.progress}</span>` : getProgressBadge(row.progress)}
+                            </td>
+                            <td class="px-5 py-3.5">
+                                ${getTimelineBadge(row.timeline, isSpecial)}
+                            </td>
+                            <td class="px-5 py-3.5 whitespace-normal">
+                                ${noteDisplay}
+                            </td>
+                        </tr>
+                    `;
+                }
+            });
+
+            tableBody.innerHTML = tableHTML;
+        }
+
+        document.addEventListener('DOMContentLoaded', renderTable);
+    </script>
 </body>
 </html>
