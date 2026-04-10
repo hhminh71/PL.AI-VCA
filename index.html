@@ -1,110 +1,823 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>VCA Visualizer - Phòng TC-KH</title>
-<style>
-    /* --- CẤU HÌNH GIAO DIỆN VCA (ACV STYLE) --- */
-    body, html { margin: 0; padding: 0; height: 100%; font-family: 'Segoe UI', Arial, sans-serif; background: #f5f7fa; display: flex; flex-direction: column;}
-    
-    /* Header */
-    .vca-header {
-        background: #0056b3; /* Xanh ACV */
-        color: white;
-        padding: 12px 20px;
-        border-bottom: 4px solid #d4af37; /* Vàng Gold */
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        flex-shrink: 0;
-    }
-    .vca-top { font-size: 11px; text-transform: uppercase; opacity: 0.8; letter-spacing: 0.5px; }
-    .vca-title { font-size: 13px; font-weight: 700; text-transform: uppercase; margin-top: 2px; }
-    .vca-badge { font-size: 12px; background: rgba(255,255,255,0.2); padding: 2px 8px; border-radius: 4px; display: inline-block; margin-top: 5px;}
-
-    /* Main Container */
-    .main-area { flex-grow: 1; position: relative; overflow: hidden; }
-    
-    /* Mindmap container - Full Size */
-    .markmap { width: 100%; height: 100vh; }
-
-    /* Footer */
-    .vca-footer { 
-        background: #e9ecef; color: #555; text-align: center; 
-        padding: 5px; font-size: 11px; flex-shrink: 0; border-top: 1px solid #ddd;
-    }
-</style>
-<style>.markmap-node-text { font-family: 'Segoe UI'; font-size: 14px; fill: #333; }</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản Lý An Toàn Thi Công Tới Sân Bay</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Tối ưu typography cho diện tích nhỏ */
+        body { font-family: system-ui, -apple-system, sans-serif; background-color: #f3f4f6; }
+        .leading-custom { line-height: 1.25 !important; }
+        .tab-btn.active { color: #1d4ed8; border-bottom-color: #1d4ed8; background-color: #eff6ff; }
+        .tab-btn { color: #6b7280; border-bottom-color: transparent; transition: all 0.2s; }
+        
+        /* Hiệu ứng chọn đáp án (Radio) */
+        .option-selected { background-color: #e0f2fe; border-color: #3b82f6; }
+        .option-selected .radio-circle { background-color: #3b82f6; border-color: #3b82f6; box-shadow: inset 0 0 0 3px #e0f2fe; }
+        
+        /* Toast notification */
+        #toast {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8); color: white; padding: 8px 16px;
+            border-radius: 20px; font-size: 14px; z-index: 1000;
+            opacity: 0; pointer-events: none; transition: opacity 0.3s;
+        }
+        #toast.show { opacity: 1; }
+        
+        /* Ẩn thanh cuộn nhưng vẫn cuộn được cho gọn màn hình */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    </style>
 </head>
-<body>
+<body class="text-gray-800 text-sm md:text-base">
 
-    <div class="vca-header">
-        <div class="vca-top">Tổng công ty Cảng hàng không Việt Nam - CTCP</div>
-        <div class="vca-title">Cảng hàng không quốc tế Cần Thơ</div>
-        <div class="vca-badge">Phòng Tài chính - Kế hoạch | Triển khai văn bản</div>
-    </div>
+<div class="max-w-3xl mx-auto bg-white min-h-screen shadow-xl relative pb-20">
+    
+    <!-- HEADER STICKY -->
+    <div class="sticky top-0 z-50 bg-white shadow-sm">
+        <header class="bg-blue-800 text-white p-2 text-center shadow-md">
+            <div class="text-xs italic text-blue-200 mb-0.5">Huấn luyện Đào tạo Cảng HKQT Cần Thơ</div>
+            <h1 class="font-bold text-base md:text-lg uppercase leading-tight">Quản Lý An Toàn Thi Công<br><span class="text-xs md:text-sm normal-case font-normal">(Mức độ nâng cao)</span></h1>
+        </header>
 
-    <div class="main-area">
-        <div class="markmap">
-            <script type="text/template">
-# BÁO CÁO PHÂN TÍCH CHUYÊN SÂU
-## So sánh QĐ 1171/2026 với QĐ 1211/2025 & QĐ 3177/2025
-
-### 1. Sự chuyển dịch về Nền tảng Pháp lý
-- **Giai đoạn 2025 (QĐ 1211 & QĐ 3177)**
-  - Căn cứ trọng tâm: **Thông tư 31/2025/TT-BCA**.
-  - Tính chất: Tập trung quản lý hình thức, tiêu chuẩn của Thẻ, Giấy phép và Chứng nhận năng định cá nhân.
-- **Giai đoạn 2026 (QĐ 1171) - BƯỚC NGOẶT**
-  - Căn cứ trọng tâm: **Thông tư 14/2026/TT-BCA**.
-  - Tính chất: Nâng cấp quản lý lên tầm vĩ mô, tập trung vào **Chương trình ANHK và Kiểm soát chất lượng**.
-
-### 2. Biến động về Phạm vi Thủ tục (Danh mục TTHC)
-- **QĐ 1211/2025 (Khởi tạo)**
-  - Công bố **13 TTHC mới** phủ rộng: Thẻ, Giấy phép, Năng định, Chương trình an ninh, Cơ sở đào tạo.
-- **QĐ 3177/2025 (Sửa đổi lần 1)**
-  - Sửa đổi **07 TTHC** (Chỉ tập trung vào 3 Thẻ, 3 Giấy phép và 1 Năng định nhân viên).
-- **QĐ 1171/2026 (Sửa đổi lần 2 - Hiện tại)**
-  - Sửa đổi **08 TTHC**.
-  - **Giữ nguyên**: 06 thủ tục về Thẻ và Giấy phép (nhưng thay đổi biểu mẫu/công nghệ).
-  - **Lược bỏ**: Không còn sửa đổi thủ tục Năng định nhân viên trong đợt này.
-  - **Bổ sung mới vào diện sửa đổi**: 02 TTHC cốt lõi về **Phê duyệt/Chấp thuận** và **Sửa đổi/Bổ sung Chương trình ANHK**.
-
-### 3. Nâng cấp Kỹ thuật & Công nghệ (Điểm nhấn QĐ 1171)
-- **Cải tiến Biểu mẫu (Phụ lục IA - TT 14/2026)**
-  - Thay thế toàn bộ form cũ: Mẫu 1A (Công văn), Mẫu 2A/4A/5A (Danh sách trích ngang), Mẫu 3A (Tờ khai cá nhân).
-  - *Lưu ý:* Tờ khai yêu cầu chi tiết hơn về khu vực hoạt động (chia nhỏ 17 khu vực) và đánh dấu cụ thể Cảng HK đăng ký.
-- **Đột phá Công nghệ Kiểm soát (Phôi thẻ/Giấy phép mới)**
-  - **Thẻ cá nhân (Dài/Ngắn hạn)**: Mặt trước bắt buộc tích hợp **Mã BE Code chứa khuôn mặt đã mã hóa**. 
-    - *Mục đích:* So khớp nhận diện sinh trắc học tự động bằng thiết bị.
-  - **Giấy phép phương tiện**: Mặt trước tích hợp **Mã BE Code chứa thông tin kèm chữ ký số**.
-    - *Mục đích:* Chống làm giả, kiểm tra nhanh qua thiết bị quét mã.
-
-### 4. Chuẩn hóa Đề cương Chương trình ANHK (Chỉ có tại QĐ 1171)
-- **Đóng gói quy chuẩn chi tiết cho từng nhóm đối tượng:**
-  - **Nhóm 1**: Người khai thác Cảng HK, Sân bay (Gồm 5 Chương chi tiết về Hạ tầng, Biện pháp phòng ngừa, Đối phó can thiệp...).
-  - **Nhóm 2**: Hãng hàng không / Người khai thác tàu bay VN.
-  - **Nhóm 3**: Quy trình ANHK bổ sung cho Hãng HK Nước ngoài tại VN.
-  - **Nhóm 4**: Doanh nghiệp cung cấp dịch vụ Không lưu.
-  - **Nhóm 5**: Doanh nghiệp Dịch vụ Khác (Xử lý hàng hóa, Sửa chữa bảo dưỡng, Suất ăn, Xăng dầu, Phục vụ mặt đất).
-  - **Nhóm 6**: Đơn vị kiểm soát ANHK chuyên trách.
-
-### 5. KẾ HOẠCH HÀNH ĐỘNG CHO PHÒNG TC-KH (CẢNG HKQT CẦN THƠ)
-- **Công tác Kế hoạch - Dự toán (Quan trọng):**
-  - **Lệ phí TTHC**: Không thay đổi (Thẻ dài hạn 150k, Giấy phép dài hạn 100k, Ngắn hạn 20k). Tiếp tục áp dụng TT 193/2016/TT-BTC -> *Dòng tiền ngân sách TTHC ổn định*.
-  - **Dự toán thiết bị MỚI**: Cần tham mưu lập dự toán mua sắm/nâng cấp **Hệ thống máy quét (Scanner) có khả năng đọc mã BE Code sinh trắc học và chữ ký số** tại các điểm kiểm tra an ninh (Cổng/Cửa) để tương thích với phôi thẻ mới của Bộ Công an.
-- **Công tác Triển khai Hành chính:**
-  - Lập tức ban hành thông báo nội bộ: **Đình chỉ sử dụng các biểu mẫu xin cấp thẻ cũ**. Áp dụng bộ Mẫu 1A, 2A, 3A, 4A, 5A theo QĐ 1171.
-- **Công tác Phối hợp Chuyên môn:**
-  - Tham mưu Ban Giám đốc Cảng chỉ đạo Đội An ninh Hàng không rà soát lại **"Chương trình ANHK Cảng HKQT Cần Thơ"**.
-  - Bắt buộc phải viết lại/điều chỉnh theo đúng **khung đề cương mới tại mục 7.12.2** của QĐ 1171 để trình Cục Quản lý Xuất nhập cảnh (Bộ Công an) phê duyệt lại (nếu có yêu cầu chuyển tiếp).
-            </script>
+        <!-- TABS -->
+        <div class="flex border-b text-sm font-bold">
+            <button id="btn-tab-quiz" class="flex-1 py-2.5 tab-btn active" onclick="switchTab('quiz')">Thi Thử (40)</button>
+            <button id="btn-tab-review" class="flex-1 py-2.5 tab-btn" onclick="switchTab('review')">Ôn Tập (Full)</button>
         </div>
     </div>
 
-    <div class="vca-footer">
-        Hệ thống hỗ trợ triển khai văn bản nội bộ - VCA
-    </div>
+    <main class="p-2">
+        <!-- TAB 1: THI THỬ -->
+        <div id="tab-quiz" class="block">
+            <!-- Top Controls -->
+            <div class="flex justify-between items-center bg-gray-100 p-2 rounded mb-2 shadow-inner border border-gray-200 sticky top-[102px] z-40 text-xs md:text-sm">
+                <div class="flex flex-col">
+                    <span class="font-bold text-blue-700 text-lg flex items-center gap-1">
+                        ⏱️ <span id="timer-display">00:00</span>
+                    </span>
+                    <span class="text-gray-500 font-medium" id="highscore-display">Điểm cao: 0/40</span>
+                </div>
+                <div class="flex gap-2">
+                    <button id="btn-submit-top" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded font-bold transition shadow" onclick="submitQuiz()">Nộp Bài</button>
+                    <button id="btn-retry-top" class="bg-gray-500 hover:bg-gray-600 text-white px-3 py-1.5 rounded font-bold transition shadow" onclick="startQuiz()">Làm Lại</button>
+                    <button id="btn-share-top" class="hidden bg-green-500 hover:bg-green-600 text-white px-3 py-1.5 rounded font-bold transition shadow" onclick="shareResult()">Chia Sẻ</button>
+                </div>
+            </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/markmap-autoloader@0.15.4"></script>
+            <!-- Vùng hiển thị điểm số (ẩn khi đang làm) -->
+            <div id="result-board" class="hidden mb-3 p-3 bg-blue-50 border border-blue-200 rounded text-center">
+                <div class="text-lg font-bold text-blue-800">KẾT QUẢ SÁT HẠCH</div>
+                <div class="text-3xl font-black text-blue-600 my-1" id="score-display">0 / 40</div>
+                <div class="text-sm text-gray-600" id="time-taken-display">Thời gian: 00:00</div>
+            </div>
 
+            <!-- Danh sách câu hỏi thi thử -->
+            <div id="quiz-container"></div>
+
+            <!-- Bottom Controls (Sticky bottom) -->
+            <div class="fixed bottom-0 left-0 right-0 max-w-3xl mx-auto bg-white p-2 border-t flex justify-end gap-2 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] z-40">
+                 <button id="btn-submit-bottom" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded font-bold transition w-full shadow" onclick="submitQuiz()">Nộp Bài</button>
+                 <button id="btn-retry-bottom" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded font-bold transition shadow hidden w-full" onclick="startQuiz()">Làm Lại Bài Khác</button>
+            </div>
+        </div>
+
+        <!-- TAB 2: ÔN TẬP -->
+        <div id="tab-review" class="hidden">
+            <!-- Search Bar -->
+            <div class="sticky top-[102px] z-40 bg-white pb-2 pt-1">
+                <div class="relative">
+                    <input type="text" id="search-input" placeholder="Nhập từ khóa tìm kiếm (không dấu, hoa thường đều được)..." class="w-full border-2 border-blue-300 focus:border-blue-500 rounded p-2 pl-8 outline-none text-sm shadow-inner transition">
+                    <span class="absolute left-2.5 top-2.5 text-gray-400">🔍</span>
+                </div>
+            </div>
+            
+            <div class="text-xs text-gray-500 mb-2 italic">Hiển thị toàn bộ dữ liệu. Đáp án đúng được tô xanh.</div>
+            
+            <!-- Danh sách câu hỏi ôn tập -->
+            <div id="review-container"></div>
+        </div>
+    </main>
+</div>
+
+<!-- Toast -->
+<div id="toast">Đã copy kết quả!</div>
+
+<script>
+/* =========================================
+   1. DỮ LIỆU RAW TEXT (Dán nguyên bản)
+========================================= */
+const rawDataString = `
+QLTC-BĐ-NC: BAN ĐẦU QUẢN LÝ AN TOÀN THI CÔNG TẠI SÂN BAY, MỨC ĐỘ NÂNG CAO(50)
+Câu 1: Theo giáo trình, mục tiêu cao nhất của công tác đảm bảo an toàn thi công tại cảng hàng không là gì?
+a. Hoàn thành công trình đúng tiến độ đề ra.
+b. Tiết kiệm chi phí đầu tư cho chủ đầu tư.
+c. Đảm bảo tuyệt đối an toàn cho hoạt động bay.
+d. Đảm bảo mỹ quan cho cảng hàng không.
+Đáp án: c. Đảm bảo tuyệt đối an toàn cho hoạt động bay.
+Câu 2: Hoạt động thi công bảo trì thường xuyên thường có đặc điểm nào sau đây?
+a. Chủ yếu thực hiện vào ban đêm, thời gian thực hiện ngắn.
+b. Quy mô lớn, kéo dài nhiều năm.
+c. Không tiềm ẩn rủi ro về vật ngoại lai (FOD).
+d. Luôn yêu cầu đóng toàn bộ khu bay.
+Đáp án: a. Chủ yếu thực hiện vào ban đêm, thời gian thực hiện ngắn.
+Câu 3: Theo Thông tư 29/2021/TT-BGTVT, hoạt động sửa chữa nào sau đây người khai thác cảng tự tổ chức thực hiện mà không cần phê duyệt phương án an toàn từ cơ quan thẩm quyền (nếu không ảnh hưởng khu bay)?
+a. Cải tạo đường cất hạ cánh.
+b. Sửa chữa hệ thống đèn hiệu đường lăn.
+c. Sửa chữa thường xuyên nhà cửa, phòng làm việc văn phòng.
+d. Xây dựng thêm đường lăn mới.
+Đáp án: c. Sửa chữa thường xuyên nhà cửa, phòng làm việc văn phòng.
+Câu 4: Thuật ngữ "Runway Incursion" trong an toàn thi công được hiểu là gì?
+a. Sự xâm nhập trái phép vào khu vực đường CHC
+b. Tàu bay hạ cánh nhầm xuống đường lăn.
+c. Việc máy bay chạy quá đà ra khỏi đường băng.
+d. Công trình thi công làm hỏng mặt đường băng.
+Đáp án: a. Sự xâm nhập trái phép vào khu vực đường CHC
+Câu 5: Nhóm hoạt động thi công nào có mức độ rủi ro cao nhất?
+a. Thi công ngoài khu bay (nhà ga, bãi xe).
+b. Thi công trong khu bay không kiểm soát (sân đỗ).
+c. Thi công trong khu bay có kiểm soát (đường CHC, đường lăn).
+d. Thi công tại khu vực vành đai sân bay.
+Đáp án: c. Thi công trong khu bay có kiểm soát (đường CHC, đường lăn).
+Câu 6: Nội dung nào sau đây PHẢI được thực hiện trước khi khởi công công trình để đảm bảo an toàn?
+a. Chỉ cần ký hợp đồng với nhà thầu và mua sắm toàn bộ vật tư thiết bị.
+b. Đánh giá rủi ro an toàn và lập phương án bảo đảm an toàn thi công.
+c. Lập phương án bảo đảm an toàn thi công.
+d. Hoàn thành việc xây dựng lán trại cho công nhân.
+Đáp án: b. Đánh giá rủi ro an toàn và lập phương án bảo đảm an toàn thi công.
+Câu 7: Sự khác biệt chính giữa "Đường CHC đóng một phần" và "Ngưỡng dịch chuyển tạm thời" (Displaced Threshold) là gì?
+a. Không có sự khác biệt nào.
+b. Đường CHC đóng cho phép tàu bay sử dụng phần mặt đường phía trước để cất cánh hướng đó, còn ngưỡng dịch chuyển thì không.
+c. Đường CHC đóng cho phép tàu bay hạ cánh, ngưỡng dịch chuyển thì không.
+d. Ngưỡng dịch chuyển cho phép tàu bay sử dụng phần mặt đường phía trước để cất cánh hướng đó, còn đường CHC đóng thì không.
+Đáp án: d. Ngưỡng dịch chuyển cho phép tàu bay sử dụng phần mặt đường phía trước để cất cánh hướng đó, còn đường CHC đóng thì không.
+Câu 8: Trách nhiệm chính của Đơn vị giám sát thi công trong khu hoạt động bay đang khai thác là gì?
+a. Theo dõi tiến độ thi công và làm thay công việc của công nhân khi thiếu người
+b. Chỉ kiểm tra chất lượng vật liệu và nghiệm thu các hạng mục công việc
+c. Giám sát việc tuân thủ phương án an ninh, an toàn đã được phê duyệt
+d. Phối hợp điều hành trực tiếp hoạt động bay khi phát sinh xung đột với thi công
+Đáp án: c. Giám sát việc tuân thủ phương án an ninh, an toàn đã được phê duyệt
+Câu 9: Khi làm việc gần tàu bay đang nổ máy, người lao động phải đặc biệt chú ý đến mối nguy nào?
+a. Bụi từ công trường.
+b. Ánh sáng từ đèn pha tàu bay.
+c. Mùi nhiên liệu hàng không.
+d. Luồng khí phản lực (Jet blast).
+Đáp án: d. Luồng khí phản lực (Jet blast).
+Câu 10: Tần suất kiểm tra giám sát an toàn tại hiện trường thi công quy định tối thiểu là bao nhiêu?
+a. 1 lần mỗi tuần.
+b. 2 lần mỗi tuần.
+c. 1 lần mỗi ngày.
+d. 2 lần mỗi ngày.
+Đáp án: c. 1 lần mỗi ngày.
+Câu 11: Biện pháp nào sau đây giúp ngăn ngừa hiệu quả vật ngoại lai (FOD) từ công trường thi công?
+a. Tăng cường giám sát bằng camera để phát hiện FOD phát sinh bất thường
+b. Thiết lập hàng rào ngăn cách, che chắn vật liệu và vệ sinh hiện trường sau mỗi ca làm việc.
+c. Giới hạn phạm vi thi công, kết hợp kiểm tra FOD trước khi bàn giao mặt bằng cho khai thác
+d. Không cần làm gì nếu thi công cách xa đường băng 500m.
+Đáp án: b. Thiết lập hàng rào ngăn cách, che chắn vật liệu và vệ sinh hiện trường sau mỗi ca làm việc.
+Câu 12: Văn bản NOTAM trong thi công sân bay dùng để làm gì?
+a. Làm cơ sở pháp lý để phê duyệt phương án tổ chức thi công trong khu bay.
+b. Cung cấp thông tin phục vụ điều hành nội bộ giữa các đơn vị thi công và khai thác tại cảng hàng không.
+c. Ghi nhận các thay đổi dài hạn để cập nhật vào tài liệu khai thác sân bay
+d. Thông báo cho phi công và các bên liên quan về những thay đổi tạm thời trong điều kiện khai thác.
+Đáp án: d. Thông báo cho phi công và các bên liên quan về những thay đổi tạm thời trong điều kiện khai thác.
+Câu 13: Tại sao việc khảo sát các công trình ngầm lại cực kỳ quan trọng trước khi đào đất thi công?
+a. Để tránh làm đứt cáp tín hiệu hàng không, gây mất liên lạc hoặc mất hệ thống đèn hiệu.
+b. Đảm bảo an toàn cho thiết bị thi công khi làm việc trong điều kiện nền đất phức tạp.
+c. Hạn chế phát sinh chi phí sửa chữa hạ tầng kỹ thuật và chậm tiến độ thi công.
+d. Phục vụ việc lập biện pháp tổ chức thi công và bố trí máy móc hợp lý
+Đáp án: a. Để tránh làm đứt cáp tín hiệu hàng không, gây mất liên lạc hoặc mất hệ thống đèn hiệu.
+Câu 14: Ai là người có trách nhiệm chính trong việc phổ biến quy định an toàn cho công nhân thi công?
+a. Cảng vụ hàng không.
+b. Đơn vị điều hành bay (ATC).
+c. Người khai thác cảng hàng không.
+d. Nhà thầu thi công phối hợp với Người khai thác cảng.
+Đáp án: d. Nhà thầu thi công phối hợp với Người khai thác cảng.
+Câu 15: Thi công dài hạn tại sân bay tiềm ẩn rủi ro gì về mặt thông tin?
+a. Nguy cơ sai lệch thông tin do thay đổi cấu hình khai thác liên tục qua nhiều giai đoạn.
+b. Gia tăng khối lượng tài liệu khai thác (NOTAM, briefing) gây khó khăn trong việc theo dõi
+c. Chậm trễ trong việc lưu trữ hồ sơ phục vụ công tác nghiệm thu công trình
+d. Rò rỉ thông tin kế hoạch thi công ra bên ngoài làm ảnh hưởng đến tính cạnh tranh
+Đáp án: a. Nguy cơ sai lệch thông tin do thay đổi cấu hình khai thác liên tục qua nhiều giai đoạn.
+Câu 16: Biện pháp nào được dùng để cô lập công trường khỏi khu vực tàu bay đang hoạt động?
+a. Bố trí nhân sự giám sát kết hợp nhắc nhở công nhân tuân thủ phạm vi làm việc đã quy định
+b. Thiết lập hàng rào tạm, biển báo, đèn chướng ngại và sơn kẻ tín hiệu tạm thời.
+c. Tăng cường thông báo qua hệ thống bộ đàm và phối hợp tuần tra định kỳ quanh khu vực thi công
+d. Tổ chức lực lượng bảo vệ trực 24/24 tại các điểm tiếp giáp giữa công trường và khu bay
+Đáp án: b. Thiết lập hàng rào tạm, biển báo, đèn chướng ngại và sơn kẻ tín hiệu tạm thời.
+Câu 17: Tại sao không được để nước đọng tại công trường thi công trong sân bay?
+a. Làm suy giảm chất lượng nền móng và ảnh hưởng đến tiến độ thi công
+b. Gây khó khăn cho việc di chuyển của thiết bị và phương tiện thi công
+c. Làm tăng độ ẩm cục bộ, ảnh hưởng đến tầm nhìn của phi công trong một số điều kiện thời tiết
+d. Nước đọng thu hút chim đến kiếm ăn, làm tăng nguy cơ chim va chạm tàu bay.
+Đáp án: d. Nước đọng thu hút chim đến kiếm ăn, làm tăng nguy cơ chim va chạm tàu bay.
+Câu 18: Người phụ trách thi công tại khu bay bắt buộc phải được trang bị thiết bị gì để liên lạc với ATC?
+a. Sử dụng điện thoại di động để liên hệ khi cần thiết, đảm bảo nhanh chóng và thuận tiện
+b. Bộ đàm có tần số phù hợp để liên lạc trực tiếp với đài kiểm soát.
+c. Sử dụng tín hiệu bằng tay (cờ, còi) kết hợp quan sát trực tiếp để tránh xung đột với tàu bay
+d. Trang bị thiết bị kết nối dữ liệu (laptop/tablet) để cập nhật thông tin khai thác theo thời gian thực
+Đáp án: b. Bộ đàm có tần số phù hợp để liên lạc trực tiếp với đài kiểm soát.
+Câu 19: Khi kết thúc mỗi ca làm việc, công việc quan trọng nhất trước khi trả lại mặt bằng là gì?
+a. Hoàn tất hồ sơ nội bộ và xác nhận khối lượng công việc đã thực hiện trong ca.
+b. Tắt toàn bộ nguồn điện trong khu vực thi công để tránh tiêu hao năng lượng không cần thiết.
+c. Kiểm tra, vệ sinh sạch sẽ FOD và đảm bảo hệ thống đèn/biển báo hoạt động bình thường.
+d. Tất cả các ý trên
+Đáp án: c. Kiểm tra, vệ sinh sạch sẽ FOD và đảm bảo hệ thống đèn/biển báo hoạt động bình thường.
+Câu 20: Trong hệ thống SMS, "Đánh giá rủi ro" trước thi công nhằm mục đích gì?
+a. Hoàn thiện hồ sơ tuân thủ theo quy định trước khi xin phép thi công.
+b. Xác định trách nhiệm pháp lý của các bên trong trường hợp xảy ra sự cố.
+c. Xác định các mối nguy và đưa ra biện pháp giảm thiểu rủi ro xuống mức chấp nhận được.
+d. Tất cả các ý trên.
+Đáp án: c. Xác định các mối nguy và đưa ra biện pháp giảm thiểu rủi ro xuống mức chấp nhận được.
+Câu 21: Thiết bị thi công có chiều cao lớn (như cần cẩu) cần lưu ý gì khi hoạt động tại sân bay?
+a. Tạm ngừng khai thác khu bay khi thiết bị vươn cao vượt giới hạn nhằm đảm bảo an toàn tuyệt đối.
+b. Đảm bảo thiết bị không vượt quá bề mặt giới hạn chướng ngại vật (OLS) được phê duyệt
+c. Chỉ được dùng cần cẩu vào những ngày không có chuyến bay.
+d. Phải được phê duyệt chiều cao tối đa và lắp đèn cảnh báo chướng ngại vật.
+Đáp án: d. Phải được phê duyệt chiều cao tối đa và lắp đèn cảnh báo chướng ngại vật.
+Câu 22: Tại sao việc thi công gần đường cất hạ cánh (CHC) được coi là nguy hiểm nhất?
+a. Môi trường làm việc có tiếng ồn và áp lực cao, dễ gây mất tập trung cho người lao động.
+b. Khả năng phát sinh FOD cao hơn so với các khu vực khác trong sân bay
+c. Điều kiện nhiệt độ bề mặt và dòng khí làm giảm hiệu quả vận hành của thiết bị thi công
+d. Vì tiềm ẩn rủi ro va chạm trực tiếp giữa tàu bay tốc độ cao và người/phương tiện thi công.
+Đáp án: d. Vì tiềm ẩn rủi ro va chạm trực tiếp giữa tàu bay tốc độ cao và người/phương tiện thi công.
+Câu 23: Hành vi vượt xe dẫn công trình của nhà khai thác Cảng trong khu bay được coi là gì?
+a. Một hành động thể hiện sự nhanh nhẹn.
+b. Một vi phạm an toàn nghiêm trọng, có thể dẫn đến Runway Incursion.
+c. Được phép nếu lái xe thấy đường vắng.
+d. Chuyện bình thường vì xe công trình thường đi nhanh hơn.
+Đáp án: b. Một vi phạm an toàn nghiêm trọng, có thể dẫn đến Runway Incursion.
+Câu 24: Nguyên tắc "An toàn khai thác bay là ưu tiên cao nhất" có nghĩa là:
+a. Dừng thi công ngay lập tức nếu có nguy cơ ảnh hưởng đến an toàn bay.
+b. Chỉ áp dụng nghiêm ngặt nguyên tắc an toàn trong các giai đoạn có tần suất khai thác cao.
+c. Chỉ ưu tiên an toàn khi có đoàn thanh tra.
+d. Ưu tiên hoàn thành công việc nhanh nhất để giảm thời gian ảnh hưởng đến hoạt động bay.
+Đáp án: a. Dừng thi công ngay lập tức nếu có nguy cơ ảnh hưởng đến an toàn bay.
+Câu 25: Việc khảo sát tầm nhìn từ Đài kiểm soát không lưu (ATC visibility) nhằm mục đích gì?
+a. Xác định vị trí lắp đặt bổ sung hệ thống camera để hỗ trợ giám sát từ xa.
+b. Đảm bảo các công trình không che khuất tầm nhìn của kiểm soát viên đối với tàu bay.
+c. Đánh giá ảnh hưởng của công trình đến mỹ quan và bố trí không gian trong khu bay
+d. Để nhân viên thi công biết tháp ở đâu mà tránh.
+Đáp án: b. Đảm bảo các công trình không che khuất tầm nhìn của kiểm soát viên đối với tàu bay.
+Câu 26: Hệ thống đèn hiệu thi công tạm thời thường có màu sắc đặc trưng nào?
+a. Sử dụng ánh sáng trắng liên tục để tăng khả năng quan sát ban đêm
+b. Sử dụng đèn màu xanh lá cây để đồng bộ với hệ thống đèn đường lăn
+c. Sử dụng đèn màu xanh dương để tương thích với đèn biên đường lăn
+d. Sử dụng đèn màu vàng/hổ phách (amber), thường ở chế độ nhấp nháy để cảnh báo khu vực nguy hiểm hoặc hạn chế
+Đáp án: d. Sử dụng đèn màu vàng/hổ phách (amber), thường ở chế độ nhấp nháy để cảnh báo khu vực nguy hiểm hoặc hạn chế
+Câu 27: Phương án bảo đảm an toàn thi công (Construction Safety Plan – CSP) là tài liệu do ai chủ trì lập?
+a. Do nhà thầu thi công tự lập và tự chịu trách nhiệm triển khai mà không cần các bên liên quan phê duyệt
+b. Nhà khai thác cảng chủ trì lập và xin ý kiến thống nhất với các đơn vị liên quan.
+c. Chủ đầu tư chủ trì chỉ đạo đơn vị thi công lập và thống nhất với Người khai thác cảng, các đơn vị liên quan.
+d. Cơ quan quản lý có thẩm quyền lập và ban hành để thực hiện.
+Đáp án: c. Chủ đầu tư chủ trì chỉ đạo đơn vị thi công lập và thống nhất với Người khai thác cảng, các đơn vị liên quan.
+Câu 28: Khi phát hiện một vật thể lạ (đinh, đá) trên đường lăn, nhân viên phải làm gì?
+a. Lờ đi và đợi đến cuối ca làm việc mới dọn dẹp.
+b. Báo ngay cho bộ phận giám sát hoặc trực tiếp nhặt bỏ để ngăn chặn nguy cơ FOD.
+c. Ghi nhận lại và chờ đội vệ sinh chuyên trách xử lý theo kế hoạch định kỳ
+d. Vứt vật thể đó sang khu vực thảm cỏ bên cạnh.
+Đáp án: b. Báo ngay cho bộ phận giám sát hoặc trực tiếp nhặt bỏ để ngăn chặn nguy cơ FOD.
+Câu 29: Đào mở nền đất gần đường CHC vào mùa mưa tiềm ẩn nguy cơ kép nào đối với an toàn khai thác bay?
+a. Gia tăng chi phí duy tu do phát sinh công tác thoát nước tạm thời
+b. Làm thay đổi đặc tính cơ lý của nền đất nhưng không ảnh hưởng đến khai thác bay
+c. Không phát sinh rủi ro đáng kể nếu khu vực đã được rào chắn
+d. Đọng nước thu hút chim và làm chậm phản ứng của xe cứu hỏa.
+Đáp án: d. Đọng nước thu hút chim và làm chậm phản ứng của xe cứu hỏa.
+Câu 30: Nhân sự thi công tại khu vực hạn chế cần được huấn luyện nội dung nào?
+a. Quy định an ninh, an toàn khu bay và quy tắc di chuyển.
+b. Kiến thức vận hành tàu bay để hỗ trợ khi cần thiết
+c. Kỹ năng giao tiếp với hành khách quốc tế
+d. Lịch sử phát triển của ngành hàng không dân dụng
+Đáp án: a. Quy định an ninh, an toàn khu bay và quy tắc di chuyển.
+Câu 31: Mối nguy nào sau đây liên quan đến hạ tầng kỹ thuật khi thi công có thể ảnh hưởng trực tiếp đến hoạt động bay?
+a. Tiếng ồn phát sinh từ công trường gây khó chịu con người đang làm việc
+b. Hư hỏng cảnh quan cây xanh trong khu vực sân bay
+c. Ô nhiễm bề mặt khu vực công cộng phục vụ hành khách
+d. Gây nhiễu hệ thống dẫn đường hàng không (NAVAIDs) do thiết bị kim loại lớn.
+Đáp án: d. Gây nhiễu hệ thống dẫn đường hàng không (NAVAIDs) do thiết bị kim loại lớn.
+Câu 32: Khi thi công vào ban đêm, yêu cầu về ánh sáng như thế nào là đúng?
+a. Cung cấp cường độ chiếu sáng tối đa để đảm bảo năng suất thi công
+b. Đủ để làm việc nhưng không được gây chói mắt cho tổ lái.
+c. Sử dụng nguồn sáng di động đơn giản để linh hoạt di chuyển
+d. Không cần ánh sáng nếu công nhân đã quen đường.
+Đáp án: b. Đủ để làm việc nhưng không được gây chói mắt cho tổ lái.
+Câu 33: Biện pháp "Quản lý sự thay đổi" trong thi công sân bay có ý nghĩa gì?
+a. Đảm bảo mọi thay đổi cấu hình khai thác đều được phân tích rủi ro trước khi thực hiện.
+b. Tăng tính linh hoạt bằng cách thay đổi nhân sự và phương án thi công khi cần thiết
+c. Giảm thiểu thủ tục hành chính khi có thay đổi nhỏ trong quá trình thi công
+d. Thay đổi bản vẽ thiết kế mà không cần lưu hồ sơ.
+Đáp án: a. Đảm bảo mọi thay đổi cấu hình khai thác đều được phân tích rủi ro trước khi thực hiện.
+Câu 34: Vùng an toàn đường cất hạ cánh (Runway Safety Area – RSA) khi có thi công phải được duy trì ở trạng thái nào?
+a. Có thể sử dụng tạm làm khu vực tập kết vật liệu nếu đã có cảnh báo
+b. Phải hoàn toàn sạch (sterile), không có vật cản hay người không phận sự.
+c. Dùng làm nơi đậu xe cho cán bộ giám sát.
+d. Để máy móc thi công nghỉ ngơi sau giờ làm.
+Đáp án: b. Phải hoàn toàn sạch (sterile), không có vật cản hay người không phận sự.
+Câu 35: Tài liệu tham chiếu quốc tế chính cho giáo trình này là gì?
+a. Luật Giao thông đường bộ.
+b. ICAO Annex 14 (Thiết kế và khai thác sân bay).
+c. Sách hướng dẫn sử dụng tàu bay Airbus.
+d. Quy chuẩn xây dựng nhà cao tầng.
+Đáp án: b. ICAO Annex 14 (Thiết kế và khai thác sân bay).
+Câu 36: Trường hợp xảy ra va chạm giữa xe thi công và tàu bay, hành động đầu tiên là gì?
+a. Di chuyển phương tiện ra khỏi hiện trường để tránh cản trở khai thác
+b. Đánh giá mức độ hư hỏng và tiến hành khắc phục tại chỗ
+c. Ghi nhận hiện trường và báo cáo sau khi kết thúc ca làm việc
+d. Thông báo ngay cho ATC/Trung tâm điều hành sân bay để triển khai khẩn nguy.
+Đáp án: d. Thông báo ngay cho ATC/Trung tâm điều hành sân bay để triển khai khẩn nguy.
+Câu 37: Đối với Người khai thác cảng hàng không, hồ sơ “Hoàn công an toàn” sau thi công có ý nghĩa quan trọng nhất nào sau đây?
+a. Là căn cứ để đánh giá năng lực và xét thưởng cho nhà thầu thi công
+b. Cung cấp dữ liệu chính xác, cập nhật về hiện trạng hạ tầng để phục vụ quản lý khai thác, lập bản đồ sân bay và công bố thông tin hàng không (AIP)
+c. Phục vụ truyền thông và quảng bá hình ảnh sân bay sau khi hoàn thành công trình
+d. Tất cả các ý trên.
+Đáp án: b. Cung cấp dữ liệu chính xác, cập nhật về hiện trạng hạ tầng để phục vụ quản lý khai thác, lập bản đồ sân bay và công bố thông tin hàng không (AIP)
+Câu 38: Yêu cầu quan trọng nhất đối với chân đế rào chắn tạm thời trong sân đỗ là gì?
+a. Có màu sắc nổi bật để dễ nhận biết từ xa
+b. Sử dụng vật liệu nhẹ để thuận tiện di chuyển và lắp đặt
+c. Trang bị bánh xe để dễ dàng thay đổi vị trí khi cần
+d. Phải đủ nặng hoặc được cố định để không bị thổi bay bởi luồng khí phản lực.
+Đáp án: d. Phải đủ nặng hoặc được cố định để không bị thổi bay bởi luồng khí phản lực.
+Câu 39: Khi tầm nhìn giảm thấp (Low Visibility Procedures – LVP), hoạt động thi công trong khu bay phải tuân thủ nguyên tắc nào sau đây?
+a. Tiếp tục thi công bình thường nếu đã có biện pháp cảnh báo tại chỗ
+b. Tuân thủ nghiêm lệnh của ATC/Người khai thác cảng, có thể bao gồm việc tạm dừng hoặc hạn chế toàn bộ hoạt động di chuyển và thi công trong khu bay.
+c. Chỉ tạm dừng khi điều kiện thời tiết xấu đến mức không thể quan sát bằng mắt thường
+d. Tăng cường nhân lực giám sát để duy trì hoạt động thi công liên tục
+Đáp án: b. Tuân thủ nghiêm lệnh của ATC/Người khai thác cảng, có thể bao gồm việc tạm dừng hoặc hạn chế toàn bộ hoạt động di chuyển và thi công trong khu bay.
+Câu 40: Hệ thống SMS yêu cầu báo cáo "Sự cố suýt nguy hiểm" (Near-miss) để làm gì?
+a. Xác định trách nhiệm và xử lý kỷ luật cá nhân liên quan
+b. Hoàn thiện hồ sơ báo cáo để phục vụ kiểm tra hành chính
+c. Để rút kinh nghiệm và ngăn ngừa tai nạn thực sự trong tương lai.
+d. Đánh giá hiệu suất làm việc của nhân sự tại hiện trường
+Đáp án: c. Để rút kinh nghiệm và ngăn ngừa tai nạn thực sự trong tương lai.
+Câu 41: Sử dụng thiết bị phát sóng vô tuyến không rõ nguồn gốc gây rủi ro gì?
+a. Gia tăng chi phí vận hành do tiêu thụ điện năng
+b. Ảnh hưởng đến hệ thống công nghệ thông tin văn phòng
+c. Không có rủi ro gì.
+d. Gây can nhiễu tần số điều hành bay và hệ thống dẫn đường.
+Đáp án: d. Gây can nhiễu tần số điều hành bay và hệ thống dẫn đường.
+Câu 42: Phương tiện thi công chỉ được phép di chuyển trên tuyến đường nào?
+a. Tuyến đường đã được phê duyệt và tuân thủ đầy đủ huấn lệnh của Đài kiểm soát không lưu (ATC)
+b. Lựa chọn tuyến đường thuận tiện miễn là không có tàu bay trong khu vực.
+c. Tận dụng các lối đi ngắn để tối ưu thời gian và nhiên liệu.
+d. Đi theo các phương tiện của hãng hàng không để đảm bảo đúng hướng.
+Đáp án: a. Tuyến đường đã được phê duyệt và tuân thủ đầy đủ huấn lệnh của Đài kiểm soát không lưu (ATC)
+Câu 43: Yếu tố con người nào dễ dẫn đến sai sót nhất khi làm đêm dài hạn?
+a. Sự mệt mỏi và mất tập trung do làm việc trái nhịp sinh học.
+b. Mức thu nhập cao làm giảm động lực làm việc của nhân sự
+c. Việc nắm vững quy định an toàn dẫn đến chủ quan
+d. Trang bị đồng phục mới chưa quen sử dụng
+Đáp án: a. Sự mệt mỏi và mất tập trung do làm việc trái nhịp sinh học.
+Câu 44: Khoảng cách an toàn từ công trình đến tim đường lăn đang khai thác phải đảm bảo:
+a. Đảm bảo không xảy ra va chạm trực tiếp với tàu bay khi di chuyển.
+b. Nằm ngoài khu vực an toàn đường lăn (Taxiway Safety Area) quy định cho loại tàu bay lớn nhất đang khai thác.
+c. Luôn luôn là 100 mét cho mọi đường lăn.
+d. Tùy thuộc vào thỏa thuận miệng giữa các bên.
+Đáp án: b. Nằm ngoài khu vực an toàn đường lăn (Taxiway Safety Area) quy định cho loại tàu bay lớn nhất đang khai thác.
+Câu 45: Một dự án thi công làm thay đổi phương án khai thác đường CHC. Cơ quan nào có thẩm quyền chấp thuận phương án an ninh, an toàn?
+a. Cảng vụ hàng không
+b. Người khai thác cảng
+c. Cục Hàng không Việt Nam
+d. Chủ đầu tư
+Đáp án: c. Cục Hàng không Việt Nam
+Câu 46: Nếu thi công trong khoảng thời gian giãn cách chuyến bay và không làm thay đổi phương án khai thác, cơ quan nào chấp thuận phương án an ninh, an toàn?
+a. Bộ Xây dựng
+b. Cục Hàng không Việt Nam
+c. Cảng vụ hàng không
+d. Chủ đầu tư
+Đáp án: c. Cảng vụ hàng không
+Câu 47: Khi có nhu cầu thay đổi thời gian thi công đã được thông báo theo quy định về thông báo tin tức hàng không, chủ đầu tư phải thực hiện trình tự nào là đúng nhất?
+a. Tự điều chỉnh thời gian thi công và thông báo cho các bên liên quan
+b. Chỉ cần thông báo cho Đài kiểm soát không lưu (ATC) là đủ
+c. Tiếp tục thi công theo kế hoạch cũ, cập nhật sau khi hoàn thành
+d. Thống nhất với Cảng vụ hàng không, Người khai thác cảng và giải trình lý do thay đổi trước khi thực hiện thủ tục xin chấp thuận điều chỉnh thời gian thi công
+Đáp án: d. Thống nhất với Cảng vụ hàng không, Người khai thác cảng và giải trình lý do thay đổi trước khi thực hiện thủ tục xin chấp thuận điều chỉnh thời gian thi công
+Câu 48: Người khai thác muốn đưa vào khai thác một nhà ga hành khách mới, cần đệ trình các hồ sơ nào sau đây đến Cục Hàng không Việt Nam?
+a. Văn bản đề nghị và sơ đồ công trình đưa vào khai thác.
+b. Chỉ cần thông báo nội bộ cảng hàng không, không cần gởi hồ sơ trình Cục Hàng không.
+c. Chỉ cần thông báo Cục Hàng không về thời gian đưa vào khai thác, không cần xin chấp thuận.
+d. Phải nộp đầy đủ hồ sơ bao gồm văn bản đề nghị, biên bản nghiệm thu và tài liệu khai thác công trình.
+Đáp án: d. Phải nộp đầy đủ hồ sơ bao gồm văn bản đề nghị, biên bản nghiệm thu và tài liệu khai thác công trình.
+Câu 49: Một khu vực sân đỗ tàu bay sẽ đóng tạm thời để sửa chữa. Người khai thác phải nộp hồ sơ gồm tờ trình xin phép, sơ đồ chi tiết, phương án duy trì hoạt động và biện pháp an ninh. Trong thời gian chờ Cục Hàng không xem xét chấp thuận, khu vực đó:
+a. Chỉ được đóng sau khi Cục Hàng không có quyết định chấp thuận.
+b. Có thể đóng ngay mà không cần chờ phê duyệt.
+c. Có thể vừa khai thác vừa đóng tạm thời một phần nếu không ảnh hưởng quá lớn.
+d. Không cần hồ sơ nếu việc đóng tạm thời dưới 3 ngày.
+Đáp án: a. Chỉ được đóng sau khi Cục Hàng không có quyết định chấp thuận.
+Câu 50: Sau khi đưa công trình cung cấp dịch vụ kỹ thuật mặt đất vào khai thác, quy trình sửa đổi các thông số kỹ thuật liên quan đến an toàn bay:
+a. Chỉ cần cập nhật trong nội bộ, không cần trình Cục Hàng không.
+b. Phải cập nhật vào tài liệu khai thác công trình, định kỳ 1 lần/năm trình Cục Hàng không.
+c. Có thể áp dụng ngay, không cần hồ sơ, miễn là đảm bảo an toàn.
+d. Chỉ cần thông báo cho Cảng vụ hàng không là đủ.
+Đáp án: b. Phải cập nhật vào tài liệu khai thác công trình, định kỳ 1 lần/năm trình Cục Hàng không.
+`;
+
+/* =========================================
+   2. LOGIC PARSE & XỬ LÝ DỮ LIỆU
+========================================= */
+let allQuestions = [];
+let currentQuiz = [];
+let userAnswers = {}; // { questionId: optionId }
+let isSubmitted = false;
+
+// Format lại chuỗi (xóa prefix a. b. c. d. để khi random không bị ngược chữ)
+function stripOptionPrefix(text) {
+    return text.replace(/^[a-d]\.\s*/i, '').trim();
+}
+
+function parseData(raw) {
+    const lines = raw.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+    const questions = [];
+    let currentQ = null;
+    let optIdCounter = 1;
+
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        if (line.match(/^Câu\s+\d+:/i)) {
+            if (currentQ) questions.push(currentQ);
+            currentQ = {
+                id: questions.length + 1,
+                originalText: line,
+                text: line.replace(/^Câu\s+\d+:\s*/i, ''), // Xóa "Câu X:" để tự render index mới
+                options: [],
+                answerStr: ''
+            };
+        } else if (line.match(/^[a-d]\.\s/i)) {
+            if (currentQ) {
+                currentQ.options.push({
+                    id: optIdCounter++,
+                    originalText: line,
+                    text: stripOptionPrefix(line),
+                    isCorrect: false
+                });
+            }
+        } else if (line.match(/^Đáp án:/i)) {
+            if (currentQ) {
+                currentQ.answerStr = line;
+                // Trích xuất chữ cái đáp án
+                const match = line.match(/^Đáp án:\s*([a-d])\./i);
+                if (match) {
+                    const correctLetter = match[1].toLowerCase();
+                    // So sánh prefix với list options ban đầu
+                    currentQ.options.forEach(opt => {
+                        if (opt.originalText.toLowerCase().startsWith(correctLetter + '.')) {
+                            opt.isCorrect = true;
+                        }
+                    });
+                }
+            }
+        } else if (currentQ && currentQ.options.length === 0) {
+            // Dòng text nối tiếp câu hỏi
+            currentQ.text += ' ' + line;
+            currentQ.originalText += ' ' + line;
+        }
+    }
+    if (currentQ) questions.push(currentQ);
+    return questions;
+}
+
+// Xáo trộn mảng
+function shuffleArray(array) {
+    const arr = [...array];
+    for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+}
+
+/* =========================================
+   3. QUẢN LÝ TRẠNG THÁI & TIMER
+========================================= */
+let timerInterval = null;
+let secondsElapsed = 0;
+let highScore = localStorage.getItem('qlat_highscore') || 0;
+let isReviewRendered = false; // Bắt buộc: Cờ hiệu để tránh Tab Trắng
+
+function init() {
+    allQuestions = parseData(rawDataString);
+    document.getElementById('highscore-display').innerText = `Điểm cao: ${highScore}/40`;
+    
+    // Khởi tạo tab search
+    document.getElementById('search-input').addEventListener('input', function(e) {
+        renderReview(e.target.value);
+    });
+
+    startQuiz();
+}
+
+function startTimer() {
+    clearInterval(timerInterval);
+    secondsElapsed = 0;
+    updateTimerUI();
+    timerInterval = setInterval(() => {
+        secondsElapsed++;
+        updateTimerUI();
+    }, 1000);
+}
+
+function stopTimer() {
+    clearInterval(timerInterval);
+}
+
+function updateTimerUI() {
+    const mins = String(Math.floor(secondsElapsed / 60)).padStart(2, '0');
+    const secs = String(secondsElapsed % 60).padStart(2, '0');
+    document.getElementById('timer-display').innerText = `${mins}:${secs}`;
+}
+
+function switchTab(tab) {
+    const tabQuiz = document.getElementById('tab-quiz');
+    const tabReview = document.getElementById('tab-review');
+    const btnQuiz = document.getElementById('btn-tab-quiz');
+    const btnReview = document.getElementById('btn-tab-review');
+
+    if (tab === 'quiz') {
+        tabQuiz.classList.remove('hidden');
+        tabReview.classList.add('hidden');
+        btnQuiz.classList.add('active');
+        btnReview.classList.remove('active');
+    } else {
+        tabQuiz.classList.add('hidden');
+        tabReview.classList.remove('hidden');
+        btnReview.classList.add('active');
+        btnQuiz.classList.remove('active');
+        
+        // FIX BUG TAB TRẮNG: Chỉ render nếu chưa render lần nào
+        if (!isReviewRendered) {
+            renderReview();
+        }
+    }
+}
+
+/* =========================================
+   4. CHỨC NĂNG THI THỬ (QUIZ)
+========================================= */
+function startQuiz() {
+    isSubmitted = false;
+    userAnswers = {};
+    
+    // Ẩn vùng kết quả, đổi text nút
+    document.getElementById('result-board').classList.add('hidden');
+    document.getElementById('btn-submit-top').classList.remove('hidden');
+    document.getElementById('btn-submit-bottom').classList.remove('hidden');
+    document.getElementById('btn-retry-top').innerText = 'Làm Lại';
+    document.getElementById('btn-retry-bottom').classList.add('hidden');
+    document.getElementById('btn-share-top').classList.add('hidden');
+
+    // Bốc ngẫu nhiên 40 câu
+    const shuffledQuestions = shuffleArray(allQuestions);
+    currentQuiz = shuffledQuestions.slice(0, 40).map(q => ({
+        ...q,
+        options: shuffleArray(q.options) // Xáo trộn cả A B C D
+    }));
+
+    renderQuiz();
+    startTimer();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function renderQuiz() {
+    const container = document.getElementById('quiz-container');
+    container.innerHTML = ''; // Clear cũ
+
+    currentQuiz.forEach((q, index) => {
+        const qDiv = document.createElement('div');
+        qDiv.className = 'p-3 mb-3 border border-gray-200 rounded shadow-sm bg-white leading-custom';
+        qDiv.id = `qbox-${q.id}`;
+        
+        qDiv.innerHTML = `<h3 class="font-bold mb-2 text-blue-900">Câu ${index + 1}: <span class="font-normal text-gray-800">${q.text}</span></h3>`;
+        
+        const optionsWrapper = document.createElement('div');
+        optionsWrapper.className = 'flex flex-col gap-1.5';
+
+        q.options.forEach(opt => {
+            const optDiv = document.createElement('div');
+            optDiv.className = 'p-2 border border-gray-300 rounded cursor-pointer transition-colors bg-gray-50 hover:bg-blue-50 flex items-start group';
+            optDiv.id = `opt-${opt.id}`;
+            optDiv.onclick = () => selectOption(q.id, opt.id, optDiv);
+            
+            optDiv.innerHTML = `
+                <div class="mr-2 mt-[3px] w-4 h-4 rounded-full border border-gray-400 flex-shrink-0 radio-circle bg-white transition-colors group-hover:border-blue-400"></div>
+                <div class="flex-1 text-gray-700">${opt.text}</div>
+            `;
+            optionsWrapper.appendChild(optDiv);
+        });
+
+        qDiv.appendChild(optionsWrapper);
+        container.appendChild(qDiv);
+    });
+}
+
+function selectOption(qId, optId, optElement) {
+    if (isSubmitted) return; // Đã nộp thì khóa click
+
+    userAnswers[qId] = optId;
+    
+    // Reset toàn bộ option của câu này
+    const parent = optElement.parentElement;
+    Array.from(parent.children).forEach(child => {
+        child.classList.remove('option-selected');
+        child.querySelector('.radio-circle').classList.remove('border-blue-500');
+    });
+
+    // Set class cho option được chọn
+    optElement.classList.add('option-selected');
+}
+
+function submitQuiz() {
+    if (isSubmitted) return;
+    
+    // Cảnh báo nếu chưa làm hết
+    if (Object.keys(userAnswers).length < 40) {
+        if (!confirm(`Bạn mới làm ${Object.keys(userAnswers).length}/40 câu. Bạn có chắc chắn muốn nộp bài?`)) {
+            return;
+        }
+    }
+
+    isSubmitted = true;
+    stopTimer();
+
+    let score = 0;
+
+    // Chấm điểm & Tô màu
+    currentQuiz.forEach(q => {
+        const userOptId = userAnswers[q.id];
+        let hasCorrectSelection = false;
+
+        q.options.forEach(opt => {
+            const optEl = document.getElementById(`opt-${opt.id}`);
+            const textContainer = optEl.querySelector('div.flex-1');
+            const iconSpan = document.createElement('span');
+            iconSpan.className = 'ml-1 font-bold';
+
+            if (opt.isCorrect) {
+                // Đáp án đúng luôn tô xanh lá
+                optEl.classList.remove('bg-gray-50', 'hover:bg-blue-50', 'border-gray-300', 'option-selected');
+                optEl.classList.add('bg-green-100', 'border-green-400', 'text-green-900');
+                iconSpan.innerHTML = '✔️';
+                iconSpan.classList.add('text-green-600');
+                textContainer.appendChild(iconSpan);
+                
+                if (userOptId === opt.id) {
+                    score++;
+                    hasCorrectSelection = true;
+                }
+            } else if (userOptId === opt.id && !opt.isCorrect) {
+                // User chọn sai -> Tô màu đỏ
+                optEl.classList.remove('bg-gray-50', 'hover:bg-blue-50', 'border-gray-300', 'option-selected');
+                optEl.classList.add('bg-red-100', 'border-red-400', 'text-red-900');
+                iconSpan.innerHTML = '✖️';
+                iconSpan.classList.add('text-red-600');
+                textContainer.appendChild(iconSpan);
+            } else {
+                // Khóa các option còn lại
+                optEl.classList.add('opacity-60', 'cursor-not-allowed');
+                optEl.classList.remove('hover:bg-blue-50');
+            }
+        });
+    });
+
+    // Cập nhật điểm
+    if (score > highScore) {
+        highScore = score;
+        localStorage.setItem('qlat_highscore', highScore);
+        document.getElementById('highscore-display').innerText = `Điểm cao: ${highScore}/40`;
+    }
+
+    // Hiển thị bảng kết quả
+    document.getElementById('score-display').innerText = `${score} / 40`;
+    document.getElementById('time-taken-display').innerText = `Thời gian: ${document.getElementById('timer-display').innerText}`;
+    document.getElementById('result-board').classList.remove('hidden');
+    
+    // Đổi trạng thái nút bấm
+    document.getElementById('btn-submit-top').classList.add('hidden');
+    document.getElementById('btn-submit-bottom').classList.add('hidden');
+    document.getElementById('btn-retry-bottom').classList.remove('hidden');
+    document.getElementById('btn-share-top').classList.remove('hidden');
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function shareResult() {
+    const score = document.getElementById('score-display').innerText;
+    const time = document.getElementById('timer-display').innerText;
+    const textToCopy = `Tôi vừa đạt ${score} điểm bài test Quản Lý An Toàn Thi Công Cảng HK trong thời gian ${time}!`;
+    
+    // Tạo text area ẩn để copy
+    const el = document.createElement('textarea');
+    el.value = textToCopy;
+    document.body.appendChild(el);
+    el.select();
+    document.execCommand('copy');
+    document.body.removeChild(el);
+
+    // Show Toast
+    const toast = document.getElementById('toast');
+    toast.classList.add('show');
+    setTimeout(() => { toast.classList.remove('show'); }, 2000);
+}
+
+/* =========================================
+   5. CHỨC NĂNG ÔN TẬP & TÌM KIẾM
+========================================= */
+// Hàm loại bỏ dấu tiếng Việt
+function removeVietnameseTones(str) {
+    str = str.replace(/à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ/g, "a");
+    str = str.replace(/è|é|ẹ|ẻ|ẽ|ê|ề|ế|ệ|ể|ễ/g, "e");
+    // str = str.replace(/ì|í|ị|ỉ|ĩ/g, "i"); // Chữ I đôi khi nhạy cảm, nhưng cho search thì okay
+    str = str.replace(/ì|í|ị|ỉ|ĩ/g, "i");
+    str = str.replace(/ò|ó|ọ|ỏ|õ|ô|ồ|ố|ộ|ổ|ỗ|ơ|ờ|ớ|ợ|ở|ỡ/g, "o");
+    str = str.replace(/ù|ú|ụ|ủ|ũ|ư|ừ|ứ|ự|ử|ữ/g, "u");
+    str = str.replace(/ỳ|ý|ỵ|ỷ|ỹ/g, "y");
+    str = str.replace(/đ/g, "d");
+    str = str.replace(/À|Á|Ạ|Ả|Ã|Â|Ầ|Ấ|Ậ|Ẩ|Ẫ|Ă|Ằ|Ắ|Ặ|Ẳ|Ẵ/g, "A");
+    str = str.replace(/È|É|Ẹ|Ẻ|Ẽ|Ê|Ề|Ế|Ệ|Ể|Ễ/g, "E");
+    str = str.replace(/Ì|Í|Ị|Ỉ|Ĩ/g, "I");
+    str = str.replace(/Ò|Ó|Ọ|Ỏ|Õ|Ô|Ồ|Ố|Ộ|Ổ|Ỗ|Ơ|Ờ|Ớ|Ợ|Ở|MỠ/g, "O");
+    str = str.replace(/Ù|Ú|Ụ|Ủ|Ũ|Ư|Ừ|Ứ|Ự|Ử|Ữ/g, "U");
+    str = str.replace(/Ỳ|Ý|Ỵ|Ỷ|Ỹ/g, "Y");
+    str = str.replace(/Đ/g, "D");
+    return str;
+}
+
+// Tạo regex phục vụ highlight giữ nguyên dấu (Fuzzy match map)
+function createHighlightRegex(keyword) {
+    const unaccented = removeVietnameseTones(keyword).toLowerCase();
+    const map = {
+        'a': '[aáàảãạâấầẩẫậăắằẳẵặAÁÀẢÃẠÂẤẦẨẪẬĂẮẰẲẴẶ]',
+        'e': '[eéèẻẽẹêếềểễệEÉÈẺẼẸÊẾỀỂỄỆ]',
+        'i': '[iíìỉĩịIÍÌỈĨỊ]',
+        'o': '[oóòỏõọôốồổỗộơớờởỡợOÓÒỎÕỌÔỐỒỔỖỘƠỚỜỞỠỢ]',
+        'u': '[uúùủũụưứừửữựUÚÙỦŨỤƯỨỪỬỮỰ]',
+        'y': '[yýỳỷỹỵYÝỲỶỸỴ]',
+        'd': '[dđDĐ]',
+    };
+    let regexStr = '';
+    for (let char of unaccented) {
+        if (map[char]) regexStr += map[char];
+        else regexStr += char.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+    }
+    return new RegExp(`(${regexStr})`, 'gi');
+}
+
+function renderReview(keyword = '') {
+    const container = document.getElementById('review-container');
+    container.innerHTML = '';
+    
+    let regex = keyword.trim() ? createHighlightRegex(keyword) : null;
+    let normalizedKeyword = removeVietnameseTones(keyword).toLowerCase();
+
+    allQuestions.forEach(q => {
+        // Thuật toán lọc
+        let isMatch = false;
+        if (keyword) {
+            let qTextNorm = removeVietnameseTones(q.originalText).toLowerCase();
+            let optsNorm = q.options.map(o => removeVietnameseTones(o.originalText).toLowerCase()).join(' ');
+            if (qTextNorm.includes(normalizedKeyword) || optsNorm.includes(normalizedKeyword)) {
+                isMatch = true;
+            }
+        } else {
+            isMatch = true; // Không có keyword thì hiện hết
+        }
+
+        if (isMatch) {
+            const qDiv = document.createElement('div');
+            qDiv.className = 'p-3 mb-3 border border-gray-200 rounded shadow-sm bg-white leading-custom';
+
+            let hlText = q.originalText;
+            if (regex) hlText = hlText.replace(regex, '<mark class="bg-yellow-300 text-black px-0.5 rounded shadow-sm">$1</mark>');
+
+            qDiv.innerHTML = `<h3 class="font-bold mb-2 text-blue-900">${hlText}</h3>`;
+            
+            const optionsWrapper = document.createElement('div');
+            optionsWrapper.className = 'flex flex-col gap-1.5';
+
+            q.options.forEach(opt => {
+                const optDiv = document.createElement('div');
+                let hlOptText = opt.originalText;
+                if (regex) hlOptText = hlOptText.replace(regex, '<mark class="bg-yellow-300 text-black px-0.5 rounded shadow-sm">$1</mark>');
+
+                if (opt.isCorrect) {
+                    optDiv.className = 'p-2 border rounded bg-green-50 border-green-400 text-green-900 font-medium flex items-start';
+                    optDiv.innerHTML = `<span class="mr-2 text-green-600">✔️</span><div class="flex-1">${hlOptText}</div>`;
+                } else {
+                    optDiv.className = 'p-2 border border-gray-200 rounded bg-gray-50 text-gray-500 flex items-start';
+                    optDiv.innerHTML = `<span class="mr-2 opacity-0">✖️</span><div class="flex-1">${hlOptText}</div>`;
+                }
+                optionsWrapper.appendChild(optDiv);
+            });
+
+            qDiv.appendChild(optionsWrapper);
+            container.appendChild(qDiv);
+        }
+    });
+
+    isReviewRendered = true; // Gắn cờ đã render xong
+}
+
+// Khởi chạy App khi trang tải xong
+window.onload = init;
+</script>
 </body>
 </html>
