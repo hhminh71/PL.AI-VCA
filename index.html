@@ -16,15 +16,26 @@
         border-bottom: 4px solid #d4af37; /* Vàng Gold */
         box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         flex-shrink: 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
     }
     .vca-top { font-size: 11px; text-transform: uppercase; opacity: 0.8; letter-spacing: 0.5px; }
     .vca-title { font-size: 13px; font-weight: 700; text-transform: uppercase; margin-top: 2px; }
     .vca-badge { font-size: 12px; background: rgba(255,255,255,0.2); padding: 2px 8px; border-radius: 4px; display: inline-block; margin-top: 5px;}
 
+    /* Nút Tải Sơ Đồ */
+    .btn-download {
+        background: #d4af37; color: #002244; border: none; padding: 8px 15px; border-radius: 5px;
+        font-weight: bold; font-family: 'Segoe UI', sans-serif; font-size: 12px; cursor: pointer;
+        display: flex; align-items: center; gap: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        transition: all 0.2s ease;
+    }
+    .btn-download:hover { background: #e6c555; transform: translateY(-1px); }
+    .btn-download svg { width: 16px; height: 16px; fill: currentColor; }
+
     /* Main Container */
     .main-area { flex-grow: 1; position: relative; overflow: hidden; }
-    
-    /* Mindmap container - Full Size */
     .markmap { width: 100%; height: 100vh; }
 
     /* Footer */
@@ -38,64 +49,242 @@
 <body>
 
     <div class="vca-header">
-        <div class="vca-top">Tổng công ty Cảng hàng không Việt Nam - CTCP</div>
-        <div class="vca-title">Cảng hàng không quốc tế Cần Thơ</div>
-        <div class="vca-badge">Phòng Tài chính - Kế hoạch | Triển khai văn bản</div>
+        <div class="vca-header-left">
+            <div class="vca-top">Tổng công ty Cảng hàng không Việt Nam - CTCP</div>
+            <div class="vca-title">Cảng hàng không quốc tế Cần Thơ</div>
+            <div class="vca-badge">Phòng Tài chính - Kế hoạch | Triển khai văn bản</div>
+        </div>
+        <button class="btn-download" onclick="downloadFullMindmap()">
+            <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+            TẢI SƠ ĐỒ (FULL HD)
+        </button>
     </div>
 
     <div class="main-area">
         <div class="markmap">
             <script type="text/template">
-# BÁO CÁO PHÂN TÍCH CHUYÊN SÂU
-## So sánh QĐ 1171/2026 với QĐ 1211/2025 & QĐ 3177/2025
+# TỔNG HỢP VĂN BẢN PHÁP LUẬT TỪ 03/2026 - 04/2026 LIÊN QUAN ACV
+## THÔNG TIN TỔNG QUAN VĂN BẢN CHỈ ĐẠO
+### Đơn vị ban hành: Tổng công ty Cảng hàng không Việt Nam - CTCP
+#### Cấp ban hành: Ban Pháp chế và Kiểm toán nội bộ (PCKTNB)
+#### Người ký: Nguyễn Ngọc Anh (KT. Trưởng ban - Phó Trưởng ban)
+### Đơn vị tiếp nhận: Cảng HKQT Cần Thơ
+#### Số đến: 529
+#### Ngày nhận: 21/04/2026
+### Thông tin định danh văn bản gốc
+#### Số: 94/PCKTNB
+#### Ngày ban hành: Tp.HCM, 21/04/2026
+#### Kênh lưu trữ nội dung:
+- Nền tảng: Trang Sharepoint của Ban PCKTNB
+- Tài khoản truy cập: Microsoft 365 do Tổng công ty cung cấp
+- Đường dẫn: https://vietnamairports.sharepoint.com/sites/bpcktnbacv-team
 
-### 1. Sự chuyển dịch về Nền tảng Pháp lý
-- **Giai đoạn 2025 (QĐ 1211 & QĐ 3177)**
-  - Căn cứ trọng tâm: **Thông tư 31/2025/TT-BCA**.
-  - Tính chất: Tập trung quản lý hình thức, tiêu chuẩn của Thẻ, Giấy phép và Chứng nhận năng định cá nhân.
-- **Giai đoạn 2026 (QĐ 1171) - BƯỚC NGOẶT**
-  - Căn cứ trọng tâm: **Thông tư 14/2026/TT-BCA**.
-  - Tính chất: Nâng cấp quản lý lên tầm vĩ mô, tập trung vào **Chương trình ANHK và Kiểm soát chất lượng**.
+## CÁC NGHỊ ĐỊNH CỦA CHÍNH PHỦ (10 NGHỊ ĐỊNH)
 
-### 2. Biến động về Phạm vi Thủ tục (Danh mục TTHC)
-- **QĐ 1211/2025 (Khởi tạo)**
-  - Công bố **13 TTHC mới** phủ rộng: Thẻ, Giấy phép, Năng định, Chương trình an ninh, Cơ sở đào tạo.
-- **QĐ 3177/2025 (Sửa đổi lần 1)**
-  - Sửa đổi **07 TTHC** (Chỉ tập trung vào 3 Thẻ, 3 Giấy phép và 1 Năng định nhân viên).
-- **QĐ 1171/2026 (Sửa đổi lần 2 - Hiện tại)**
-  - Sửa đổi **08 TTHC**.
-  - **Giữ nguyên**: 06 thủ tục về Thẻ và Giấy phép (nhưng thay đổi biểu mẫu/công nghệ).
-  - **Lược bỏ**: Không còn sửa đổi thủ tục Năng định nhân viên trong đợt này.
-  - **Bổ sung mới vào diện sửa đổi**: 02 TTHC cốt lõi về **Phê duyệt/Chấp thuận** và **Sửa đổi/Bổ sung Chương trình ANHK**.
+### 1. NGHỊ ĐỊNH 96/2026/NĐ-CP (Luật Đầu tư)
+#### Thời gian
+- Ban hành: 31/03/2026
+- Hiệu lực: 31/03/2026
+#### Tên văn bản: Quy định chi tiết và hướng dẫn thi hành Luật Đầu tư
+#### Đối tượng áp dụng
+- Nhà đầu tư
+- Cơ quan nhà nước có thẩm quyền
+- Tổ chức, cá nhân liên quan đến hoạt động đầu tư kinh doanh tại Việt Nam
+#### Nội dung chính
+- **Điều kiện đầu tư kinh doanh:** Quy định chi tiết ngành/nghề cấm và ngành/nghề có điều kiện. Yêu cầu bắt buộc phải đáp ứng để cấp phép/hoạt động.
+- **Bảo đảm và ưu đãi đầu tư:**
+  - Hỗ trợ cân đối ngoại tệ
+  - Các hình thức bảo đảm khác do Thủ tướng Chính phủ quyết định
+  - Bảo đảm ưu đãi khi có thay đổi pháp luật
+- **Quy trình, thủ tục đầu tư:** Hình thức nộp (trực tiếp, bưu chính công ích). Nhà đầu tư chịu trách nhiệm tính chính xác của hồ sơ.
+- **Cơ chế giải quyết:** Thiết lập cơ chế phản ánh vướng mắc, kiến nghị. Cơ quan NN có trách nhiệm giải quyết, phòng ngừa tranh chấp đầu tư quốc tế.
+- **Đối tượng hưởng ưu đãi đầu tư:** Ngành nghề ưu đãi, địa bàn KTXH khó khăn, quy mô vốn lớn, sử dụng nhiều lao động.
+#### Điểm mới nổi bật bổ sung
+- Điều 6: Trường hợp dừng giải quyết và điều kiện nộp HS liên quan đầu tư
+- Điều 19: Đối tượng được hưởng ưu đãi đầu tư
+- Điều 51: Trường hợp KHÔNG phải thực hiện thủ tục điều chỉnh chủ trương đầu tư
+- Điều 72: Cho phép thành lập tổ chức kinh tế trước khi có GCN Đầu tư
 
-### 3. Nâng cấp Kỹ thuật & Công nghệ (Điểm nhấn QĐ 1171)
-- **Cải tiến Biểu mẫu (Phụ lục IA - TT 14/2026)**
-  - Thay thế toàn bộ form cũ: Mẫu 1A (Công văn), Mẫu 2A/4A/5A (Danh sách trích ngang), Mẫu 3A (Tờ khai cá nhân).
-  - *Lưu ý:* Tờ khai yêu cầu chi tiết hơn về khu vực hoạt động (chia nhỏ 17 khu vực) và đánh dấu cụ thể Cảng HK đăng ký.
-- **Đột phá Công nghệ Kiểm soát (Phôi thẻ/Giấy phép mới)**
-  - **Thẻ cá nhân (Dài/Ngắn hạn)**: Mặt trước bắt buộc tích hợp **Mã BE Code chứa khuôn mặt đã mã hóa**. 
-    - *Mục đích:* So khớp nhận diện sinh trắc học tự động bằng thiết bị.
-  - **Giấy phép phương tiện**: Mặt trước tích hợp **Mã BE Code chứa thông tin kèm chữ ký số**.
-    - *Mục đích:* Chống làm giả, kiểm tra nhanh qua thiết bị quét mã.
+### 2. NGHỊ ĐỊNH 99/2026/NĐ-CP (Tài sản kết cấu hạ tầng giao thông)
+#### Thời gian
+- Ban hành: 31/03/2026
+- Hiệu lực: 31/03/2026
+#### Tên văn bản: Sửa đổi, bổ sung quản lý, sử dụng và khai thác tài sản kết cấu hạ tầng giao thông
+#### Sửa Khoản 3 Điều 4 (NĐ 44/2024/NĐ-CP) về quyết định giao/khai thác/xử lý tài sản:
+- **Liên quan Quốc phòng:** Bắt buộc có ý kiến của Bộ Quốc phòng (bằng văn bản, lưu hồ sơ).
+- **Liên quan An ninh Quốc gia:** Bắt buộc có ý kiến của Bộ Công an (bằng văn bản, lưu hồ sơ).
+- **KHÔNG liên quan QP-AN:** Cơ quan/đơn vị (Bộ XD, UBND cấp tỉnh, CQ QL đường bộ/QL tài sản) có trách nhiệm tự xác định bằng văn bản và thể hiện trong hồ sơ.
+#### Sửa Điều 6 về Thẩm quyền quyết định:
+- Chủ tịch UBND cấp tỉnh quyết định HOẶC phân cấp thẩm quyền quyết định giao cho cơ quan/đơn vị QL tài sản ở địa phương (đối với tài sản hạ tầng đường bộ thuộc địa phương quản lý).
 
-### 4. Chuẩn hóa Đề cương Chương trình ANHK (Chỉ có tại QĐ 1171)
-- **Đóng gói quy chuẩn chi tiết cho từng nhóm đối tượng:**
-  - **Nhóm 1**: Người khai thác Cảng HK, Sân bay (Gồm 5 Chương chi tiết về Hạ tầng, Biện pháp phòng ngừa, Đối phó can thiệp...).
-  - **Nhóm 2**: Hãng hàng không / Người khai thác tàu bay VN.
-  - **Nhóm 3**: Quy trình ANHK bổ sung cho Hãng HK Nước ngoài tại VN.
-  - **Nhóm 4**: Doanh nghiệp cung cấp dịch vụ Không lưu.
-  - **Nhóm 5**: Doanh nghiệp Dịch vụ Khác (Xử lý hàng hóa, Sửa chữa bảo dưỡng, Suất ăn, Xăng dầu, Phục vụ mặt đất).
-  - **Nhóm 6**: Đơn vị kiểm soát ANHK chuyên trách.
+### 3. NGHỊ ĐỊNH 100/2026/NĐ-CP (Sở hữu trí tuệ)
+#### Thời gian
+- Ban hành: 31/03/2026
+- Hiệu lực: 01/04/2026
+#### Tên văn bản: Sửa đổi NĐ 65/2023/NĐ-CP hướng dẫn Luật SHTT về sở hữu công nghiệp & bảo vệ quyền
+#### Bổ sung quy định quản lý, khai thác quyền SHTT
+- **Trách nhiệm Chủ sở hữu:** Lập, lưu giữ Danh mục quyền SHTT chưa đáp ứng điều kiện ghi nhận giá trị tài sản trong sổ kế toán.
+- **Mục đích sử dụng cho quản trị nội bộ:**
+  - Quản lý, theo dõi tình trạng pháp lý.
+  - Làm căn cứ định giá, xác định giá trị trong giao dịch dân sự, kinh doanh thương mại & mục đích hợp pháp khác.
+  - Thông tin minh chứng nguồn lực, uy tín, tiềm năng đối với đối tác, nhà đầu tư.
 
-### 5. KẾ HOẠCH HÀNH ĐỘNG CHO PHÒNG TC-KH (CẢNG HKQT CẦN THƠ)
-- **Công tác Kế hoạch - Dự toán (Quan trọng):**
-  - **Lệ phí TTHC**: Không thay đổi (Thẻ dài hạn 150k, Giấy phép dài hạn 100k, Ngắn hạn 20k). Tiếp tục áp dụng TT 193/2016/TT-BTC -> *Dòng tiền ngân sách TTHC ổn định*.
-  - **Dự toán thiết bị MỚI**: Cần tham mưu lập dự toán mua sắm/nâng cấp **Hệ thống máy quét (Scanner) có khả năng đọc mã BE Code sinh trắc học và chữ ký số** tại các điểm kiểm tra an ninh (Cổng/Cửa) để tương thích với phôi thẻ mới của Bộ Công an.
-- **Công tác Triển khai Hành chính:**
-  - Lập tức ban hành thông báo nội bộ: **Đình chỉ sử dụng các biểu mẫu xin cấp thẻ cũ**. Áp dụng bộ Mẫu 1A, 2A, 3A, 4A, 5A theo QĐ 1171.
-- **Công tác Phối hợp Chuyên môn:**
-  - Tham mưu Ban Giám đốc Cảng chỉ đạo Đội An ninh Hàng không rà soát lại **"Chương trình ANHK Cảng HKQT Cần Thơ"**.
-  - Bắt buộc phải viết lại/điều chỉnh theo đúng **khung đề cương mới tại mục 7.12.2** của QĐ 1171 để trình Cục Quản lý Xuất nhập cảnh (Bộ Công an) phê duyệt lại (nếu có yêu cầu chuyển tiếp).
+### 4. NGHỊ ĐỊNH 128/2026/NĐ-CP (Luật Giá)
+#### Thời gian
+- Ban hành: 06/04/2026
+- Hiệu lực: 06/04/2026
+#### Tên văn bản: Sửa đổi NĐ 85/2024/NĐ-CP về Luật Giá
+#### Lập và giải trình phương án giá hàng hóa/dịch vụ
+- **Chủ thể lập:** Tổ chức, cá nhân kinh doanh, cung ứng được cơ quan có thẩm quyền/cơ quan được phân cấp định giá lựa chọn, yêu cầu.
+- **Thời hạn lập hồ sơ:** Tối đa 30 ngày (kể từ ngày nhận văn bản yêu cầu theo dấu bưu điện).
+- **Trách nhiệm:** Chịu trách nhiệm TOÀN DIỆN tính chính xác, trung thực của số liệu, dữ liệu, tài liệu, hồ sơ.
+- **Cơ chế gia hạn (Trường hợp phức tạp):**
+  - Được quyền gửi văn bản đề nghị kéo dài thời gian kèm lý do, thuyết minh.
+  - Thời gian kéo dài TỐI ĐA KHÔNG QUÁ 15 NGÀY.
+- **Trách nhiệm giải trình:** Phải giải trình, báo cáo rõ nội dung khi có yêu cầu của cơ quan NN có thẩm quyền.
+
+### 5. NGHỊ ĐỊNH 105/2026/NĐ-CP (Tài chính Công đoàn)
+#### Thời gian
+- Ban hành: 31/03/2026
+- Hiệu lực: 16/05/2026
+#### Tên văn bản: Hướng dẫn thi hành Luật Công đoàn về tài chính
+#### Phương thức và thời hạn đóng KPCĐ
+- **Đóng theo tháng:** Chậm nhất là ngày cuối cùng của tháng tiếp theo (Áp dụng: Cơ quan, tổ chức, đơn vị, DN, HTX, Liên hiệp HTX).
+- **Đóng 3 tháng/lần:** Chậm nhất là ngày cuối cùng của tháng tiếp theo ngay sau chu kỳ (Áp dụng: Tổ chức, DN nông/lâm/ngư/diêm nghiệp trả lương theo chu kỳ).
+#### Nguồn đóng KPCĐ
+- Ngân sách nhà nước, nguồn thu sự nghiệp, nguồn thu hợp pháp khác.
+- Đơn vị tự bảo đảm chi thường xuyên & chi đầu tư: Tự bảo đảm từ hoạt động sự nghiệp và nguồn thu khác.
+#### Miễn, giảm, tạm dừng đóng
+- **Miễn đóng:** DN, HTX giải thể hoặc phá sản.
+- **Tạm dừng đóng:** Tối đa 12 tháng (Do gặp khó khăn thiên tai, dịch bệnh).
+- **Giảm mức đóng:** Tối đa 20% (Áp dụng khi đơn vị phải cắt giảm lao động đáng kể).
+#### Quản lý & Sử dụng
+- Nguyên tắc: Đúng mục đích, tiết kiệm, hiệu quả.
+- Trách nhiệm: Tổ chức NLĐ tại DN phải tuân thủ quy định và công khai cho thành viên.
+
+### 6. NGHỊ ĐỊNH 69/2026/NĐ-CP (Xử phạt PCCC & CNCH)
+#### Thời gian
+- Ban hành: 06/03/2026
+- Hiệu lực: 20/04/2026
+#### Tên văn bản: Sửa NĐ 106/2025/NĐ-CP xử phạt VPHC lĩnh vực PCCC và CNCH
+#### Bổ sung các hành vi vi phạm hành chính mới
+- **Điều 20:** Trang bị phương tiện cơ giới không bảo đảm số lượng, yêu cầu kỹ thuật.
+- **Khoản 2 Điều 21:** Không duy trì trữ lượng nước chữa cháy.
+- **Khoản 4 Điều 6:** Sử dụng người đứng đầu cơ sở chưa có văn bản thông báo kết quả huấn luyện nghiệp vụ PCCC, CNCH.
+- **Điểm a Khoản 1 Điều 10:** Không xuất trình hồ sơ PCCC, CNCH phục vụ kiểm tra, thanh tra.
+- **Điểm a Khoản 1 Điều 17:** Mua bảo hiểm cháy, nổ bắt buộc không đủ đối tượng đối với cơ sở bắt buộc phải mua.
+
+### 7. NGHỊ ĐỊNH 89/2026/NĐ-CP (Kiểm định xe cơ giới)
+#### Thời gian
+- Ban hành: 30/03/2026
+- Hiệu lực: 01/07/2026
+#### Tên văn bản: Điều kiện kinh doanh dịch vụ kiểm định xe cơ giới
+#### Niên hạn sử dụng xe cơ giới (Tính theo năm sản xuất)
+- Xe ô tô chở hàng: 25 năm
+- Xe ô tô chở người (từ 09 người trở lên): 20 năm
+- Xe chở người bốn bánh có gắn động cơ: 15 năm
+- Căn cứ xác định: GCN chất lượng an toàn kỹ thuật/BVMT hoặc thông tin nhà sản xuất.
+#### Giấy chứng nhận kiểm định
+- Mặc định: Cấp dưới dạng bản điện tử.
+- Yêu cầu bản giấy: Cơ sở đăng kiểm in từ phần mềm quản lý, KHÔNG sử dụng phôi ấn chỉ, đóng dấu xác nhận cấp cho chủ xe.
+
+### 8. NGHỊ ĐỊNH 76/2026/NĐ-CP (Bình đẳng giới)
+#### Thời gian
+- Ban hành: 16/03/2026
+- Hiệu lực: 01/05/2026
+#### Tên văn bản: Sửa NĐ 125/2021/NĐ-CP xử phạt VPHC lĩnh vực bình đẳng giới
+#### Nội dung chính
+- Phạm vi: Lao động, giáo dục, văn hóa, thông tin.
+- **Tăng mức phạt:** Tối đa từ 3.000.000 VNĐ lên 4.000.000 VNĐ.
+- **Hành vi vi phạm bị phạt:**
+  - Xúc phạm danh dự, nhân phẩm nhằm cản trở bổ nhiệm quản lý/lãnh đạo/chuyên môn vì định kiến giới.
+  - Cố ý tuyên truyền sai sự thật để cản trở bổ nhiệm vì định kiến giới.
+
+### 9. NGHỊ ĐỊNH 102/2026/NĐ-CP (Cạnh tranh)
+#### Thời gian
+- Ban hành: 31/03/2026
+- Hiệu lực: 20/05/2026
+#### Tên văn bản: Sửa NĐ 75/2019/NĐ-CP xử phạt VPHC lĩnh vực cạnh tranh
+#### Nội dung chính
+- Siết chặt kỷ cương thị trường về tập trung kinh tế và gian dối thông tin.
+- **Mức phạt:** Phạt từ 1% đến 5% tổng doanh thu đối với DN thực hiện tập trung kinh tế thuộc trường hợp bị cấm.
+- **Biện pháp khắc phục hậu quả:**
+  - Buộc chia, tách doanh nghiệp đã sáp nhập/hợp nhất.
+  - Buộc bán lại một phần/toàn bộ vốn góp, tài sản đã mua.
+  - Buộc chịu sự kiểm soát của cơ quan NN có thẩm quyền về giá cả và điều kiện giao dịch khác.
+
+### 10. NGHỊ ĐỊNH 85/2026/NĐ-CP (Bảo hiểm hưu trí bổ sung)
+#### Tên văn bản: Về bảo hiểm hưu trí bổ sung
+#### Nội dung chính
+- **Tính chất:** Tự nguyện (do DN quản lý quỹ hưu trí triển khai qua NSDLĐ).
+- **Quy định đối với Người sử dụng lao động (NSDLĐ):**
+  - KHÔNG được coi là điều kiện tuyển dụng, ký mới/gia hạn HĐLĐ.
+  - KHÔNG gắn với đánh giá thi đua, khen thưởng hay chính sách phúc lợi khác.
+- **Đối tượng tham gia:** NSDLĐ và NLĐ đã tham gia BHXH bắt buộc.
+- **Mức đóng:** Do NSDLĐ và NLĐ thỏa thuận trên cơ sở tự nguyện.
+
+## CÁC THÔNG TƯ CỦA BỘ, NGÀNH (04 THÔNG TƯ)
+
+### 11. THÔNG TƯ 20/2026/TT-BTC (Thuế Thu nhập doanh nghiệp)
+#### Thời gian
+- Ban hành: 12/03/2026
+- Hiệu lực: 12/03/2026 (Áp dụng kể từ kỳ tính thuế năm 2025)
+#### Tên văn bản: Quy định chi tiết Luật Thuế TNDN và NĐ 320/2025/NĐ-CP
+#### Hồ sơ chi phí được trừ
+- Yêu cầu chung: Đầy đủ hợp đồng, hóa đơn, chứng từ, quy chế nội bộ.
+- Tài trợ giáo dục/y tế/khắc phục thiên tai: BẮT BUỘC có Biên bản xác nhận (Mẫu số 01/TNDN kèm theo Thông tư).
+#### Chi phí KHÔNG tương ứng doanh thu trong kỳ (Trường hợp đặc thù được trừ)
+- Chi phí đấu thầu nhưng không trúng thầu.
+- Chi phí nghiên cứu thị trường/sản phẩm mới nhưng không thành công.
+- Chi phí khấu hao tài sản cho thuê trong thời gian chưa có khách thuê.
+#### Hồ sơ ủy quyền thanh toán không dùng tiền mặt (Từ 5.000.000 VNĐ)
+- (1) Hóa đơn, chứng từ theo quy định pháp luật kế toán.
+- (2) Quy chế tài chính/Quy chế nội bộ/Quyết định ủy quyền cho NLĐ mua hàng phục vụ SXKD.
+- (3) Chứng từ thanh toán không dùng tiền mặt của NLĐ khi mua hàng.
+- (4) Chứng từ thanh toán không dùng tiền mặt của DN thanh toán lại cho NLĐ.
+#### Hồ sơ hưởng ưu đãi thuế
+- Doanh nghiệp tự xác định điều kiện và tự kê khai.
+- Nếu thanh tra phát hiện sai: Bị xử lý truy thu và phạt.
+#### Thời điểm xác định doanh thu tính thuế
+- Quy định cụ thể cho: Xuất khẩu, vận tải, xây dựng, cung cấp điện nước, hoạt động của DN nước ngoài.
+
+### 12. THÔNG TƯ 19/2026/TT-BNNMT (Bản đồ địa chính)
+#### Thời gian
+- Ban hành: 30/03/2026
+- Hiệu lực: 30/03/2026
+#### Tên văn bản: Quy định kỹ thuật đo đạc, lập bản đồ địa chính và CSDL đất đai
+#### Lồng ghép nội dung đo đạc và xây dựng CSDL
+- Bắt buộc lồng ghép khi đo vẽ chi tiết thửa đất: Đăng ký đất đai, tài sản gắn liền với đất, lập HS địa chính, xây dựng CSDL.
+- Thực hiện trên: Hệ thống phần mềm xây dựng CSDL đất đai ở địa phương.
+#### Quy trình triển khai
+- **Chủ đầu tư:** Lập kế hoạch điều phối các cơ quan.
+- **Đơn vị thi công:** Phối hợp địa phương thông báo công khai thời gian/địa điểm; Thu thập hồ sơ tài liệu.
+- **Tại thực địa:** Đơn vị thi công thu thập giấy tờ, hướng dẫn người sử dụng đất kê khai đăng ký.
+#### Kiểm tra và nghiệm thu
+- Kiểm tra các hạng mục lồng ghép: Xây dựng lưới địa chính, đo vẽ bản đồ, lồng ghép đăng ký đất đai.
+- Thẩm định/nghiệm thu thực hiện theo quy chế giám sát, đánh giá, kiểm định chất lượng lĩnh vực quản lý đất đai.
+
+### 13. THÔNG TƯ 21/2026/TT-BTC (Quản lý thuế)
+#### Thời gian
+- Ban hành: 17/03/2026
+- Hiệu lực: 17/03/2026
+#### Tên văn bản: Sửa Thông tư 80/2021/TT-BTC hướng dẫn Luật QL Thuế và NĐ 126/2020/NĐ-CP
+#### Quy định hồ sơ miễn/giảm tiền thuê đất
+- **Thẩm quyền:** Thuộc cơ quan thuế giải quyết.
+- **Đối tượng/Điều kiện:** Đất thuê trả tiền hàng năm mục đích SXKD (trừ nông nghiệp, lâm nghiệp, nuôi trồng thủy sản, làm muối).
+- **Tình trạng:** Phải tạm ngừng hoạt động do thiên tai, hỏa hoạn hoặc bất khả kháng (Theo Khoản 4 Điều 5 NĐ 230/2025/NĐ-CP).
+
+### 14. THÔNG TƯ 28/2026/TT-BTC (Phí xuất nhập cảnh)
+#### Thời gian
+- Ban hành: 27/03/2026
+- Hiệu lực: 01/04/2026
+#### Tên văn bản: Mức thu, chế độ thu, nộp phí, lệ phí xuất cảnh, nhập cảnh, quá cảnh, cư trú tại VN
+#### Danh mục thu phí/lệ phí
+- Lệ phí cấp: Hộ chiếu, giấy thông hành, giấy phép xuất cảnh, tem "AB".
+- Phí cấp: Thị thực, giấy tờ có giá trị xuất cảnh/nhập cảnh/cư trú cho người nước ngoài.
+#### Các trường hợp đặc biệt ĐƯỢC MIỄN PHÍ/LỆ PHÍ
+- Khách mời của Đảng, Nhà nước, lãnh đạo cấp cao cùng thân nhân.
+- Cán bộ ngoại giao, lãnh sự, tổ chức quốc tế (Áp dụng theo nguyên tắc có đi có lại hoặc điều ước quốc tế).
             </script>
         </div>
     </div>
@@ -105,6 +294,68 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/markmap-autoloader@0.15.4"></script>
+    <script>
+        // Thuật toán chụp toàn bộ Mindmap độ phân giải cao
+        function downloadFullMindmap() {
+            const svg = document.querySelector('.markmap svg');
+            if (!svg) return alert("Sơ đồ chưa tải xong, vui lòng đợi giây lát!");
 
+            const g = svg.querySelector('g');
+            if (!g) return;
+
+            // 1. Lấy kích thước thật của sơ đồ (không bị ảnh hưởng bởi Zoom/Pan)
+            const bbox = g.getBBox();
+            const padding = 60; // Viền an toàn
+
+            // 2. Clone SVG để tạo file ảnh ngầm
+            const clone = svg.cloneNode(true);
+            const cloneG = clone.querySelector('g');
+            
+            // Xóa transform để sơ đồ tự canh giữa khung hình mới
+            cloneG.setAttribute('transform', '');
+
+            const width = bbox.width + padding * 2;
+            const height = bbox.height + padding * 2;
+            
+            clone.setAttribute('viewBox', `${bbox.x - padding} ${bbox.y - padding} ${width} ${height}`);
+            
+            // Scale x3 để đạt chất lượng Full HD / 4K
+            const scale = 3; 
+            clone.setAttribute('width', width * scale);
+            clone.setAttribute('height', height * scale);
+
+            // 3. Thêm nền xanh nhạt VCA
+            const bg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            bg.setAttribute('x', bbox.x - padding);
+            bg.setAttribute('y', bbox.y - padding);
+            bg.setAttribute('width', width);
+            bg.setAttribute('height', height);
+            bg.setAttribute('fill', '#f5f7fa');
+            clone.insertBefore(bg, clone.firstChild);
+
+            // Thêm style định dạng chữ
+            const style = document.createElementNS('http://www.w3.org/2000/svg', 'style');
+            style.textContent = ".markmap-node-text { font-family: 'Segoe UI', Arial, sans-serif; font-size: 14px; fill: #333; } path { fill: none; }";
+            clone.insertBefore(style, clone.firstChild);
+
+            // 4. Render ra Canvas và tải xuống
+            const svgData = new XMLSerializer().serializeToString(clone);
+            const img = new Image();
+            img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
+            
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                canvas.width = width * scale;
+                canvas.height = height * scale;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0);
+                
+                const a = document.createElement('a');
+                a.download = 'VCA_Mindmap_ChiTiet.png';
+                a.href = canvas.toDataURL('image/png');
+                a.click();
+            };
+        }
+    </script>
 </body>
 </html>
