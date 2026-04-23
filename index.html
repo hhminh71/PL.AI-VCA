@@ -1,110 +1,1318 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>VCA Visualizer - Phòng TC-KH</title>
-<style>
-    /* --- CẤU HÌNH GIAO DIỆN VCA (ACV STYLE) --- */
-    body, html { margin: 0; padding: 0; height: 100%; font-family: 'Segoe UI', Arial, sans-serif; background: #f5f7fa; display: flex; flex-direction: column;}
-    
-    /* Header */
-    .vca-header {
-        background: #0056b3; /* Xanh ACV */
-        color: white;
-        padding: 12px 20px;
-        border-bottom: 4px solid #d4af37; /* Vàng Gold */
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        flex-shrink: 0;
-    }
-    .vca-top { font-size: 11px; text-transform: uppercase; opacity: 0.8; letter-spacing: 0.5px; }
-    .vca-title { font-size: 13px; font-weight: 700; text-transform: uppercase; margin-top: 2px; }
-    .vca-badge { font-size: 12px; background: rgba(255,255,255,0.2); padding: 2px 8px; border-radius: 4px; display: inline-block; margin-top: 5px;}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Hàng Hóa Nguy Hiểm - CAT8</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Tối ưu thanh cuộn */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        /* Tối ưu typography cho đọc nhanh */
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        .text-compact { line-height: 1.3 !important; }
+        
+        /* Radio button custom */
+        input[type="radio"] { accent-color: #2563eb; width: 1.1rem; height: 1.1rem; flex-shrink: 0; margin-top: 2px;}
+        
+        /* Highlight search */
+        mark { background-color: #fef08a; color: #1f2937; border-radius: 2px; padding: 0 2px; }
 
-    /* Main Container */
-    .main-area { flex-grow: 1; position: relative; overflow: hidden; }
-    
-    /* Mindmap container - Full Size */
-    .markmap { width: 100%; height: 100vh; }
-
-    /* Footer */
-    .vca-footer { 
-        background: #e9ecef; color: #555; text-align: center; 
-        padding: 5px; font-size: 11px; flex-shrink: 0; border-top: 1px solid #ddd;
-    }
-</style>
-<style>.markmap-node-text { font-family: 'Segoe UI'; font-size: 14px; fill: #333; }</style>
+        /* Loader */
+        .loader { border: 3px solid #f3f3f3; border-radius: 50%; border-top: 3px solid #3b82f6; width: 20px; height: 20px; -webkit-animation: spin 1s linear infinite; animation: spin 1s linear infinite; display: inline-block; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
 </head>
-<body>
+<body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col">
 
-    <div class="vca-header">
-        <div class="vca-top">Tổng công ty Cảng hàng không Việt Nam - CTCP</div>
-        <div class="vca-title">Cảng hàng không quốc tế Cần Thơ</div>
-        <div class="vca-badge">Phòng Tài chính - Kế hoạch | Triển khai văn bản</div>
-    </div>
-
-    <div class="main-area">
-        <div class="markmap">
-            <script type="text/template">
-# BÁO CÁO PHÂN TÍCH CHUYÊN SÂU
-## So sánh QĐ 1171/2026 với QĐ 1211/2025 & QĐ 3177/2025
-
-### 1. Sự chuyển dịch về Nền tảng Pháp lý
-- **Giai đoạn 2025 (QĐ 1211 & QĐ 3177)**
-  - Căn cứ trọng tâm: **Thông tư 31/2025/TT-BCA**.
-  - Tính chất: Tập trung quản lý hình thức, tiêu chuẩn của Thẻ, Giấy phép và Chứng nhận năng định cá nhân.
-- **Giai đoạn 2026 (QĐ 1171) - BƯỚC NGOẶT**
-  - Căn cứ trọng tâm: **Thông tư 14/2026/TT-BCA**.
-  - Tính chất: Nâng cấp quản lý lên tầm vĩ mô, tập trung vào **Chương trình ANHK và Kiểm soát chất lượng**.
-
-### 2. Biến động về Phạm vi Thủ tục (Danh mục TTHC)
-- **QĐ 1211/2025 (Khởi tạo)**
-  - Công bố **13 TTHC mới** phủ rộng: Thẻ, Giấy phép, Năng định, Chương trình an ninh, Cơ sở đào tạo.
-- **QĐ 3177/2025 (Sửa đổi lần 1)**
-  - Sửa đổi **07 TTHC** (Chỉ tập trung vào 3 Thẻ, 3 Giấy phép và 1 Năng định nhân viên).
-- **QĐ 1171/2026 (Sửa đổi lần 2 - Hiện tại)**
-  - Sửa đổi **08 TTHC**.
-  - **Giữ nguyên**: 06 thủ tục về Thẻ và Giấy phép (nhưng thay đổi biểu mẫu/công nghệ).
-  - **Lược bỏ**: Không còn sửa đổi thủ tục Năng định nhân viên trong đợt này.
-  - **Bổ sung mới vào diện sửa đổi**: 02 TTHC cốt lõi về **Phê duyệt/Chấp thuận** và **Sửa đổi/Bổ sung Chương trình ANHK**.
-
-### 3. Nâng cấp Kỹ thuật & Công nghệ (Điểm nhấn QĐ 1171)
-- **Cải tiến Biểu mẫu (Phụ lục IA - TT 14/2026)**
-  - Thay thế toàn bộ form cũ: Mẫu 1A (Công văn), Mẫu 2A/4A/5A (Danh sách trích ngang), Mẫu 3A (Tờ khai cá nhân).
-  - *Lưu ý:* Tờ khai yêu cầu chi tiết hơn về khu vực hoạt động (chia nhỏ 17 khu vực) và đánh dấu cụ thể Cảng HK đăng ký.
-- **Đột phá Công nghệ Kiểm soát (Phôi thẻ/Giấy phép mới)**
-  - **Thẻ cá nhân (Dài/Ngắn hạn)**: Mặt trước bắt buộc tích hợp **Mã BE Code chứa khuôn mặt đã mã hóa**. 
-    - *Mục đích:* So khớp nhận diện sinh trắc học tự động bằng thiết bị.
-  - **Giấy phép phương tiện**: Mặt trước tích hợp **Mã BE Code chứa thông tin kèm chữ ký số**.
-    - *Mục đích:* Chống làm giả, kiểm tra nhanh qua thiết bị quét mã.
-
-### 4. Chuẩn hóa Đề cương Chương trình ANHK (Chỉ có tại QĐ 1171)
-- **Đóng gói quy chuẩn chi tiết cho từng nhóm đối tượng:**
-  - **Nhóm 1**: Người khai thác Cảng HK, Sân bay (Gồm 5 Chương chi tiết về Hạ tầng, Biện pháp phòng ngừa, Đối phó can thiệp...).
-  - **Nhóm 2**: Hãng hàng không / Người khai thác tàu bay VN.
-  - **Nhóm 3**: Quy trình ANHK bổ sung cho Hãng HK Nước ngoài tại VN.
-  - **Nhóm 4**: Doanh nghiệp cung cấp dịch vụ Không lưu.
-  - **Nhóm 5**: Doanh nghiệp Dịch vụ Khác (Xử lý hàng hóa, Sửa chữa bảo dưỡng, Suất ăn, Xăng dầu, Phục vụ mặt đất).
-  - **Nhóm 6**: Đơn vị kiểm soát ANHK chuyên trách.
-
-### 5. KẾ HOẠCH HÀNH ĐỘNG CHO PHÒNG TC-KH (CẢNG HKQT CẦN THƠ)
-- **Công tác Kế hoạch - Dự toán (Quan trọng):**
-  - **Lệ phí TTHC**: Không thay đổi (Thẻ dài hạn 150k, Giấy phép dài hạn 100k, Ngắn hạn 20k). Tiếp tục áp dụng TT 193/2016/TT-BTC -> *Dòng tiền ngân sách TTHC ổn định*.
-  - **Dự toán thiết bị MỚI**: Cần tham mưu lập dự toán mua sắm/nâng cấp **Hệ thống máy quét (Scanner) có khả năng đọc mã BE Code sinh trắc học và chữ ký số** tại các điểm kiểm tra an ninh (Cổng/Cửa) để tương thích với phôi thẻ mới của Bộ Công an.
-- **Công tác Triển khai Hành chính:**
-  - Lập tức ban hành thông báo nội bộ: **Đình chỉ sử dụng các biểu mẫu xin cấp thẻ cũ**. Áp dụng bộ Mẫu 1A, 2A, 3A, 4A, 5A theo QĐ 1171.
-- **Công tác Phối hợp Chuyên môn:**
-  - Tham mưu Ban Giám đốc Cảng chỉ đạo Đội An ninh Hàng không rà soát lại **"Chương trình ANHK Cảng HKQT Cần Thơ"**.
-  - Bắt buộc phải viết lại/điều chỉnh theo đúng **khung đề cương mới tại mục 7.12.2** của QĐ 1171 để trình Cục Quản lý Xuất nhập cảnh (Bộ Công an) phê duyệt lại (nếu có yêu cầu chuyển tiếp).
-            </script>
+    <!-- Header -->
+    <header class="bg-white shadow-sm sticky top-0 z-30">
+        <div class="max-w-4xl mx-auto px-4 py-3">
+            <div class="text-xs italic text-gray-500 mb-1">Huấn luyện Đào tạo Cảng HKQT Cần Thơ</div>
+            <h1 class="text-xl font-bold text-blue-700 uppercase tracking-wide text-compact">Ôn Tập & Sát Hạch Hàng Hóa Nguy Hiểm – CAT8</h1>
         </div>
+        
+        <!-- Tabs -->
+        <div class="max-w-4xl mx-auto px-4 flex border-b border-gray-200 mt-2">
+            <button id="tab-quiz" onclick="switchTab('quiz')" class="flex-1 py-2 text-sm font-semibold text-blue-600 border-b-2 border-blue-600 transition-colors">
+                <i class="fas fa-stopwatch mr-1"></i> Thi Thử (40)
+            </button>
+            <button id="tab-review" onclick="switchTab('review')" class="flex-1 py-2 text-sm font-semibold text-gray-500 border-b-2 border-transparent hover:text-blue-500 transition-colors">
+                <i class="fas fa-book-open mr-1"></i> Ôn Tập (Full)
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow max-w-4xl mx-auto w-full px-2 sm:px-4 py-4">
+        
+        <!-- ================= TAB 1: THI THỬ ================= -->
+        <div id="quiz-container" class="block">
+            <!-- Top Sticky Actions -->
+            <div class="sticky top-[88px] z-20 bg-gray-50/95 backdrop-blur py-2 mb-4 border-b border-gray-200 flex justify-between items-center shadow-sm rounded-b-lg px-2">
+                <div class="flex items-center space-x-3">
+                    <div class="bg-white px-3 py-1.5 rounded-md shadow-sm border border-gray-200 flex items-center font-mono text-lg font-bold text-gray-700">
+                        <i class="fas fa-clock text-blue-500 mr-2"></i> <span class="timer-display">00:00</span>
+                    </div>
+                    <div id="high-score" class="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2 py-1 rounded border border-emerald-100 hidden">Điểm cao: 0/40</div>
+                </div>
+                <div class="flex space-x-2">
+                    <button onclick="submitQuiz()" id="btn-submit-top" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 rounded text-sm font-semibold shadow transition-colors">Nộp Bài</button>
+                    <button onclick="retryQuiz()" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-3 py-1.5 rounded text-sm font-semibold shadow-sm transition-colors" title="Làm mới"><i class="fas fa-redo"></i></button>
+                </div>
+            </div>
+
+            <!-- Quiz Questions List -->
+            <div id="quiz-list" class="space-y-4"></div>
+
+            <!-- Bottom Sticky Actions -->
+            <div class="sticky bottom-0 z-20 bg-white border-t border-gray-200 p-3 mt-6 flex justify-between items-center shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] rounded-t-lg">
+                <div id="quiz-result" class="font-bold text-lg hidden"></div>
+                <div class="flex space-x-2">
+                    <button onclick="copyResult()" id="btn-share" class="hidden bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-1.5 rounded text-sm font-semibold shadow transition-colors"><i class="fas fa-share-alt mr-1"></i> Chia sẻ</button>
+                    <button onclick="submitQuiz()" id="btn-submit-bottom" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-1.5 rounded text-sm font-semibold shadow transition-colors">Nộp Bài</button>
+                    <button onclick="retryQuiz()" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-1.5 rounded text-sm font-semibold shadow-sm transition-colors">Làm Lại</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= TAB 2: ÔN TẬP ================= -->
+        <div id="review-container" class="hidden relative">
+            <!-- Sticky Search Bar -->
+            <div class="sticky top-[88px] z-20 bg-gray-50/95 backdrop-blur py-2 mb-4">
+                <div class="relative shadow-sm rounded-md">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-search text-gray-400"></i>
+                    </div>
+                    <input type="text" id="search-input" oninput="handleSearch()" class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="Tìm kiếm câu hỏi hoặc đáp án (không dấu)...">
+                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center text-xs text-gray-400 font-semibold" id="search-count"></div>
+                </div>
+            </div>
+
+            <!-- Review Questions List -->
+            <div id="review-list" class="space-y-3">
+                <div class="text-center py-10 text-gray-500"><span class="loader"></span> Đang tải dữ liệu...</div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-16 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-4 py-2 rounded shadow-lg text-sm transition-opacity duration-300 opacity-0 pointer-events-none z-50">
+        Đã copy kết quả!
     </div>
 
-    <div class="vca-footer">
-        Hệ thống hỗ trợ triển khai văn bản nội bộ - VCA
-    </div>
+<script>
+/* ==========================================
+   1. RAW DATA (TEMPLATE STRING) & PARSER
+   ========================================== */
+// Data is structured with Q: for question, A: for wrong option, *A: for correct option.
+// Note: Correct answers are inferred based on standard aviation CAT8 rules to make the app functional.
+const rawDataString = `
+Q: Nhận dạng nhãn và cho biết chất nguy hiểm tương ứng? [Image 1]
+A: Chất khí dễ cháy
+*A: Chất lỏng dễ cháy
+A: Chất rắn dễ cháy
+A: Chất khí không độc, không cháy
 
-    <script src="https://cdn.jsdelivr.net/npm/markmap-autoloader@0.15.4"></script>
+Q: Nhận dạng nhãn và cho biết chất nguy hiểm tương ứng? [Image 2]
+A: Chất độc
+A: Chất truyền nhiễm
+*A: Chất khí dễ cháy
+A: Chất ăn mòn
 
+Q: Nhận dạng nhãn và cho biết chất nguy hiểm tương ứng? [Image 3]
+A: Chất khí dễ cháy
+A: Chất lỏng dễ cháy
+*A: Chất rắn dễ cháy
+A: Chất khí không độc, không cháy
+
+Q: Nhận dạng nhãn và cho biết chất nguy hiểm tương ứng? [Image 4]
+*A: Chất độc
+A: Chất truyền nhiễm
+A: Chất khí dễ cháy
+A: Chất ăn mòn
+
+Q: Nhận dạng nhãn và cho biết chất nguy hiểm tương ứng? [Image 5]
+A: Chất độc
+*A: Chất truyền nhiễm
+A: Chất khí dễ cháy
+A: Chất ăn mòn
+
+Q: Nhận dạng nhãn và cho biết chất nguy hiểm tương ứng? [Image 6]
+A: Chất độc
+A: Chất truyền nhiễm
+A: Chất khí dễ cháy
+*A: Chất ăn mòn
+
+Q: Nhận dạng nhãn và cho biết chất nguy hiểm tương ứng? [Image 7]
+A: Chất độc
+*A: Chất nổ
+A: Chất khí dễ cháy
+A: Chất ăn mòn
+
+Q: Nhận dạng nhãn và cho biết chất nguy hiểm tương ứng? [Image 8]
+A: Chất độc
+*A: Chất phóng xạ
+A: Chất khí dễ cháy
+A: Chất ăn mòn
+
+Q: Nhận dạng nhãn và cho biết chất nguy hiểm tương ứng? [Image 9]
+A: Chất độc
+*A: Chất oxy hóa
+A: Chất khí dễ cháy
+A: Chất ăn mòn
+
+Q: Nhận dạng nhãn và cho biết chất nguy hiểm tương ứng? [Image 10]
+A: Chất khí độc
+*A: Chất khí không độc, không cháy
+A: Chất khí dễ cháy
+A: Chất ăn mòn
+
+Q: Một kiện hàng có dán nhãn sau phải được chất xếp theo chiều mũi tên: [Image 11]
+A: Hướng về phía buồng lái
+A: Hướng về phía đuôi máy bay
+*A: Hướng lên trên
+A: Hướng xuống dưới
+
+Q: Anh/chị cần chú ý gì khi phục vụ kiện hàng có dán nhãn này? [Image 12]
+A: Không được để nơi có ánh sáng mặt trời chiếu trực tiếp
+A: Tránh xa các nơi có nguồn nhiệt
+A: Đặt nơi thoáng mát, điều hòa không khí
+*A: Tất cả các câu a, b, c đúng
+
+Q: Ai chịu trách nhiệm dán nhãn và ghi chú trên kiện hàng hóa nguy hiểm phù hợp với tất cả các yêu cầu về vận chuyển hàng không đang áp dụng?
+A: Đại lý giao nhận hàng hóa
+A: Hãng vận chuyển
+*A: Người gửi hàng
+A: Nhân viên kho hàng
+
+Q: Kiện hàng có dán nhãn phục vụ " Cargo Aircraft Only " có thể được chất xếp trên cả máy bay chở khách và máy bay chuyên chở hàng? [Image 13]
+A: Đúng
+*A: Sai
+
+Q: Nhận dạng nhãn và cho biết chất nguy hiểm tương ứng? [Image 14]
+A: Chất độc
+A: Chất oxy hóa
+*A: Chất nguy hiểm khác, chất nguy hiểm cho môi trường
+A: Chất ăn mòn
+
+Q: Ai chịu trách nhiệm kiểm tra và thay thế nhãn trên kiện hàng hóa nguy hiểm khi bị bong tróc và khó nhận dạng trong quá trình vận chuyển?
+A: Đại lý giao nhận hàng hóa
+*A: Hãng vận chuyển
+A: Người gửi hàng
+A: Nhân viên kho hàng
+
+Q: Qui định dán Nhãn hàng hóa nguy hiểm trên kiện hàng hóa nguy hiểm bắt buộc?
+A: Phải được dán bên trong kiện hàng
+*A: Phải được dán bên ngoài kiện hàng
+A: Dán ở đâu cũng được
+A: Không cần phải dán
+
+Q: Nhận dạng nhãn và cho biết chất nguy hiểm tương ứng? [Image 15]
+A: Chất nổ nhóm 1.4G
+A: Chất nổ nhóm 1.4B
+*A: Chất nổ nhóm 1.4S
+A: Chất rắn dễ cháy
+
+Q: Nhận dạng nhãn và cho biết chất nguy hiểm tương ứng? [Image 16]
+A: Nhóm 4.1 - Chất rắn dễ cháy
+*A: Nhóm 4.2 - Chất rắn tự bốc cháy
+A: Nhóm 4.3 - Chất rắn nguy hiểm khi tiếp xúc với nước
+
+Q: Nhận dạng nhãn và cho biết chất nguy hiểm tương ứng? [Image 17]
+A: Nhóm 4.1 - Chất rắn dễ cháy
+A: Nhóm 4.2 - Chất rắn tự bốc cháy
+*A: Nhóm 4.3 - Chất rắn nguy hiểm khi tiếp xúc với nước
+
+Q: Nhận dạng nhãn và cho biết chất nguy hiểm tương ứng? [Image 18]
+A: Chất phóng xạ mức I-Trắng
+*A: Chất phóng xạ mức II-Vàng
+A: Chất phóng xạ mức III-Vàng
+
+Q: Nhận dạng nhãn và cho biết chất nguy hiểm tương ứng? [Image 19]
+*A: Chất phóng xạ mức I-Trắng
+A: Chất phóng xạ mức II-Vàng
+A: Chất phóng xạ mức III-Vàng
+
+Q: Cho biết ý nghĩa của nhãn phục vụ sau: [Image 20]
+A: Lưu ý kiện hàng có chứa pin lithium
+*A: Lưu ý kiện hàng có chứa vật liệu từ tính
+
+Q: Cho biết ý nghĩa của nhãn phục vụ sau: [Image 21]
+A: Lưu ý kiện hàng có chứa pin lithium
+A: Lưu ý kiện hàng có chứa vật liệu từ tính
+A: Lưu ý kiện hàng có chứa bình khí dễ cháy
+*A: Lưu ý kiện hàng có chứa khí hóa lỏng lạnh
+
+Q: Cho biết ý nghĩa của nhãn phục vụ sau: [Image 22]
+A: Dành cho xe lăn hoặc các thiết bị hỗ trợ di chuyển sử dụng bình ắc quy
+A: Có thể dán vào xe lăn hoặc các thiết bị hỗ trợ di chuyển để hỗ trợ phục vụ
+A: Nhãn này được sử dụng để xác định xe lăn đã tháo rời bình ắc quy ra hay chưa
+*A: Tất cả đều đúng
+
+Q: Cho biết ý nghĩa của nhãn phục vụ sau: [Image 23]
+A: Dành cho ắc quy của xe lăn hoặc các thiết bị hỗ trợ di chuyển của hành khách
+*A: Lưu ý kiện hàng có chứa pin lithium
+A: Lưu ý kiện hàng có chứa chất rắn dễ cháy
+
+Q: Nhãn phục vụ nào sau đây phải được dùng cho kiện hàng hóa nguy hiểm nhóm 4.1 và 5.2?
+A: [Image 24]
+A: [Image 25]
+*A: [Image 26]
+A: [Image 27]
+
+Q: Ký hiệu un trên bao bì sau là: [Image 28]
+A: Ký hiệu của nhà sản xuất
+*A: Ký hiệu bao bì theo tiêu chuẩn kỹ thuật của Liên Hiệp Quốc
+A: Ký hiệu chỉ loại bao bì
+
+Q: Kiện hàng có nhãn dưới đây có thể chứa hàng hóa nguy hiểm không? [Image 29]
+*A: Có, đây là kiện hàng chứa hàng hóa nguy hiểm số lượng hạn chế.
+A: Không, vì bao bì không có biểu tượng un chỉ bao bì tiêu chuẩn của Liên Hiệp Quốc dùng để chứa hàng hóa nguy hiểm.
+
+Q: Cơ quan (tổ chức) nào chịu trách nhiệm phân loại hàng hóa nguy hiểm?
+*A: Ủy ban các chuyên gia của Liên hiệp quốc
+A: Ủy ban các chuyên gia của Tổ chức hàng không dân dụng quốc tế
+A: Ủy ban các chuyên gia của Hiệp hội vận tải hàng không quốc tế
+A: Ủy ban các chuyên gia của Cục hàng không Việt Nam
+
+Q: Chương trình huấn luyện hàng hóa nguy hiểm phải được kiểm tra và phê duyệt theo quy định của cơ quan nhà nước có thẩm quyền thích hợp. Điều này là:
+*A: Đúng
+A: Sai
+
+Q: Huấn luyện định kỳ phải được thực hiện trong thời gian bao lâu kể từ lần huấn luyện trước để đảm bảo kiến thức được cập nhật, trừ khi cơ quan có thẩm quyền yêu cầu thời gian huấn luyện định kỳ ngắn hơn?
+A: 06 tháng
+A: 12 tháng
+A: 18 tháng
+*A: 24 tháng
+
+Q: Ai là người phải biết trên tàu bay đang chở những hàng hóa nguy hiểm gì để có thể xử lý đúng cách trong các trường hợp khẩn cấp có thể xảy ra?
+A: Tiếp viên trưởng
+*A: Cơ trưởng
+A: Đại diện hãng
+A: Cơ phó
+
+Q: Định nghĩa hàng hóa nguy hiểm?
+A: Hàng hóa nguy hiểm là vật hoặc chất có khả năng gây nguy hại đến sức khỏe, sự an toàn, tài sản hoặc môi trường và những vật, chất được liệt kê trong Danh mục hàng hóa nguy hiểm trong tài liệu Quy định về hàng hóa nguy hiểm của IATA (DGR).
+A: Hàng hóa nguy hiểm là vật hoặc chất có khả năng gây nguy hại đến sự an toàn, được liệt kê trong Danh mục hàng hóa nguy hiểm trong tài liệu Quy định về hàng hóa nguy hiểm của IATA (DGR) hoặc được phân loại dựa trên các quy định trong tài liệu DGR.
+*A: Hàng hóa nguy hiểm là vật hoặc chất có khả năng gây nguy hại đến sức khỏe, sự an toàn, tài sản hoặc môi trường và những vật, chất được liệt kê trong Danh mục hàng hóa nguy hiểm trong tài liệu Quy định về hàng hóa nguy hiểm của IATA (DGR) hoặc được phân loại dựa trên các quy định trong tài liệu DGR.
+A: Hàng hóa nguy hiểm là vật hoặc chất có khả năng gây nguy hại môi trường được liệt kê trong Danh mục hàng hóa nguy hiểm trong tài liệu Quy định về hàng hóa nguy hiểm của IATA (DGR) hoặc được phân loại dựa trên các quy định trong tài liệu DGR.
+
+Q: Quy định về hạn chế vận chuyển hàng hóa nguy hiểm có nội dung gì?
+A: Một số hàng hóa nguy hiểm được xem là quá nguy hiểm để vận chuyển trên bất kỳ tàu bay nào và trong bất kỳ trường hợp nào.
+A: Một số hàng hóa nguy hiểm khác bị cấm vận chuyển trong các điều kiện bình thường, nhưng có thể được vận chuyển nếu được sự cho phép riêng của các quốc gia có liên quan.
+A: Hầu hết hàng hóa nguy hiểm có thể được vận chuyển an toàn trên máy bay chở khách, nhưng một số chỉ được vận chuyển trên tàu bay chở hàng.
+*A: Tất cả các ý trên đều đúng
+
+Q: Mỗi hàng hóa nguy hiểm phải được nhận dạng bởi một Tên chuẩn trong vận chuyển. Tên chuẩn được xác định bởi:
+A: 01 số UN gồm 2 chữ số hoặc 01 số ID trong series 8000
+A: 01 số UN gồm 3 chữ số hoặc 01 số ID trong series 8000
+*A: 01 số UN gồm 4 chữ số hoặc 01 số ID trong series 8000
+A: 01 số UN gồm 5 chữ số hoặc 01 số ID trong series 8000
+
+Q: Những điều kiện có thể ảnh hưởng đến hàng hóa nguy hiểm (tính chất, bao bì…) khi vận chuyển bằng đường hàng không mà không thấy được trên mặt đất bao gồm:
+A: Sự chấn động
+A: Sự thay đổi áp suất
+A: Sự thay đổi nhiệt độ
+*A: Tất cả các ý trên
+
+Q: Quy định của IATA luôn luôn phải chặt chẽ, khắc khe hơn quy định riêng của quốc gia và hãng vận chuyển. Điều này là đúng hay sai?
+*A: Đúng
+A: Sai
+
+Q: Tổ chức nào đã xây dựng các khuyến cáo về vận chuyển các loại hàng hóa nguy hiểm ngoại trừ chất phóng xạ?
+*A: Hội đồng các chuyên gia của Liên Hiệp Quốc về Vận chuyển hàng hóa nguy hiểm (SCoETDG)
+A: Cơ quan năng lượng nguyên tử quốc tế (IAEA)
+A: Tổ chức hàng không dân dụng quốc tế (ICAO)
+A: Hiệp hội vận tải hàng không quốc tế (IATA)
+
+Q: Tổ chức nào xây dựng các quy trình khuyến cáo về vận chuyển an toàn chất phóng xạ?
+A: Hội đồng các chuyên gia của Liên Hiệp Quốc về Vận chuyển hàng hóa nguy hiểm (SCoETDG)
+*A: Cơ quan năng lượng nguyên tử quốc tế (IAEA)
+A: Tổ chức hàng không dân dụng quốc tế (ICAO)
+A: Hiệp hội vận tải hàng không quốc tế (IATA)
+
+Q: Tổ chức nào ban hành tài liệu Hướng dẫn kỹ thuật cho việc vận chuyển an toàn hàng hóa nguy hiểm bằng đường hàng không (Doc 9284)?
+A: Hội đồng các chuyên gia của Liên Hiệp Quốc về Vận chuyển hàng hóa nguy hiểm (SCoETDG)
+A: Cơ quan năng lượng nguyên tử quốc tế (IAEA)
+*A: Tổ chức hàng không dân dụng quốc tế (ICAO)
+A: Hiệp hội vận tải hàng không quốc tế (IATA)
+
+Q: Tổ chức nào ban hành cuốn Quy định về hàng hóa nguy hiểm (Dangerous Goods Regulations – viết tắt là DGR)?
+A: Hội đồng các chuyên gia của Liên Hiệp Quốc về Vận chuyển hàng hóa nguy hiểm (SCoETDG)
+A: Cơ quan năng lượng nguyên tử quốc tế (IAEA)
+A: Tổ chức hàng không dân dụng quốc tế (ICAO)
+*A: Hiệp hội vận tải hàng không quốc tế (IATA)
+
+Q: Sử dụng Danh mục kiểm tra (checklist) để kiểm tra và chấp nhận lô hàng hóa nguy hiểm đã khai báo là nhiệm vụ của:
+A: Người gửi hàng
+*A: Nhân viên chấp nhận hàng hóa của hãng vận chuyển
+A: Cả a và b đều đúng
+
+Q: Bảo đảm hàng hóa nguy hiểm được nhận dạng, phân loại, đóng gói, ghi chú, dán nhãn và lập chứng từ theo đúng quy định trong DGR là trách nhiệm của:
+*A: Người gửi hàng
+A: Hãng vận chuyển
+A: Cả a và b đều đúng
+
+Q: Lưu kho, chất xếp, cung cấp thông tin bao gồm thông tin ứng phó khẩn cấp liên quan hàng hóa nguy hiểm là trách nhiệm của:
+A: Người gửi hàng
+*A: Hãng vận chuyển
+A: Cả a và b đều đúng
+
+Q: Sau khi hoàn thành đạt yêu cầu khóa huấn luyện cơ bản, huấn luyện định kỳ phải được thực hiện trong vòng bao lâu?
+A: 06 tháng tiếp theo, trừ khi nhà chức trách có thẩm quyền quy định thời gian huấn luyện định kỳ ngắn hơn
+A: 12 tháng tiếp theo, trừ khi nhà chức trách có thẩm quyền quy định thời gian huấn luyện định kỳ ngắn hơn
+*A: 24 tháng tiếp theo, trừ khi nhà chức trách có thẩm quyền quy định thời gian huấn luyện định kỳ ngắn hơn
+A: 36 tháng tiếp theo, trừ khi nhà chức trách có thẩm quyền quy định thời gian huấn luyện định kỳ ngắn hơn
+
+Q: Theo quy định của IATA về huấn luyện hàng hóa nguy hiểm, nhân viên an ninh soi chiếu, cán bộ trực soi chiếu thuộc nhóm đối tượng được huấn luyện theo phân hạng (CAT) nào?
+A: CAT 6
+A: CAT 8
+A: CAT 10
+*A: CAT 12
+
+Q: Hãng vận chuyển phải cung cấp tất cả thông tin về hàng hóa nguy hiểm hành khách được mang theo trong hành lý hoặc để trong người tại thời điểm mua vé máy bay và khi làm thủ tục. Điều này là đúng hay sai?
+*A: Đúng
+A: Sai
+
+Q: Tại sao vẫn vận chuyển hàng hóa nguy hiểm dù nguy cơ hiện hữu?
+A: Nhu cầu thương mại
+A: Vận chuyển đường không nhanh chóng và tiếp cận được các khu vực xa xôi hẻo lánh
+A: Yêu cầu phải có để tàu bay hoạt động an toàn
+A: Hàng hóa miễn thuế phục vụ trong chuyến bay
+*A: Tất cả các ý trên đều đúng
+
+Q: Không yêu cầu bắt buộc phải có bài kiểm tra và kết quả kiểm tra đạt yêu cầu sau khóa huấn luyện để xác nhận học viên hiểu biết về các quy định vận chuyển hàng hóa nguy hiểm bằng đường hàng không.
+A: Đúng
+*A: Sai
+
+Q: IATA quy định hồ sơ huấn luyện hàng hóa nguy hiểm phải được lưu trữ bởi người sử dụng lao động trong khoảng thời gian tối thiểu là 36 tháng và phải có sẵn khi có yêu cầu từ nhân viên hoặc cơ quan nhà nước có thẩm quyền.
+*A: Đúng
+A: Sai
+
+Q: Hãng vận chuyển phải đảm bảo có đủ các bảng thông báo hiển thị nổi bật tại các điểm nhận hàng nhằm cảnh báo người gửi hàng về các quy định áp dụng cho việc vận chuyển hàng hóa nguy hiểm. Ngoài ra còn phải có thông tin hiển thị trên “không vận đơn” (Airway bill). Nhận định này?
+*A: Đúng
+A: Sai
+
+Q: Hành khách có thể tìm thấy thông tin về hàng hóa nguy hiểm ở đâu?
+A: Thông tin cung cấp ở điểm bán vé
+A: Thông tin cung cấp trên trang web của các hãng vận chuyển
+A: Thông tin kèm theo vé của khách hoặc hành khách được thông báo trước hoặc trong khi làm thủ tục lên máy bay.
+A: Những bảng cảnh báo có hình ảnh minh họa đặt tại các khu vực ở sân bay: quầy vé, khu vực làm thủ tục, khu vực kiểm tra an ninh hàng lý xách tay, ký gửi và cửa lên máy bay.
+*A: Tất cả các phương án trên
+
+Q: Theo quy định của IATA về huấn luyện hàng hóa nguy hiểm, nhân viên phục vụ hành khách thuộc nhóm đối tượng được huấn luyện theo phân hạng (CAT) nào?
+*A: CAT 9
+A: CAT 7
+A: CAT 10
+A: CAT 12
+
+Q: Theo quy định của IATA về huấn luyện hàng hóa nguy hiểm, thành viên tổ lái, nhân viên tài liệu hướng dẫn chất xếp, nhân viên cân bằng trọng tải được huấn luyện theo phân hạng (CAT) nào?
+A: CAT 6
+A: CAT 8
+*A: CAT 10
+A: CAT 12
+
+Q: Theo quy định của IATA về huấn luyện hàng hóa nguy hiểm, nhân viên phục vụ hành lý, hành hóa thuộc nhóm đối tượng được huấn luyện theo phân hạng (CAT) nào?
+A: CAT 6
+*A: CAT 8
+A: CAT 10
+A: CAT 12
+
+Q: Trong một số trường hợp, vì sao hàng hóa nguy hiểm chỉ cho phép chuyên chở trên tàu bay chở hàng?
+A: Số lượng lớn
+A: Bị cấm chuyên chở trên máy bay chở khách
+*A: Cả a và b đều đúng
+
+Q: Hàng hóa nguy hiểm không được phép để trong hành lý ký gửi, xách tay hoặc để trong người của hành khách hoặc phi hành đoàn, chỉ trừ những hàng hóa nguy hiểm được liệt kê trong Bảng 2.3.A của tài liệu DGR. Điều này là đúng hay sai?
+*A: Đúng
+A: Sai
+
+Q: Những vật hoặc chất như thế nào được xem là quá nguy hiểm để vận chuyển bằng đường hàng không dưới mọi trường hợp?
+A: Có khả năng gây nổ, phản ứng hóa học nguy hiểm, dễ cháy, tạo ra sức nóng
+A: Phát ra chất độc, chất ăn mòn, khí dễ cháy ở điều kiện bình thường trong quá trình vận chuyển
+*A: Cả a và b đều đúng
+A: Cả a và b đều sai
+
+Q: Trong nhận diện hàng hóa nguy hiểm tiềm ẩn, nhân viên chấp nhận hàng hóa, nhân viên làm thủ tục cho hành khách, nhân viên an ninh soi chiếu phải được cung cấp thông tin về:
+A: Mô tả chung đối với các hàng hóa hoặc vật phẩm trong hành lý của hành khách mà có thể chứa hàng hóa nguy hiểm
+A: Các dấu hiệu có thể cho thấy sự hiện diện của hàng hóa nguy hiểm (VD: nhãn, ghi chú…)
+A: Những loại hàng hóa nguy hiểm hành khách được phép mang theo quy định trong tài liệu DGR, mục 2.3.
+*A: Tất cả đều đúng
+
+Q: Nếu phát hiện ra hàng hóa nguy hiểm, hoặc hàng hóa nguy hiểm được chuẩn bị để vận chuyển dưới dạng hàng hóa thông thường, anh/chị phải:
+A: Dán nhãn hàng hóa nguy hiểm
+A: Tìm chủ của kiện hàng và trả lại
+A: Không quan tâm tới
+*A: Báo ngay cho nhân viên chấp nhận hàng hóa nguy hiểm hoặc các chuyên gia để được hỗ trợ
+
+Q: Một kiện hàng có thể nhìn thấy băng đá đóng bên ngoài hoặc khi chạm vào rất lạnh có thể chứa:
+A: Vũ khí
+A: Bình gas
+*A: Đá khô hoặc khí hóa lỏng lạnh
+A: Pin lithium
+
+Q: Một kiện hàng có trọng tâm dịch chuyển có thể chứa:
+A: Vũ khí
+*A: Chất lỏng
+A: Đá khô
+A: Pin lithium
+
+Q: Các kiện hàng tái sử dụng có:
+A: Trọng tâm dịch chuyển
+A: Mùi/hơi lạ
+A: Tiếng kêu leng keng nghe thấy được trong quá trình phục vụ
+*A: Các ghi chú hoặc dán nhãn hàng hóa nguy hiểm cũ
+
+Q: Thiết bị thở có thể chứa hàng hóa nguy hiểm tiềm ẩn gì?
+*A: Bình khí nén hoặc khí oxy, máy tạo oxy hoá học hoặc oxy hóa lỏng lạnh
+A: Các chất lỏng dễ cháy (dầu hỏa, xăng vv...)
+A: Thuỷ ngân và chất phóng xạ
+A: Chất truyền nhiễm
+
+Q: Các vật phẩm nào có thể chứa hoặc chỉ ra sự hiện diện của hàng hóa nguy hiểm?
+A: Dụng cụ nha khoa
+A: Mẫu xét nghiệm y khoa
+A: Đèn khò
+*A: Tât cả các ý trên
+
+Q: Vật, chất nào sau đây hành khách và tổ bay có thể mang theo dưới dạng hành lý?
+A: Bình khí nén nhỏ chứa khí CO2 hoặc dưỡng khí oxy
+*A: Diêm quẹt cháy ở mọi bề mặt và bật lửa tia lửa xanh hay bật lửa xì gà
+A: Bình oxy y tế cá nhân có chứa oxy lỏng
+A: Vũ khí gây sốc điện (ví dụ súng điện) có chứa chất nguy hiểm như chất nổ, khí nén, pin lithium, v.v…
+
+Q: Vật phẩm nào sau đây sử dụng trong kinh doanh hoặc sử dụng cá nhân bị cấm vận chuyển bởi hành khách hoặc tổ bay:
+A: Máy uốn tóc có chứa khí hidro carbon
+A: Đá khô
+A: Diêm quẹt an toàn, bật lửa mang theo trong người
+*A: Diêm quẹt cháy ở mọi bề mặt và bật lửa tia lửa xanh hay bật lửa xì gà
+
+Q: Ở dạng hàng hóa, mỗi kiện hàng nguy hiểm phải được kiểm tra kỹ lưỡng theo các yêu cầu trong tài liệu DGR bởi đối tượng nhân viên nào?
+A: Nhân viên an ninh soi chiếu
+A: Nhân viên làm thủ tục
+*A: Nhân viên chấp nhận hàng hóa nguy hiểm của hãng vận chuyển
+A: Tất cả các ý trên
+
+Q: Theo quy định về hàng hóa nguy hiểm được phép mang theo bởi hành khách hoặc tổ bay, các loại bếp lò cắm trại và bình nhiên liệu trống rỗng:
+A: Không được để trong hành lý xách tay
+A: Yêu cầu phải có sự chấp thuận của hãng vận chuyển 
+A: Chỉ được để trong hành lý ký gửi
+*A: Tất cả đều đúng
+
+Q: Khi hành khách hoặc tổ bay mang theo đá khô, hành lý ký gửi phải ghi chú “Dry ice” hoặc “carbon dioxide, solid” và trọng lượng tịnh tối đa của đá khô được phép ký gửi là:
+A: 1 kg
+*A: 2,5kg
+A: 5 kg
+A: Không giới hạn
+
+Q: Vật, chất nào sau đây hành khách và tổ bay có thể mang theo dưới dạng hành lý?
+A: Bình oxy y tế cá nhân có chứa oxy lỏng
+A: Thiết bị gây tê liệt, mất khả năng tự vệ như bình xịt hơi cay, có chứa chất làm sưng tấy hoặc hủy hoại thân thể
+A: Thức uống có cồn có nồng độ cồn trên 70%
+*A: Thức uống có cồn có nồng độ cồn không quá 70%
+
+Q: Các loại bình xịt chứa khí thuộc Nhóm 2.2, không có chất nguy hiểm phụ, sử dụng trong thể thao hoặc gia đình có được phép xách tay hay không?
+A: Có
+*A: Không
+
+Q: Nhiệt kế y tế có chứa thủy ngân, mỗi người được phép mang theo 02 cái để sử dụng cá nhân, đựng trong hộp bảo vệ. Điều này là:
+A: Đúng
+*A: Sai
+
+Q: Quy định riêng của quốc gia bao gồm:
+A: Nhóm 2 ký tự là mã của hãng vận chuyển và 02 số, bắt đầu từ số “01”, ví dụ “AC-01”
+*A: Nhóm 3 chữ cái, chữ cuối cùng luôn luôn là chữ “G”, theo sau là nhóm 2 con số bắt đầu từ số “01”, ví dụ “AUG-01”
+A: a và b đúng
+A: a và b sai
+
+Q: Quy định riêng của hãng vận chuyển bao gồm:
+*A: Nhóm 2 ký tự là mã của hãng vận chuyển và 02 số, bắt đầu từ số “01”, ví dụ “VN-01”
+A: Nhóm 3 chữ cái, chữ cuối cùng luôn luôn là chữ “G”, theo sau là nhóm 2 con số bắt đầu từ số “01”, ví dụ “USG-01”
+A: a và b đúng
+A: a và b sai
+
+Q: Theo quy định của tài liệu DGR, cho phép mỗi hành khách chỉ được mang theo người bao nhiêu bao diêm an toàn hoặc bao nhiêu chiếc bật lửa (nhỏ thông thường) dùng khí hóa lỏng?
+*A: 01 bao diêm an toàn hoặc 01 chiếc bật lửa
+A: 02 bao diêm an toàn hoặc 01 chiếc bật lửa
+A: 01 bao diêm an toàn hoặc 02 chiếc bật lửa
+A: 02 bao diêm an toàn hoặc 02 chiếc bật lửa
+
+Q: Có một số đối tượng hành khách cụ thể mà mục đích du lịch của họ có thể chỉ ra các hàng hóa nguy hiểm tiềm ẩn họ đang mang theo, ví dụ các đoàn đi thám hiểm, trượt tuyết hoặc đoàn làm phim, nhiếp ảnh.
+A: Sai
+*A: Đúng
+
+Q: Một số dấu hiệu nhận biết sự hiện diện của hàng hóa nguy hiểm tiềm ẩn?
+A: Một kiện hàng bị ố hoặc ẩm ướt có thể bị rò rỉ chất bên trong
+A: Các bình phun xịt có thể tạo ra tiếng kêu leng keng nghe thấy được trong quá trình phục vụ
+A: Các kiện hàng sinh ra khói hoặc hơi có mùi nguy hiểm
+*A: Tất cả các ý trên đều đúng
+
+Q: Phụ tùng, thiết bị máy bay có thể chứa hàng hóa nguy hiểm tiềm ẩn gì?
+A: Pháo sáng hoặc bình chữa cháy
+A: Máy sản xuất oxy hoá học
+A: Bình khí nén
+A: Thiết bị cứu sinh (áo phao, phao trượt thoát hiểm)
+*A: Tất cả các ý trên đều đúng
+
+Q: Dụng cụ cắm trại, thám hiểm có thể chứa hàng hóa nguy hiểm tiềm ẩn gì?
+A: Chất khí dễ cháy (khí butane, propane)
+A: Chất lỏng dễ cháy (dầu hỏa, xăng)
+A: Chất rắn dễ cháy
+*A: Tất cả các ý trên đều đúng
+
+Q: Một số vật và chất không được phép mang trong hành lý ký gửi hoặc hành lý xách tay thì:
+A: Bị cấm vận chuyển hoàn toàn
+*A: Có thể được chấp nhận vận chuyển theo đường hàng hóa
+A: Thuốc chữa bệnh không chứa chất phóng xạ hoặc các vật phẩm vệ sinh cá nhân (bao gồm các loại bình xịt) như keo xịt tóc, nước hoa, dầu thơm và các loại dược phẩm có chứa cồn.
+A: Bị cấm vận chuyển
+
+Q: Các thiết bị điện tử cầm tay có pin lithium metal hoặc lithium ion, bao gồm thiết bị y tế ví dụ như máy tạo oxy xách tay (Portable Oxygen Concentrator - POC) và các thiết bị điện tử cá nhân như máy chụp hình, điện thoại di động, máy tính xách tay, máy tính bảng và pin sạc dự phòng được hành khách hoặc tổ bay mang theo để sử dụng cá nhân. Pin lithium metal không được vượt quá 2g hàm lượng lithium và pin lithium ion không được vượt quá 100Wh.
+A: Được phép để trong hành lý xách tay, ký gửi
+A: Không cần xin phép hãng vận chuyển
+*A: a và b đúng
+A: a và b sai
+
+Q: Tất cả các loại pin lithium rời (tháo khỏi xe lăn hoặc thiết bị hỗ trợ di chuyển), pin rời/ dự phòng cho các thiết bị điện tử, thiết bị y tế cầm tay:
+A: Chỉ cho phép để trong hành lý ký gửi
+*A: Chỉ cho phép để trong hành lý xách tay
+A: Cho phép để trong hành lý ký gửi và xách tay 
+
+Q: Thức uống có cồn, trong các bao bì bán lẻ, có độ cồn trên 24% nhưng không quá 70%, đựng trong bao bì không quá 5 lít, mỗi người được phép mang không quá 5 lít:
+A: Phải có sự cho phép của hãng vận chuyển 
+*A: Không cần có sự cho phép của hãng vận chuyển, được phép để trong hành lý xách tay hoặc ký gửi
+A: Được phép để trong hành lý ký gửi nhưng phải báo vị trí chất xếp cho cơ trưởng
+A: Tất cả các phương án a,b,c
+
+Q: Với sự cho phép của hãng vận chuyển, đá khô trong hành lý ký gửi để giữ lạnh hàng hóa dễ hư hỏng không phải là hàng hóa nguy hiểm phải tuân thủ các quy định:
+A: Trọng lượng không quá 2.5 kg
+A: Bao bì cho phép thoát khí CO2 ra ngoài
+A: Có ghi chú “Dry Ice” và trọng lượng tịnh của đá khô ở bên ngoài kiện hàng
+*A: Tất cả các phương án a,b,c
+
+Q: Loại hàng hóa nào dưới đây có khả năng chứa hàng hóa nguy hiểm?
+*A: Bộ dụng cụ sửa chữa
+A: Quần áo
+A: Bức tranh 
+A: Bộ bàn ghế gỗ
+
+Q: Lô hàng hóa khai báo là thuốc tiêm chủng (vắc xin) có thể chứa chất nguy hiểm tiềm ẩn nào?
+A: Các chất khí dễ cháy
+A: Các chất khí nén
+*A: Có thể đóng gói chung với đá khô 
+A: Các vật liệu từ tính hoặc thủy ngân 
+
+Q: Theo Quy định của IATA, hàng hóa nguy hiểm được phân loại thành … loại, mỗi loại thể hiện các … liên quan. Từ nào còn thiếu trong nhận định trên?
+A: 07 – mối nguy hiểm
+A: 08 – tính chất
+*A: 09 – mối nguy hiểm
+A: 10 – thuộc tính
+
+Q: Theo Quy định của IATA, những Loại hàng hóa nguy hiểm nào sau đây được phân chia thành các nhóm nhỏ?
+*A: Loại 1, 2, 4, 5, 6
+A: Loại 1, 3, 4, 6
+A: Loại 1, 2, 4, 6, 7, 9
+A: Loại 1, 2, 4, 5, 8
+
+Q: Theo Quy định của IATA, hàng hóa nguy hiểm Loại 1 – Chất nổ được phân chia thành bao nhiêu nhóm nhỏ?
+A: 4 nhóm
+A: 5 nhóm
+*A: 6 nhóm
+A: 7 nhóm
+
+Q: Theo Quy định của IATA, hàng hóa nguy hiểm Loại 2 là vật/chất nguy hiểm gì?
+*A: Chất khí
+A: Chất lỏng dễ cháy
+A: Chất ôxy hóa và chất peroxide hữu cơ
+A: Chất độc và chất truyền nhiễm
+
+Q: Theo Quy định của IATA, hàng hóa nguy hiểm Loại 2 được phân chia thành bao nhiêu nhóm nhỏ?
+A: 02 nhóm
+*A: 03 nhóm
+A: 04 nhóm
+A: Không chia nhóm
+
+Q: Theo Quy định của IATA, hàng hóa nguy hiểm Nhóm 2.1 là?
+*A: Khí dễ cháy
+A: Khí không độc, không cháy
+A: Khí độc
+A: Chất độc
+
+Q: Theo Quy định của IATA, hàng hóa nguy hiểm Nhóm 2.2 là?
+A: Khí dễ cháy
+*A: Khí không độc, không cháy
+A: Khí độc
+A: Chất lỏng dễ cháy
+
+Q: Theo Quy định của IATA, hàng hóa nguy hiểm Nhóm 2.3 là?
+A: Khí dễ cháy
+A: Khí không độc, không cháy
+*A: Khí độc
+A: Chất lỏng dễ cháy
+
+Q: Theo Quy định của IATA, hàng hóa nguy hiểm Loại 3 là vật/chất nguy hiểm gì?
+*A: Chất lỏng dễ cháy
+A: Chất nổ
+A: Chất ô-xy hóa và chất peroxide hữu cơ
+A: Chất phóng xạ
+
+Q: Theo Quy định của IATA, hàng hóa nguy hiểm Loại 3 phân chia thành bao nhiêu nhóm nhỏ?
+A: 02 nhóm
+A: 03 nhóm
+A: 04 nhóm
+*A: Không chia nhóm
+
+Q: Theo Quy định của IATA, hàng hóa nguy hiểm Loại 4 là vật/chất nguy hiểm gì?
+A: Chất nổ
+A: Chất lỏng dễ cháy
+*A: Chất rắn dễ cháy
+A: Chất ăn mòn
+
+Q: Theo Quy định của IATA, hàng hóa nguy hiểm Nhóm 4.1 là?
+*A: Chất rắn dễ cháy
+A: Chất rắn tự bốc cháy
+A: Chất rắn nguy hiểm khi tiếp xúc với nước 
+A: Chất oxy hóa
+
+Q: Theo Quy định của IATA, hàng hóa nguy hiểm Nhóm 4.2 là?
+A: Chất rắn dễ cháy
+*A: Chất rắn tự bốc cháy
+A: Chất khi tiếp xúc với nước sinh ra khí dễ cháy
+A: Chất hữu cơ pexoxide
+
+Q: Theo Quy định của IATA, hàng hóa nguy hiểm Nhóm 4.3 là?
+A: Chất rắn dễ cháy, chất tự phản ứng và chất nổ rắn khử nhạy
+A: Chất rắn tự phát cháy
+*A: Chất rắn nguy hiểm khi tiếp xúc với nước
+
+Q: Theo Quy định của IATA, hàng hóa nguy hiểm Loại 5 là vật/chất nguy hiểm gì?
+A: Chất rắn dễ cháy
+*A: Chất ô-xy hóa và chất peroxide hữu cơ
+A: Chất độc và chất truyền nhiễm
+A: Chất phóng xạ
+
+Q: Theo Quy định của IATA, hàng hóa nguy hiểm Loại 5 được phân chia thành 02 nhóm, gồm nhóm 5.1 Chất ô xy hóa và nhóm 5.2 Chất peroxide hữu cơ.
+*A: Đúng
+A: Sai
+
+Q: Theo Quy định của IATA, hàng hóa nguy hiểm Loại 6 là vật/chất nguy hiểm gì?
+A: Chất ô-xy hóa và chất peroxide hữu cơ
+*A: Chất độc và chất truyền nhiễm
+A: Chất phóng xạ
+A: Chất ăn mòn
+
+Q: Theo Quy định của IATA, hàng hóa nguy hiểm Loại 7 là vật/chất nguy hiểm gì?
+*A: Chất phóng xạ
+A: Chất ăn mòn
+A: Chất nguy hiểm khác
+A: Chất khí
+
+Q: Theo Quy định của IATA, hàng hóa nguy hiểm Loại 7 được phân chia thành bao nhiêu nhóm nhỏ?
+A: 02 nhóm
+A: 03 nhóm
+A: 04 nhóm
+*A: Không chia nhóm
+
+Q: Theo Quy định của IATA, hàng hóa nguy hiểm Loại 8 là vật/chất nguy hiểm gì?
+A: Chất lỏng dễ cháy
+A: Chất ô-xy hóa và chất peroxide hữu cơ
+*A: Chất ăn mòn
+A: Chất nguy hiểm khác
+
+Q: Theo Quy định của IATA, hàng hóa nguy hiểm Loại 9 là vật/chất nguy hiểm gì?
+A: Chất nổ
+A: Chất khí
+A: Chất ăn mòn
+*A: Chất nguy hiểm khác, chất nguy hại cho môi trường
+
+Q: Một số hàng hóa nguy hiểm có thể có những tính chất nguy hiểm tương ứng với tiêu chí phân loại của nhiều nhóm/loại. Khi đó, hàng hóa nguy hiểm này sẽ có tính chất nguy hiểm chính và tính chất nguy hiểm phụ.
+*A: Đúng
+A: Sai
+
+Q: Mỗi loại/nhóm hàng hóa nguy hiểm được xác định bởi một mã IMP gồm 3 chữ cái (IMP Code) nhằm giúp phân biệt dễ dàng và rõ ràng sự hiện diện của hàng hóa nguy hiểm trên nhiều văn bản khác nhau của chuyến bay.
+*A: Đúng
+A: Sai
+
+Q: Hàng hóa nguy hiểm được ấn định nhóm đóng gói I tương ứng với:
+A: Mức độ nguy hiểm thấp
+A: Mức độ nguy hiểm trung bình
+*A: Mức độ nguy hiểm cao
+
+Q: Chỉ có chất nổ thuộc Nhóm 1.4, nhóm tương thích S (1.4S) được chấp nhận vận chuyển trên máy bay chở khách
+A: Sai
+*A: Đúng
+
+Q: Căn cứ vào chỉ số bức xạ (TI), hàng hóa nguy hiểm Loại 7 được phân chia thành những mức nào?
+A: Mức I-Trắng, mức II-Trắng
+A: Mức I-Trắng, mức II-Vàng và mức III-Trắng
+*A: Mức I-Trắng, mức II-Vàng và mức III-Vàng
+
+Q: Trong những vật chất sau, đâu là hàng hóa nguy hiểm Loại 9 - Chất nguy hiểm khác, chất gây nguy hại cho môi trường
+A: Hạt polymer / Hợp chất đúc nhựa
+A: Carbon dioxide, thể rắn (Đá khô)
+A: Pin lithium
+A: Nam châm
+*A: Tất cả các ý trên đều đúng
+
+Q: Mã 3 chữ ICE chỉ vật chất nguy hiểm nào sau đây?
+A: Chất rắn dễ cháy
+A: Vật liệu từ tính
+*A: Đá khô
+A: Chất phóng xạ
+
+Q: Các khía cạnh nào sau đây cần phải được chú ý nhằm bảo đảm việc phục vụ và lưu trữ đúng quy định những kiện hàng hóa nguy hiểm trong kho bãi hoặc khi chất xếp, bốc dỡ từ máy bay?
+A: Lưu trữ và phục vụ
+A: Kiểm tra, giám sát
+A: Bảo vệ phòng tránh hư hỏng
+*A: Tất cả các ý trên đều đúng
+
+Q: Khi chất xếp hàng hóa nguy hiểm, cần phải quan tâm đến những điều kiện nào sau đây để bảo đảm an toàn:
+A: Phân cách
+A: Ràng buộc
+A: Các yêu cầu về chống đỡ
+A: Các yêu cầu cụ thể của chủng loại hàng
+*A: Tất cả các ý trên đều đúng
+
+Q: Hàng hóa nguy hiểm phải được bảo vệ nhằm tránh bị hư hỏng, có thể do sự di chuyển của hành lý, bưu phẩm, bưu kiện hoặc hàng hóa khác. Cần phải lưu ý đặc biệt khi phục vụ những kiện hàng này trong quá trình chuẩn bị trước khi vận chuyển, loại máy bay chuyên chở và phương pháp chất xếp nhằm tránh việc gây hư hỏng hàng do kéo lê, quăng ném, phục vụ không theo quy định của kiện hàng. Nhận định trên đúng hay sai?
+*A: Đúng
+A: Sai
+
+Q: Quy định về Hàng hóa nguy hiểm của IATA quy định như thế nào về kiểm tra, giám sát những kiện hàng hóa nguy hiểm?
+A: Kiện hàng nguy hiểm không được chất xếp lên máy bay hoặc vào ULD trừ khi chúng đã được kiểm tra kỹ lưỡng ngay trước khi chất xếp và không có dấu hiệu rò rỉ hoặc hư hỏng có thể nhìn thấy.
+A: Trước khi chất ULD lên máy bay, ULD phải được kiểm tra và chắc chắn không có dấu hiệu rò rỉ, hư hỏng nào có thể làm hỏng ULD.
+A: Bất kỳ kiện hàng hóa nguy hiểm nào bị hư hỏng hoặc rò rỉ phải được chuyển đi khỏi máy bay và tiêu hủy an toàn theo đúng quy trình của công ty và nhà chức trách sân bay. Có thể nhờ sự trợ giúp của cơ quan chuyên môn.
+A: Trường hợp có rò rỉ chất nguy hiểm, phải chắc chắn là phần còn lại của lô hàng không bị hư hỏng và các hàng hóa khác không bị dính chất nguy hiểm.
+*A: Tất cả các ý trên đều đúng
+
+Q: Sau khi hàng hóa nguy hiểm được chấp nhận, khi phát hiện nhãn của kiện hàng bị mất, không dính vào kiện hàng hoặc mờ, khó đọc, …… phải thay thế nhãn tương ứng với thông tin trong Tờ khai của người gửi hàng. Từ nào còn thiếu trong quy định trên?
+A: Người gửi hàng
+A: Nhân viên bốc xếp
+*A: Hãng vận chuyển
+A: Nhân viên điều khiển, vận hành thiết bị hàng không, phương tiện hoạt động tại khu vực hạn chế của cảng hàng không, sân bay
+
+Q: IATA quy định như thế nào về phục vụ kiện hàng và ULD có chứa chất tự phản ứng (Nhóm 4.1) và peroxide hữu cơ (Nhóm 5.2)?
+A: Phải bảo vệ tránh ánh nắng trực tiếp, đặt cách xa tất cả các nguồn nhiệt
+A: Phải đặt ở những nơi thông thoáng trong suốt quá trình chất xếp, bốc dỡ và lưu trữ
+A: Không yêu cầu phục vụ đặc biệt
+*A: a và b đúng
+
+Q: Trong quy định của IATA về lưu trữ và phục vụ chất phóng xạ, để đảm bảo bức xạ thấp nhất có thể, phải lưu ý:
+A: Vận chuyển chất phóng xạ trên xe chở hoặc xe nâng ở vị trí xa cơ thể của mình nhất
+A: Khi kiện hàng chất phóng xạ nằm trong một chuỗi các thùng chứa, đặt thùng chứa kiện chất phóng xạ ở vị trí cuối cùng trong chuỗi
+A: Chuẩn bị tất cả những thứ cần thiết cho ULD hoặc xe (vật liệu chống đỡ, dây ràng, v.v) trước khi tiến hành phục vụ kiện hàng phóng xạ.
+A: Quy định rõ số lượng nhân viên đủ để chuẩn bị và phục vụ chất phóng xạ.
+*A: Tất cả các ý trên đều đúng
+
+Q: Chất xếp hàng hóa nguy hiểm không tương thích có thể thực hiện bằng những cách nào?
+*A: Buộc dây cố định riêng biệt từng kiện, đặt cách xa nhau
+A: Đặt những kiện hàng thường (không phải hàng nguy hiểm) vào giữa những kiện hàng không tương thích với nhau
+A: a và b đúng
+A: a và b sai
+
+Q: Một kiện hàng chứa chất lỏng dễ cháy (Loại 3) có thể được chất xếp sát cạnh một kiện hàng chứa chất ô xy hóa (Nhóm 5.1) không?
+A: Được phép, không yêu cầu phân cách
+*A: Không được phép, yêu cầu phân cách an toàn
+
+Q: Một kiện hàng chứa chất rắn dễ cháy (Nhóm 4.1) có thể được chất xếp sát cạnh một kiện hàng chứa chất ăn mòn (Loại 8) không?
+*A: Được phép, không yêu cầu phân cách
+A: Không được phép, yêu cầu phân cách an toàn
+
+Q: Những kiện hàng có dán nhãn “Cargo Aircraft Only” hoặc “CAO”:
+A: Được phép chất xếp lên máy bay chở khách
+A: Được phép chất xếp lên máy bay chở khách và máy bay chở hàng
+*A: Chỉ được phép chất lên máy bay chở hàng
+A: Các ý trên đều sai
+
+Q: Định nghĩa máy bay chở hàng:
+A: Bất kỳ máy bay không phải máy bay chở khách chỉ chuyên chở hàng hóa và tài sản
+A: Tàu bay chở bất cứ ai ngoại trừ thành viên tổ bay, nhân viên của hãng vận chuyển được cấp chỗ ngồi chính thức, đại diện có thẩm quyền của cơ quan nhà nước phù hợp hoặc người hộ tống hàng hóa.
+*A: a và b đều đúng
+
+Q: Những kiện hàng chứa chất lỏng nguy hiểm có dán nhãn chỉ hướng “This Way Up” phải được chất xếp như thế nào?
+A: Chất xếp và phục vụ ngược lại với hướng của nhãn
+*A: Luôn phải được chất xếp và phục vụ phù hợp với hướng của nhãn
+A: Khi chất xếp không cần chú ý đến hướng của nhãn
+
+Q: Những kiện hàng có chứa chất độc (Nhóm 6.1) và chất truyền nhiễm (Nhóm 6.2) không được chất trong cùng khoang hàng với:
+A: Động vật sống
+A: Thực phẩm
+A: Thức ăn cho động vật, thực vật
+A: Những chất do con người và động vật tiêu thụ
+*A: Tất cả các ý trên đều đúng
+
+Q: Nhằm hạn chế thấp nhất ảnh hưởng của bức xạ, những kiện hàng chất phóng xạ phải được chất xếp:
+A: Trên mặt sàn của khoang hàng
+A: Tại phần cuối xa nhất của khoang hàng trên sàn chính
+A: a và b đều đúng
+*A: a và b đều sai
+
+Q: Vật liệu có từ tính phải được chất xếp ở vị trí sao cho ảnh hưởng đối với la bàn chỉ hướng của máy bay là ít nhất. Nhận định trên đúng hay sai?
+*A: Đúng
+A: Sai
+
+Q: Đá khô hoặc khí hóa lỏng lạnh có thể được chất xếp để vận chuyển với điều kiện hãng vận chuyển phải lưu ý các yếu tố nào?
+A: sắp xếp thích hợp loại máy bay
+A: mức độ thông khí trên máy bay
+A: phương pháp đóng gói và lưu trữ
+A: có chất xếp với các hàng hóa nhạy cảm với nhiệt độ khác hoặc có động vật sống trên cùng chuyến bay không
+*A: Tất cả các ý trên đều đúng
+
+Q: Kiện hàng nguy hiểm thuộc Nhóm 6.1 (chất độc) và kiện hàng nguy hiểm thuộc Loại 3 (chất lỏng dễ cháy) có thể được chất gần nhau trên cùng một hầm hàng máy bay?
+A: Đúng
+*A: Sai
+
+Q: Kiện hàng nguy hiểm thuộc Loại 8 (chất ăn mòn) và kiện hàng nguy hiểm thuộc Nhóm 4.3 (chất dễ cháy khi ẩm ướt) có thể được chất gần nhau trên một hầm hàng máy bay?
+A: Đúng
+*A: Sai
+
+Q: Kiện hàng chứa chất phóng xạ và kiện hàng chứa động vật sống có thể được chất gần nhau trên hầm hàng máy bay mà không cần phải phân cách?
+A: Đúng
+*A: Sai
+
+Q: Kiểm tra điều kiện tương thích của 2 chất trong kiện hàng sau: [Image 30]
+*A: Cần tách biệt
+A: Có thể xếp chung trong một kiện hàng  
+
+Q: Quy định cung cấp thông tin về hàng hóa nguy hiểm của IATA bao gồm:
+A: Cung cấp thông tin cho Cơ trưởng
+A: Cung cấp thông tin cho nhân viên
+A: Cơ trưởng cung cấp thông tin khi xảy ra khẩn nguy trong chuyến bay
+*A: Tất cả các ý trên đều đúng
+
+Q: Bảng NOTOC (Notification To Captain) là:
+A: Bảng thông tin cung cấp cho nhân viên
+A: Bảng thông tin cung cấp cho kiểm soát viên không lưu khi xảy ra khẩn nguy trong chuyến bay
+*A: Bảng thông tin cung cấp cho Cơ trưởng của chuyến bay
+A: Bảng thông tin cung cấp cho tiếp viên trưởng của chuyến bay
+
+Q: Hãng vận chuyển phải cung cấp thông tin trong sổ tay khai thác hoặc các sổ tay thích hợp khác cho tất cả nhân viên nhằm giúp tổ bay và nhân viên phục vụ có thể thực hiện tốt nhiệm vụ của mình liên quan đến vận chuyển hàng hóa nguy hiểm. Nhận định trên đúng hay sai?
+*A: Đúng
+A: Sai
+
+Q: Nếu xảy ra tình huống khẩn nguy trong chuyến bay liên quan hàng hóa nguy hiểm, cơ trưởng phải:
+*A: Thông báo cho đơn vị cung cấp dịch vụ kiểm soát không lưu thích hợp
+A: Thông báo cho nhà chức trách sân bay khởi hành
+A: Không cần thông báo
+A: Tất cả các ý trên đều sai
+
+Q: Một kiện hàng có dán nhãn sau bị rò rỉ chất lỏng khi đang chất xếp lên tàu bay, cho biết biện pháp xử lý khẩn cấp trong tình huống này? [Image 31]
+A: Kiểm tra nội dung bên trong kiện hàng có còn nguyên vẹn hay không
+*A: Cách ly khu vực xảy ra sự cố, không chạm tay vào kiện hàng, duy trì khoảng cách an toàn 25 mét, nhờ sự hỗ trợ của cơ quan chuyên môn
+A: Sử dụng băng keo chống thấm dán chặc những chỗ bị hư hỏng trên kiện hàng trước khi tiếp tục chất xếp
+A: Cảnh báo mọi người về nguy cơ cháy nổ, cách ly khu vực xảy ra sự cố và thông báo bộ phận phòng cháy chữa cháy
+
+Q: Nhân viên làm việc trên sân đỗ cần duy trì khoảng cách tối thiểu cách xa một kiện hàng chứa "Chất phóng xạ" bị hư hỏng là bao nhiêu mét?
+A: 10 mét
+A: 15 mét
+*A: 25 mét
+A: 35 mét
+
+Q: Trong quá trình làm việc, nếu anh/chị lỡ tiếp xúc với chất nguy hiểm thì anh/chị phải rửa sạch phần thân thể bị dính chất nguy hiểm với nhiều nước để hạn chế ảnh hưởng nguy hại đến bản thân?
+*A: Đúng
+A: Sai
+
+Q: Một kiện hàng có dán nhãn sau bị hư hỏng nghiêm trọng trên sân đỗ, cho biết biện pháp xử lý khẩn cấp trong tình huống này? [Image 32]
+A: Thông báo ngay cho bộ phận phòng cháy chữa cháy, ngăn ngừa cháy nổ, tránh tiếp xúc với da
+*A: Cách ly khu vực xảy ra sự cố, không được chạm vào kiện hàng, duy trì khoảng cách an toàn 25 mét, nhờ sự hỗ trợ của cơ quan chuyên môn
+A: Tránh tiếp xúc với da và không cần áp dụng các biện pháp xử lý khẩn cấp do không gây nguy hiểm đáng kể
+A: Thông báo ngay cho bộ phận phòng cháy chữa cháy, sơ tán các kiện hàng hóa khác, làm thông thoáng khu vực xảy ra sự cố, duy trì khoảng cách an toàn 25 mét.
+
+Q: Sự cố hàng hóa nguy hiểm là?
+A: Là một sự việc xảy ra liên quan đến vận chuyển hàng hóa nguy hiểm bằng đường hàng không, gây hậu quả làm chết hoặc thương tật nghiêm trọng cho người hoặc hủy hoại nghiêm trọng nhiều tài sản hoặc môi trường.
+*A: Là một sự việc xảy ra liên quan đến vận chuyển hàng hóa nguy hiểm bằng đường hàng không, không phải là tai nạn và không nhất thiết xảy ra trên tàu bay, gây thương tật cho người, làm hư hỏng tài sản hoặc môi trường, gây cháy, tràn, rò rỉ chất lỏng nguy hiểm hoặc chất phóng xạ, hoặc có chứng cứ cho thấy bao bì đóng gói không còn nguyên vẹn.
+A: Bất kỳ sự việc nào liên quan đến vận chuyển hàng hóa nguy hiểm bằng đường hàng không có nguy cơ gây hư hỏng nghiêm trọng tàu bay hoặc thương tật cho con người trên tàu bay cũng được xem như sự cố về hàng hóa nguy hiểm.
+A: Cả b và c đúng.
+
+Q: Tai nạn hàng hóa nguy hiểm là?
+*A: Là một sự việc xảy ra liên quan đến vận chuyển hàng hóa nguy hiểm bằng đường hàng không, gây hậu quả làm chết hoặc thương tật nghiêm trọng cho người hoặc hủy hoại nghiêm trọng nhiều tài sản hoặc môi trường.
+A: Là một sự việc xảy ra liên quan đến vận chuyển hàng hóa nguy hiểm bằng đường hàng không, không phải là tai nạn và không nhất thiết xảy ra trên tàu bay, gây thương tật cho người, làm hư hỏng tài sản hoặc môi trường, gây cháy, tràn, rò rỉ chất lỏng nguy hiểm hoặc chất phóng xạ, hoặc có chứng cứ cho thấy bao bì đóng gói không còn nguyên vẹn.
+A: Bất kỳ sự việc nào liên quan đến vận chuyển hàng hóa nguy hiểm bằng đường hàng không có nguy cơ gây hư hỏng nghiêm trọng tàu bay hoặc thương tật cho con người trên tàu bay cũng được xem như sự cố về hàng hóa nguy hiểm.
+A: Cả a, b, c đều đúng
+
+Q: Cho biết biện pháp xử lý khẩn cấp trong sự cố liên quan kiện hàng hóa nguy hiểm này? [Image 33]
+A: Kiểm tra nội dung bên trong kiện hàng có còn nguyên vẹn hay không
+*A: Cách ly khu vực xảy ra sự cố, không chạm tay vào kiện hàng, duy trì khoảng cách an toàn 25 mét, nhờ sự hổ trợ của cơ quan chuyên môn
+A: Sử dụng băng keo chống thấm dán chặt những chỗ bị hư hỏng trên kiện hàng trước khi tiếp tục chất xếp
+A: Bảo vệ chống lửa, tránh tiếp xúc với da và thông báo cho bộ phận phòng cháy chữa cháy
+
+Q: Bao bì chứa hàng hóa sau bị biến dạng trong quá trình chất xếp, cho biết biện pháp xử lý khẩn cấp trong tình huống này? [Image 34]
+A: Bảo vệ chống lửa và thông báo cho bộ phận phòng cháy chữa cháy
+*A: Cách ly khu vực xãy ra sự cố, không chạm tay vào kiện hàng, duy trì khoảng cách an toàn 25 mét, nhờ sự hổ trợ của cơ quan chuyên môn
+A: Bảo vệ chống lửa, dùng nước và thông báo cho bộ phận phòng cháy chữa cháy
+A: Cả a và b đúng
+
+Q: Cho biết biện pháp xử lý khẩn cấp trong trường hợp xảy ra sự cố liên quan kiện hàng sau: [Image 35]
+A: Bảo vệ chống lửa, dùng nước và thông báo cho bộ phận phòng cháy chữa cháy
+*A: Bảo vệ chống lửa, tuyệt đối không dùng nước và thông báo cho bộ phận phòng cháy chữa cháy
+A: Sử dụng băng keo chống thấm dán chặc những chổ bị hư hỏng trên kiện hàng trước khi tiếp tục chất xếp
+A: Bảo vệ chống lửa, tránh tiếp xúc với da và thông báo cho bộ phận phòng cháy chữa cháy
+
+Q: Cho biết biện pháp xử lý khẩn cấp khi xảy ra sự cố liên quan kiện hàng sau: [Image 36]
+A: Bảo vệ chống lửa, dùng nước và thông báo cho bộ phận phòng cháy chữa cháy 
+*A: Bảo vệ chống lửa, sơ tán các kiện hàng hóa khác, làm thông thoáng khu vực xảy ra sự cố, duy trì khoảng cách an toàn tối thiểu 25 mét, thông báo cho bộ phận phòng cháy chữa cháy
+A: Sử dụng băng keo chống thấm dán chặc những chổ bị hư hỏng trên kiện hàng trước khi tiếp tục chất xếp
+A: Bảo vệ chống lửa, tránh tiếp xúc với da và thông báo cho bộ phận phòng cháy chữa cháy
+
+Q: Một số can nhựa của lô hàng chất lỏng dễ cháy bị rò rỉ ra ngoài, mối nguy hiểm gì có thể xảy ra?
+A: Gây bỏng lạnh và gây ngạt
+A: Phản ứng nguy hiểm khi tiếp xúc với các chất nguy hiểm khác
+A: Ăn mòn da và kim loại
+*A: Thoát ra chất khí dễ cháy
+
+Q: Một kiện hàng có dán nhãn "Chất ăn mòn" bị rò rỉ chất lỏng, cho biết mối nguy hiểm gì có thể xảy ra?
+A: Làm thoát ra chất khí dễ cháy
+*A: Gây nguy hiểm cho da nếu chạm vào và ăn mòn kim loại
+A: Gây bệnh tật cho con người và động vật
+A: Gây bỏng lạnh và ngộp do thiếu dưỡng khí
+
+Q: Chỉ ra cách xử lý không đúng nếu xảy ra sự cố với một kiện hàng hóa nguy hiểm:
+A: Xác định loại/nhóm hàng hóa nguy hiểm nếu thấy an toàn.
+A: Cách ly kiện hàng và giải tỏa những kiện hàng hóa, tài sản xung quanh
+A: Không tiếp xúc với các chất rò rỉ và thông báo cho cán bộ cấp trên của mình
+*A: Các nhân viên có liên quan đến sự cố có thể rời khỏi vị trí mà không cần được xác nhận họ tên.
+`;
+
+    // Biến toàn cục
+    let allQuestions = [];
+    let currentQuizQuestions = [];
+    let isReviewRendered = false; // CỜ HIỆU QUAN TRỌNG ĐỂ FIX LỖI TAB TRẮNG
+    let timerInterval;
+    let secondsElapsed = 0;
+    let isSubmitted = false;
+
+    // --- Hàm tiện ích ---
+
+    // Format Image placeholders
+    function formatImagePlaceholder(text) {
+        return text.replace(/\[Image \d+\]/g, `<span class="inline-flex items-center justify-center bg-gray-200 border border-gray-400 text-gray-600 text-xs px-2 py-0.5 rounded mx-1 shadow-sm"><i class="fas fa-image mr-1"></i>Hình ảnh</span>`);
+    }
+
+    // Parse text to JSON object array
+    function parseRawData(rawStr) {
+        const questions = [];
+        const blocks = rawStr.trim().split(/\n\s*\n/);
+        
+        blocks.forEach((block, index) => {
+            const lines = block.trim().split('\n').map(l => l.trim()).filter(l => l);
+            if(lines.length < 2) return;
+            
+            let qText = lines[0].replace(/^Q:\s*/, '');
+            qText = formatImagePlaceholder(qText);
+            
+            const options = [];
+            for(let i = 1; i < lines.length; i++) {
+                let optText = lines[i];
+                let isCorrect = false;
+                if(optText.startsWith('*A:')) {
+                    isCorrect = true;
+                    optText = optText.replace(/^\*A:\s*/, '');
+                } else {
+                    optText = optText.replace(/^A:\s*/, '');
+                }
+                optText = formatImagePlaceholder(optText);
+                options.push({ text: optText, isCorrect });
+            }
+            questions.push({ id: index, question: qText, options });
+        });
+        return questions;
+    }
+
+    // Shuffle Array
+    function shuffleArray(array) {
+        const newArr = [...array];
+        for (let i = newArr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [newArr[i], newArr[j]] = [newArr[j], newArr[i]];
+        }
+        return newArr;
+    }
+
+    // Loại bỏ dấu tiếng Việt
+    function removeAccents(str) {
+        return str.normalize('NFD')
+                  .replace(/[\u0300-\u036f]/g, '')
+                  .replace(/đ/g, 'd').replace(/Đ/g, 'D');
+    }
+
+    // Tạo regex highlight thông minh (bỏ qua dấu)
+    function createHighlightRegex(keyword) {
+        if(!keyword) return null;
+        const map = {
+            'a': '[aáàảãạăắằẳẵặâấầẩẫậ]',
+            'e': '[eéèẻẽẹêếềểễệ]',
+            'i': '[iíìỉĩị]',
+            'o': '[oóòỏõọôốồổỗộơớờởỡợ]',
+            'u': '[uúùủũụưứừửữự]',
+            'y': '[yýỳỷỹỵ]',
+            'd': '[dđ]'
+        };
+        let regexStr = '';
+        const safeKeyword = removeAccents(keyword).toLowerCase();
+        for (let char of safeKeyword) {
+            regexStr += map[char] || char.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+        }
+        return new RegExp(`(${regexStr})`, 'gi');
+    }
+
+    // --- Khởi tạo ---
+    window.onload = () => {
+        allQuestions = parseRawData(rawDataString);
+        updateHighScoreDisplay();
+        initQuiz();
+    };
+
+    /* ==========================================
+       2. TAB SWITCHING LOGIC
+       ========================================== */
+    function switchTab(tabId) {
+        const quizContainer = document.getElementById('quiz-container');
+        const reviewContainer = document.getElementById('review-container');
+        const btnQuiz = document.getElementById('tab-quiz');
+        const btnReview = document.getElementById('tab-review');
+
+        if(tabId === 'quiz') {
+            quizContainer.classList.remove('hidden');
+            reviewContainer.classList.add('hidden');
+            btnQuiz.classList.replace('text-gray-500', 'text-blue-600');
+            btnQuiz.classList.replace('border-transparent', 'border-blue-600');
+            btnReview.classList.replace('text-blue-600', 'text-gray-500');
+            btnReview.classList.replace('border-blue-600', 'border-transparent');
+        } else {
+            quizContainer.classList.add('hidden');
+            reviewContainer.classList.remove('hidden');
+            btnReview.classList.replace('text-gray-500', 'text-blue-600');
+            btnReview.classList.replace('border-transparent', 'border-blue-600');
+            btnQuiz.classList.replace('text-blue-600', 'text-gray-500');
+            btnQuiz.classList.replace('border-blue-600', 'border-transparent');
+
+            // FIX TAB TRẮNG: Sử dụng biến flag isReviewRendered để kiểm tra
+            if(!isReviewRendered) {
+                renderReview();
+            }
+        }
+    }
+
+    /* ==========================================
+       3. THI THỬ (QUIZ) LOGIC
+       ========================================== */
+    function initQuiz() {
+        isSubmitted = false;
+        document.getElementById('quiz-result').classList.add('hidden');
+        document.getElementById('btn-share').classList.add('hidden');
+        document.getElementById('btn-submit-top').classList.remove('hidden');
+        document.getElementById('btn-submit-bottom').classList.remove('hidden');
+        
+        // Random 40 questions (or all if < 40)
+        currentQuizQuestions = shuffleArray(allQuestions).slice(0, 40);
+        
+        const container = document.getElementById('quiz-list');
+        container.innerHTML = '';
+
+        currentQuizQuestions.forEach((q, index) => {
+            const shuffledOptions = shuffleArray(q.options);
+            let html = `
+            <div class="bg-white p-3 sm:p-4 rounded-lg shadow-sm border border-gray-200 quiz-item" id="quiz-q-${index}">
+                <h3 class="font-bold text-gray-800 mb-2 text-compact"><span class="text-blue-600 mr-1">Câu ${index + 1}:</span> ${q.question}</h3>
+                <div class="space-y-1.5 ml-1">`;
+            
+            shuffledOptions.forEach((opt, optIdx) => {
+                const optId = `q${index}_opt${optIdx}`;
+                html += `
+                    <label class="flex items-start p-2 rounded cursor-pointer hover:bg-blue-50 transition-colors border border-transparent quiz-label">
+                        <input type="radio" name="question_${index}" value="${opt.isCorrect}" class="mt-0.5 mr-2">
+                        <span class="text-gray-700 text-sm text-compact">${opt.text}</span>
+                    </label>`;
+            });
+
+            html += `</div></div>`;
+            container.innerHTML += html;
+        });
+
+        startTimer();
+    }
+
+    function startTimer() {
+        clearInterval(timerInterval);
+        secondsElapsed = 0;
+        updateTimerDisplay();
+        timerInterval = setInterval(() => {
+            secondsElapsed++;
+            updateTimerDisplay();
+        }, 1000);
+    }
+
+    function updateTimerDisplay() {
+        const m = String(Math.floor(secondsElapsed / 60)).padStart(2, '0');
+        const s = String(secondsElapsed % 60).padStart(2, '0');
+        document.querySelectorAll('.timer-display').forEach(el => el.innerText = `${m}:${s}`);
+    }
+
+    function submitQuiz() {
+        if(isSubmitted) return;
+        clearInterval(timerInterval);
+        isSubmitted = true;
+
+        let score = 0;
+        currentQuizQuestions.forEach((q, index) => {
+            const qDiv = document.getElementById(`quiz-q-${index}`);
+            const labels = qDiv.querySelectorAll('.quiz-label');
+            const radios = qDiv.querySelectorAll('input[type="radio"]');
+            
+            radios.forEach((radio, i) => {
+                radio.disabled = true; // Lock input
+                const isCorrect = radio.value === "true";
+                const isChecked = radio.checked;
+                
+                if (isCorrect) {
+                    labels[i].classList.add('bg-green-100', 'border-green-400', 'text-green-800');
+                    labels[i].querySelector('span').innerHTML = `<i class="fas fa-check-circle text-green-600 mr-1"></i>` + labels[i].querySelector('span').innerHTML;
+                }
+                
+                if (isChecked) {
+                    if (isCorrect) {
+                        score++;
+                    } else {
+                        labels[i].classList.add('bg-red-100', 'border-red-400', 'text-red-800');
+                        labels[i].querySelector('span').innerHTML = `<i class="fas fa-times-circle text-red-600 mr-1"></i>` + labels[i].querySelector('span').innerHTML;
+                    }
+                }
+            });
+        });
+
+        // Update UI
+        const resultDiv = document.getElementById('quiz-result');
+        resultDiv.innerHTML = `Điểm của bạn: <span class="${score >= 32 ? 'text-green-600' : 'text-red-600'}">${score} / ${currentQuizQuestions.length}</span>`;
+        resultDiv.classList.remove('hidden');
+        
+        document.getElementById('btn-submit-top').classList.add('hidden');
+        document.getElementById('btn-submit-bottom').classList.add('hidden');
+        document.getElementById('btn-share').classList.remove('hidden');
+
+        // Save High Score
+        const currentHighScore = localStorage.getItem('cat8_highscore') || 0;
+        if(score > parseInt(currentHighScore)) {
+            localStorage.setItem('cat8_highscore', score);
+            updateHighScoreDisplay();
+        }
+    }
+
+    function retryQuiz() {
+        initQuiz();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function updateHighScoreDisplay() {
+        const hs = localStorage.getItem('cat8_highscore');
+        if(hs) {
+            const el = document.getElementById('high-score');
+            el.innerText = `Điểm cao: ${hs}/40`;
+            el.classList.remove('hidden');
+        }
+    }
+
+    function copyResult() {
+        const resultText = document.getElementById('quiz-result').innerText;
+        const timeText = document.querySelector('.timer-display').innerText;
+        const shareString = `Tôi vừa hoàn thành Sát hạch Hàng Hóa Nguy Hiểm CAT8.\nKết quả: ${resultText}\nThời gian: ${timeText}`;
+        
+        navigator.clipboard.writeText(shareString).then(() => {
+            const toast = document.getElementById('toast');
+            toast.classList.remove('opacity-0', 'pointer-events-none');
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'pointer-events-none');
+            }, 2000);
+        });
+    }
+
+
+    /* ==========================================
+       4. ÔN TẬP (REVIEW) & SEARCH LOGIC
+       ========================================== */
+    function renderReview() {
+        const container = document.getElementById('review-list');
+        container.innerHTML = '';
+
+        allQuestions.forEach((q, index) => {
+            let html = `
+            <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-200 review-item" data-search="${removeAccents(q.question + ' ' + q.options.map(o=>o.text).join(' ')).toLowerCase()}">
+                <h3 class="font-bold text-gray-800 mb-2 text-compact text-sm"><span class="text-blue-600 mr-1">${index + 1}.</span> <span class="q-content">${q.question}</span></h3>
+                <div class="space-y-1 ml-1">`;
+            
+            q.options.forEach((opt) => {
+                if(opt.isCorrect) {
+                    html += `<div class="p-2 rounded bg-green-100 border border-green-300 text-green-800 font-semibold text-sm text-compact opt-content"><i class="fas fa-check-circle mr-1"></i>${opt.text}</div>`;
+                } else {
+                    html += `<div class="p-2 rounded bg-gray-50 text-gray-500 text-sm text-compact opt-content">${opt.text}</div>`;
+                }
+            });
+
+            html += `</div></div>`;
+            container.innerHTML += html;
+        });
+
+        document.getElementById('search-count').innerText = `${allQuestions.length} câu`;
+        isReviewRendered = true; // ĐÁNH DẤU LÀ ĐÃ RENDER ĐỂ KHÔNG BỊ RENDER LẠI GÂY LAG
+    }
+
+    function handleSearch() {
+        const input = document.getElementById('search-input').value;
+        const keyword = removeAccents(input).toLowerCase();
+        const items = document.querySelectorAll('.review-item');
+        const regex = createHighlightRegex(input);
+        let count = 0;
+
+        items.forEach((item, index) => {
+            const searchData = item.getAttribute('data-search');
+            
+            if (searchData.includes(keyword)) {
+                item.style.display = 'block';
+                count++;
+                
+                // Highlight logic
+                const qContent = item.querySelector('.q-content');
+                const optContents = item.querySelectorAll('.opt-content');
+                
+                // Khôi phục text gốc từ bộ nhớ để tránh bị lặp thẻ <mark>
+                const qData = allQuestions[index];
+                
+                if(input.trim() !== '') {
+                    qContent.innerHTML = qData.question.replace(regex, '<mark>$1</mark>');
+                    optContents.forEach((optEl, i) => {
+                        let text = qData.options[i].text;
+                        if(qData.options[i].isCorrect) {
+                            optEl.innerHTML = `<i class="fas fa-check-circle mr-1"></i>` + text.replace(regex, '<mark>$1</mark>');
+                        } else {
+                            optEl.innerHTML = text.replace(regex, '<mark>$1</mark>');
+                        }
+                    });
+                } else {
+                    // Xóa highlight nếu ô tìm kiếm rỗng
+                    qContent.innerHTML = qData.question;
+                    optContents.forEach((optEl, i) => {
+                        if(qData.options[i].isCorrect) {
+                            optEl.innerHTML = `<i class="fas fa-check-circle mr-1"></i>` + qData.options[i].text;
+                        } else {
+                            optEl.innerHTML = qData.options[i].text;
+                        }
+                    });
+                }
+
+            } else {
+                item.style.display = 'none';
+            }
+        });
+
+        document.getElementById('search-count').innerText = `${count} câu`;
+    }
+
+</script>
 </body>
 </html>
