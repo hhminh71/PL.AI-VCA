@@ -1,110 +1,647 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>VCA Visualizer - Phòng TC-KH</title>
-<style>
-    /* --- CẤU HÌNH GIAO DIỆN VCA (ACV STYLE) --- */
-    body, html { margin: 0; padding: 0; height: 100%; font-family: 'Segoe UI', Arial, sans-serif; background: #f5f7fa; display: flex; flex-direction: column;}
-    
-    /* Header */
-    .vca-header {
-        background: #0056b3; /* Xanh ACV */
-        color: white;
-        padding: 12px 20px;
-        border-bottom: 4px solid #d4af37; /* Vàng Gold */
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        flex-shrink: 0;
-    }
-    .vca-top { font-size: 11px; text-transform: uppercase; opacity: 0.8; letter-spacing: 0.5px; }
-    .vca-title { font-size: 13px; font-weight: 700; text-transform: uppercase; margin-top: 2px; }
-    .vca-badge { font-size: 12px; background: rgba(255,255,255,0.2); padding: 2px 8px; border-radius: 4px; display: inline-block; margin-top: 5px;}
-
-    /* Main Container */
-    .main-area { flex-grow: 1; position: relative; overflow: hidden; }
-    
-    /* Mindmap container - Full Size */
-    .markmap { width: 100%; height: 100vh; }
-
-    /* Footer */
-    .vca-footer { 
-        background: #e9ecef; color: #555; text-align: center; 
-        padding: 5px; font-size: 11px; flex-shrink: 0; border-top: 1px solid #ddd;
-    }
-</style>
-<style>.markmap-node-text { font-family: 'Segoe UI'; font-size: 14px; fill: #333; }</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Ôn tập & Thi thử - Cảng HKQT Cần Thơ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Tối ưu vùng nhìn, line-height nhỏ, ẩn scrollbar cho mượt */
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        .compact-text { line-height: 1.2; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        mark { background-color: #fde047; color: #000; padding: 0 2px; border-radius: 2px; font-weight: 500; }
+        input[type="radio"]:disabled + span { opacity: 0.9; }
+    </style>
 </head>
-<body>
+<body class="bg-gray-100 text-gray-800 antialiased h-screen flex flex-col overflow-hidden">
 
-    <div class="vca-header">
-        <div class="vca-top">Tổng công ty Cảng hàng không Việt Nam - CTCP</div>
-        <div class="vca-title">Cảng hàng không quốc tế Cần Thơ</div>
-        <div class="vca-badge">Phòng Tài chính - Kế hoạch | Triển khai văn bản</div>
-    </div>
-
-    <div class="main-area">
-        <div class="markmap">
-            <script type="text/template">
-# BÁO CÁO PHÂN TÍCH CHUYÊN SÂU
-## So sánh QĐ 1171/2026 với QĐ 1211/2025 & QĐ 3177/2025
-
-### 1. Sự chuyển dịch về Nền tảng Pháp lý
-- **Giai đoạn 2025 (QĐ 1211 & QĐ 3177)**
-  - Căn cứ trọng tâm: **Thông tư 31/2025/TT-BCA**.
-  - Tính chất: Tập trung quản lý hình thức, tiêu chuẩn của Thẻ, Giấy phép và Chứng nhận năng định cá nhân.
-- **Giai đoạn 2026 (QĐ 1171) - BƯỚC NGOẶT**
-  - Căn cứ trọng tâm: **Thông tư 14/2026/TT-BCA**.
-  - Tính chất: Nâng cấp quản lý lên tầm vĩ mô, tập trung vào **Chương trình ANHK và Kiểm soát chất lượng**.
-
-### 2. Biến động về Phạm vi Thủ tục (Danh mục TTHC)
-- **QĐ 1211/2025 (Khởi tạo)**
-  - Công bố **13 TTHC mới** phủ rộng: Thẻ, Giấy phép, Năng định, Chương trình an ninh, Cơ sở đào tạo.
-- **QĐ 3177/2025 (Sửa đổi lần 1)**
-  - Sửa đổi **07 TTHC** (Chỉ tập trung vào 3 Thẻ, 3 Giấy phép và 1 Năng định nhân viên).
-- **QĐ 1171/2026 (Sửa đổi lần 2 - Hiện tại)**
-  - Sửa đổi **08 TTHC**.
-  - **Giữ nguyên**: 06 thủ tục về Thẻ và Giấy phép (nhưng thay đổi biểu mẫu/công nghệ).
-  - **Lược bỏ**: Không còn sửa đổi thủ tục Năng định nhân viên trong đợt này.
-  - **Bổ sung mới vào diện sửa đổi**: 02 TTHC cốt lõi về **Phê duyệt/Chấp thuận** và **Sửa đổi/Bổ sung Chương trình ANHK**.
-
-### 3. Nâng cấp Kỹ thuật & Công nghệ (Điểm nhấn QĐ 1171)
-- **Cải tiến Biểu mẫu (Phụ lục IA - TT 14/2026)**
-  - Thay thế toàn bộ form cũ: Mẫu 1A (Công văn), Mẫu 2A/4A/5A (Danh sách trích ngang), Mẫu 3A (Tờ khai cá nhân).
-  - *Lưu ý:* Tờ khai yêu cầu chi tiết hơn về khu vực hoạt động (chia nhỏ 17 khu vực) và đánh dấu cụ thể Cảng HK đăng ký.
-- **Đột phá Công nghệ Kiểm soát (Phôi thẻ/Giấy phép mới)**
-  - **Thẻ cá nhân (Dài/Ngắn hạn)**: Mặt trước bắt buộc tích hợp **Mã BE Code chứa khuôn mặt đã mã hóa**. 
-    - *Mục đích:* So khớp nhận diện sinh trắc học tự động bằng thiết bị.
-  - **Giấy phép phương tiện**: Mặt trước tích hợp **Mã BE Code chứa thông tin kèm chữ ký số**.
-    - *Mục đích:* Chống làm giả, kiểm tra nhanh qua thiết bị quét mã.
-
-### 4. Chuẩn hóa Đề cương Chương trình ANHK (Chỉ có tại QĐ 1171)
-- **Đóng gói quy chuẩn chi tiết cho từng nhóm đối tượng:**
-  - **Nhóm 1**: Người khai thác Cảng HK, Sân bay (Gồm 5 Chương chi tiết về Hạ tầng, Biện pháp phòng ngừa, Đối phó can thiệp...).
-  - **Nhóm 2**: Hãng hàng không / Người khai thác tàu bay VN.
-  - **Nhóm 3**: Quy trình ANHK bổ sung cho Hãng HK Nước ngoài tại VN.
-  - **Nhóm 4**: Doanh nghiệp cung cấp dịch vụ Không lưu.
-  - **Nhóm 5**: Doanh nghiệp Dịch vụ Khác (Xử lý hàng hóa, Sửa chữa bảo dưỡng, Suất ăn, Xăng dầu, Phục vụ mặt đất).
-  - **Nhóm 6**: Đơn vị kiểm soát ANHK chuyên trách.
-
-### 5. KẾ HOẠCH HÀNH ĐỘNG CHO PHÒNG TC-KH (CẢNG HKQT CẦN THƠ)
-- **Công tác Kế hoạch - Dự toán (Quan trọng):**
-  - **Lệ phí TTHC**: Không thay đổi (Thẻ dài hạn 150k, Giấy phép dài hạn 100k, Ngắn hạn 20k). Tiếp tục áp dụng TT 193/2016/TT-BTC -> *Dòng tiền ngân sách TTHC ổn định*.
-  - **Dự toán thiết bị MỚI**: Cần tham mưu lập dự toán mua sắm/nâng cấp **Hệ thống máy quét (Scanner) có khả năng đọc mã BE Code sinh trắc học và chữ ký số** tại các điểm kiểm tra an ninh (Cổng/Cửa) để tương thích với phôi thẻ mới của Bộ Công an.
-- **Công tác Triển khai Hành chính:**
-  - Lập tức ban hành thông báo nội bộ: **Đình chỉ sử dụng các biểu mẫu xin cấp thẻ cũ**. Áp dụng bộ Mẫu 1A, 2A, 3A, 4A, 5A theo QĐ 1171.
-- **Công tác Phối hợp Chuyên môn:**
-  - Tham mưu Ban Giám đốc Cảng chỉ đạo Đội An ninh Hàng không rà soát lại **"Chương trình ANHK Cảng HKQT Cần Thơ"**.
-  - Bắt buộc phải viết lại/điều chỉnh theo đúng **khung đề cương mới tại mục 7.12.2** của QĐ 1171 để trình Cục Quản lý Xuất nhập cảnh (Bộ Công an) phê duyệt lại (nếu có yêu cầu chuyển tiếp).
-            </script>
+    <!-- Header Cố định -->
+    <header class="bg-blue-700 text-white shadow-md z-50 shrink-0">
+        <div class="max-w-3xl mx-auto px-3 py-2 text-center">
+            <div class="text-xs italic opacity-80 mb-0.5">Huấn luyện Đào tạo Cảng HKQT Cần Thơ</div>
+            <h1 class="text-base font-bold uppercase tracking-wide">Ôn Tập Câu Hỏi 28/3</h1>
         </div>
+        
+        <!-- Tabs -->
+        <div class="flex max-w-3xl mx-auto bg-blue-800">
+            <button id="tabBtn-quiz" onclick="switchTab('quiz')" class="flex-1 py-2 text-sm font-bold border-b-4 border-white transition-all text-white">Thi Thử (40)</button>
+            <button id="tabBtn-review" onclick="switchTab('review')" class="flex-1 py-2 text-sm font-medium border-b-4 border-transparent text-blue-200 transition-all hover:text-white">Ôn Tập (Full)</button>
+        </div>
+    </header>
+
+    <!-- Khu vực nội dung cuộn -->
+    <main class="flex-1 overflow-y-auto hide-scrollbar relative">
+        <div class="max-w-3xl mx-auto bg-white min-h-full pb-20">
+            
+            <!-- TAB 1: THI THỬ -->
+            <div id="tab-quiz" class="block">
+                <!-- Sticky Bar Quiz -->
+                <div class="sticky top-0 bg-white/95 backdrop-blur z-40 border-b border-gray-200 p-2 flex justify-between items-center shadow-sm">
+                    <div class="flex flex-col">
+                        <span id="timer" class="text-xl font-bold text-blue-600 font-mono">00:00</span>
+                        <span id="high-score" class="text-[10px] text-gray-500 font-semibold">Điểm cao: 0/40</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <button id="btn-retry-top" onclick="startQuiz()" class="px-3 py-1.5 bg-gray-200 text-gray-700 text-sm font-semibold rounded active:bg-gray-300">Làm Lại</button>
+                        <button id="btn-submit-top" onclick="submitQuiz()" class="px-3 py-1.5 bg-green-600 text-white text-sm font-semibold rounded active:bg-green-700">Nộp Bài</button>
+                        <button id="btn-share-top" onclick="shareResult()" class="hidden px-3 py-1.5 bg-blue-600 text-white text-sm font-semibold rounded active:bg-blue-700">Chia Sẻ</button>
+                    </div>
+                </div>
+
+                <!-- Danh sách câu hỏi Thi thử -->
+                <div id="quiz-container" class="p-2 space-y-3"></div>
+
+                <!-- Footer Bar Quiz (Sticky Bottom) -->
+                <div class="sticky bottom-0 bg-white border-t border-gray-200 p-3 flex justify-between items-center shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] z-40 mt-4">
+                    <div id="result-text" class="text-sm font-bold text-blue-700 hidden">Kết quả: 0/40</div>
+                    <div class="flex gap-2 ml-auto">
+                        <button id="btn-retry-bottom" onclick="startQuiz()" class="px-4 py-2 bg-gray-200 text-gray-700 text-sm font-bold rounded shadow active:scale-95 transition-transform">Làm Lại</button>
+                        <button id="btn-submit-bottom" onclick="submitQuiz()" class="px-4 py-2 bg-green-600 text-white text-sm font-bold rounded shadow active:scale-95 transition-transform">Nộp Bài</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 2: ÔN TẬP -->
+            <div id="tab-review" class="hidden">
+                <!-- Sticky Search Bar -->
+                <div class="sticky top-0 z-40 bg-gray-100 p-2 border-b border-gray-300 shadow-sm">
+                    <div class="relative">
+                        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                        <input type="text" id="search-input" placeholder="Tìm câu hỏi, đáp án..." class="w-full pl-9 pr-3 py-2 rounded border border-gray-300 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 compact-text">
+                    </div>
+                </div>
+                
+                <!-- Danh sách câu hỏi Ôn tập -->
+                <div id="review-container" class="p-2 space-y-3 pt-3"></div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-16 left-1/2 -translate-x-1/2 bg-gray-800 text-white px-4 py-2 rounded shadow-lg text-sm transition-opacity duration-300 opacity-0 pointer-events-none z-50">
+        Đã copy kết quả!
     </div>
 
-    <div class="vca-footer">
-        Hệ thống hỗ trợ triển khai văn bản nội bộ - VCA
-    </div>
+<script>
+/** * YÊU CẦU 2: DỮ LIỆU RAW TEXT 
+ * Dữ liệu được trích xuất từ file PDF, đánh dấu đáp án đúng bằng dấu '*' ở đầu.
+ */
+const rawData = `
+Q: Mục đích kiểm tra, giám sát an toàn điều kiện khai thác cảng hàng không là gì?
+A. Kịp thời phát hiện những điểm không phù hợp các mối nguy trong quá trình hoạt động của cảng để khắc phục kịp thời đảm bảo an toàn cho tàu bay
+B. Là một yêu cầu bắt buộc trong quá trình cấp chứng nhận khai thác sân bay cho cảng hàng không
+C. Một công cụ để đảm bảo rằng một sân bay đã được cấp chứng nhận khai thác luôn đáp ứng với tất cả các yêu cầu các thông số kỹ thuật an toàn yêu cầu của ICAO và tiêu chuẩn quốc gia
+*D. Tất cả đều đúng
 
-    <script src="https://cdn.jsdelivr.net/npm/markmap-autoloader@0.15.4"></script>
+Q: Quy trình cấp mới giấy chứng nhận khai thác sân của Cục Hàng không Việt Nam bao gồm bao nhiêu bước:
+A. 7 bước
+B. 6 bước
+*C. 5 bước
+D. 4 bước
 
+Q: Cục HKVN thực hiện việc giám sát an toàn, đánh giá an toàn đảm bảo duy trì điều kiện khai thác khi nào?
+A. Định kỳ 2 năm/lần
+B. Hàng năm
+C. Đột xuất
+*D. Cả a và c
+
+Q: Trách nhiệm người khai thác cảng hàng không sân bay phải thực hiện giám sát an toàn, đánh giá an toàn đảm bảo duy trì điều kiện khai thác khi nào?
+A. Hàng ngày và đột xuất
+B. Định kỳ 2 lần/năm
+C. Định kỳ 2 năm/lần
+*D. Cả a và b
+
+Q: Đánh giá công tác đảm bảo duy trì điều kiện an toàn khai thác của Tổng công ty khi nào?
+A. Đột xuất
+B. Định kỳ 2 lần/năm
+C. Định kỳ 2 năm/lần
+*D. Cả a và c
+
+Q: Tần suất kiểm tra cơ sở hạ tầng khu bay, hệ thống trang thiết bị phục vụ bay:
+A. hàng ngày phải tối thiểu 4 lần/ ngày đối với cảng hàng không cấp 1
+B. hàng ngày phải tối thiểu 2 lần/ ngày đối với cảng hàng không cấp 2
+C. hàng ngày phải tối thiểu 1 lần/ ngày đối với cảng hàng không cấp 3
+*D. Cả 3 câu trên đều đúng
+
+Q: Tần suất kiểm tra việc tuân thủ quy định an toàn của người và phương tiện hoạt động tại khu bay:
+A. hàng ngày phải tối thiểu 4 lần/ ngày đối với cảng hàng không cấp 1
+B. hằng ngày phải tối thiểu 4 lần/ ngày đối với cảng hàng không cấp 2
+C. hàng ngày phải tối thiểu 2 lần/ ngày đối với cảng hàng không cấp 3
+*D. Cả 3 câu trên đều đúng
+
+Q: Trong quá trình kiểm tra bề mặt đường cất hạ cánh phát hiện một vết nứt chiều dài 10 cm và rộng 1cm, với vai trò người kiểm tra an toàn hàng ngày, bạn sẽ làm gì?
+A. Không quan tâm đến vết nứt trên
+*B. Báo cho bộ phận bảo trì sân bay xem xét đánh giá cụ thể và ghi nhận vào nhật ký theo dõi vết nứt trên để theo dõi xu hướng của vết nứt
+C. Thông báo đóng cửa sân bay
+D. Tất cả đều đúng
+
+Q: Khi cảng hàng không sân bay có công bố điểm kiểm tra đài VOR sân bay, điều nào sau đây đúng nhất:
+A. Ở sân bay có điểm kiểm tra đài VOR, phải có sơn tín hiệu đánh dấu điểm kiểm tra đài VOR
+B. Ở sân bay có điểm kiểm tra đài VOR phải có biển báo đánh dấu điểm kiểm tra đài VOR
+C. Ở sân bay có điểm kiểm tra đài VOR phải có sơn tín hiệu đánh dấu điểm kiểm tra đài VOR, sơn tín hiệu này phải được vẽ ở trung tâm vị trí tàu bay đậu để tiếp nhận tín hiệu đài VOR
+*D. Cả b và c đều đúng
+
+Q: Trường hợp nào sau đây mà người khai thác cảng hàng không, sân bay phải cung cấp thông tin phục vụ thông báo tin tức hàng không và đưa ra các hành động phù hợp:
+A. Một phần hoặc toàn bộ thiết bị bằng mắt của sân bay bị hỏng hoặc hoạt động sai, Nguồn cấp điện thông thường hoặc nguồn cấp điện dự phòng bị hỏng
+B. Công tác xây dựng hoặc bảo trì, Độ gồ ghề hoặc hư hỏng trên đường cất hạ cánh, đường lăn hay sân đỗ tàu bay
+C. Nước trên đường cất hạ cánh, đường lăn, sân đỗ tàu bay, Chuột/ chim/ động vật trên đường cất hạ cánh, đường lăn, sân đỗ tàu bay
+*D. Tất cả các nội dung trên
+
+Q: Hệ thống đèn nhận biết đường lăn thoát nhanh RETIL không được bật sáng trong trường hợp nào?
+A. Hư hỏng 1 đèn bất kỳ
+B. Có sự cố làm cho các đèn không đủ sáng bình thường
+*C. Cả a và b đều đúng
+D. Cả a và b đều sai
+
+Q: Chọn câu trả lời đúng nhất: Biển báo "NO ENTRY" phải được đặt :
+A. Giữa tim đường lăn
+B. Trên tim đường lăn, phía sau dấu hiệu đóng cửa tạm thời đường lăn 5 m
+C. Đặt hai bên lề đường lăn theo khoảng cách quy định
+*D. Ở đầu khu vực cấm, theo hướng nhìn của phi công ở cả hai phía của đường lăn theo khoảng cách quy định
+
+Q: Xe dẫn đường - follow me phải được lắp đặt đèn cảnh báo chướng ngại vật ánh sáng màu gì? cường độ ra sao?
+A. Màu đỏ, ánh sáng cố định, Cường độ thấp loại A
+B. Màu đỏ, ánh sáng cố định, Cường độ thấp loại B
+*C. Màu vàng, Chớp sáng (60-90 fpm), Cường độ thấp loại C
+D. Màu vàng, Chớp sáng (60-90 fpm), Cường độ thấp loại D
+
+Q: Chướng ngại vật cố định cần đánh dấu đều phải sơn màu:
+*A. Màu cam/trắng
+B. Màu đỏ/trắng
+C. Màu đỏ
+D. Cả a và b đều đúng
+
+Q: Vị trí chờ lên đường CHC phải được thiết lập tại các vị trí nào?
+*A. Trên đường lăn tại nút giao của đường lăn với đường CHC
+B. Trên đường công vụ khẩn nguy tại nút giao của một đường CHC
+C. Trên khu vực sân đỗ với đường lăn
+D. Cả a và b đều đúng
+
+Q: Khoảng cách từ tim đường CHC đến sân chờ, vị trí chờ lên đường CHC, vị trí chờ trên đường công vụ đối với đường cất hạ cánh code 3, 4 và trang bị CAT II, III tối thiểu là bao nhiêu?
+A. 75m
+*B. 90m
+C. 107.5m
+D. 60m
+
+Q: Để đảm bảo hệ thống đèn tiếp cận chính xác CAT I, đèn ngưỡng đường CHC, đèn lề đường CHC, đèn cuối đường CHC phải đảm bảo ít nhất bao nhiêu đèn còn sáng?
+A. 95%
+B. 100%
+*C. 85%
+D. 80%
+
+Q: Thời gian phản ứng tính như thế nào:
+A. Thời gian phản ứng là thời gian giữa thời điểm báo động đầu tiên đến thời điểm khi chiếc xe chữa cháy đầu tiên đến vị trí tàu bay lâm nạn
+*B. Thời gian phản ứng là thời gian giữa thời điểm báo động đầu tiên đến thời điểm khi chiếc xe chữa cháy đầu tiên đến vị trí tàu bay lâm nạn xả bọt với tốc độ tối thiểu đạt 50% tốc độ quy định
+C. Thời gian phản ứng là thời gian giữa thời điểm báo động đầu tiên đến thời điểm khi chiếc xe chữa cháy đầu tiên thực hiện xả bọt
+D. Cả 3 ý trên đều sai
+
+Q: Số lượng xe cứu hỏa yêu cầu tối thiểu đối với sân bay có cấp cứu hỏa cấp 10 là?
+A. 2 xe
+*B. 3 xe
+C. 4 xe
+D. 5 xe
+
+Q: Cảng hàng không ABC, có đường CHC code 4 và có chiều rộng dải bay mỗi bên là 75m tính từ tim đường CHC. Như vậy sân bay trên có đáp ứng tiêu chuẩn của ICAO không, nếu không thì giải pháp gì phải thực hiện để được cấp chứng nhận?
+A. Đáp ứng tiêu chuẩn của ICAO và đủ điều kiện cấp giấy chứng nhận
+B. Dải bay không đáp ứng yêu cầu của ICAO nhưng vẫn đủ điều kiện cấp giấy chứng nhận
+*C. Dải bay không đáp ứng yêu cầu của ICAO nên người khai thác cảng phải thực hiện báo cáo nghiên cứu hàng không để trình Cục Hàng không chấp thuận và cấp giấy chứng nhận sân bay
+
+Q: Hiện tại, Cảng hàng không ABC có cấp cứu hỏa cấp 10 và có 04 xe Rosenbauer có dung tích nước mỗi xe là 12500 lít. Tuy nhiên, do ảnh hưởng của thời tiết nên 02 xe cứu hỏa bị hư đột xuất và không có khả năng vận hành. Theo bạn, thì sân bay cần phải thực hiện ngay công việc gì để đảm bảo an toàn khai thác?
+A. Tạm ngưng hoạt động của sân bay
+*B. Thực hiện thủ tục thông báo tin tức hàng không để hạ cấp cứu hỏa sân bay
+C. Thông báo cho các hãng hàng không về tình trạng sân bay
+D. Tất cả các công việc trên
+
+Q: Hệ thống thông tin sử dụng khi báo động tình huống khẩn nguy giữa ATC và trạm cứu hỏa trung tâm là
+A. Điện thoại di động
+B. Hệ thống bộ đàm
+*C. Điện thoại trực tiếp (hotline)
+D. Thông báo lên các nhóm Viber, Zalo
+
+Q: Nội dung kiểm tra an toàn định kỳ công tác khẩn nguy cứu nạn bao gồm các nội dung nào:
+A. Thiết bị phương tiện cứu nạn chữa cháy
+B. Hệ thống chất chữa cháy chính và dự phòng
+C. Huấn luyện cứu nạn chữa cháy và tình trạng trang thiết bị đi theo xe cứu hỏa
+*D. Tất cả các nội dung trên
+
+Q: Bề mặt tiếp cận bắt đầu từ:
+*A. Từ trước ngưỡng đường cất hạ cánh, cách ngưỡng 60m
+B. Cuối đường CHC
+C. Trung tâm sân bay
+D. Vị trí quy chiếu
+
+Q: Bề mặt tiếp cận hạ cánh đối với đường CHC tiếp cận chính xác CAT I, II, III có độ dốc bao nhiêu %
+A. Đoạn thứ nhất 2.5%, Đoạn thứ hai 3%
+B. Đoạn thứ nhất 2%, Đoạn thứ hai 3%
+*C. Đoạn thứ nhất 2%, Đoạn thứ hai 2.5%
+D. Đoạn thứ nhất 2%, Đoạn thứ hai 1.5%
+
+Q: Bề mặt chuyển tiếp đối với đường CHC tiếp cận chính xác CAT I, II, III có độ dốc bao nhiêu %:
+*A. 14.3%
+B. 33.3%
+C. 20%
+D. 15%
+
+Q: Bề mặt lấy độ cao (take off surface) đường CHC tiếp cận chính xác CAT I, II, III có độ dốc bao nhiêu %?
+A. 3%
+B. 2.5%
+C. 1.6%
+*D. 2%
+
+Q: Những vật thể nằm trong khu vực OLS nhưng không thể di dời phải:
+*A. Được đánh dấu và chiếu sáng
+B. Được xây tường bao
+C. Được sơn màu cam hoặc đỏ và được chiếu sáng
+D. Được bỏ qua
+
+Q: Chiều rộng dải bay theo yêu cầu của ICAO đối với đường CHC code 3, 4 là:
+A. 150m
+B. 300m
+C. 140m
+*D. 280m
+
+Q: Theo ICAO khuyến cáo: Đối với đường cất hạ cánh có thiết bị mã số 3 hoặc 4, dải bay được san nền trong phạm vi khoảng cách tối thiểu về mỗi phía tính từ tim đường cất hạ cánh kéo dài nhằm đảm bảo cho tàu bay sử dụng đường cất hạ cánh an toàn trong trường hợp lăn ra khỏi phạm vi đường cất hạ cánh là:
+*A. 75m
+B. 150m
+C. 140m
+D. 100m
+
+Q: Sơn đánh dấu ngưỡng đường cất hạ cánh đối với đường cất hạ cánh có bề rộng là 45m thực hiện theo yêu cầu nào
+*A. Chiều dài mỗi thanh 30m, rộng 1.8m, khoảng trống giữa các vạch là 1.8m và bao gồm 12 thanh
+B. Chiều dài mỗi thanh 40m, rộng 1.8m, khoảng trống giữa các vạch là 1.8m và bao gồm 16 thanh
+C. Chiều dài mỗi thanh 20m, rộng 1.8m, khoảng trống giữa các vạch là 1.8m và bao gồm 12 thanh
+D. Chiều dài mỗi thanh 30m, rộng 3.6m, khoảng trống giữa các vạch là 1.8m và bao gồm 12 thanh
+
+Q: Sơn tín hiệu đường cất hạ cánh phải là
+*A. Màu trắng
+B. Màu vàng
+C. Màu đen
+D. Màu đỏ
+
+Q: Công tác phối hợp giữa cơ sở thông báo tin tức hàng không và người khai thác sân bay nhằm:
+A. Tăng doanh thu
+*B. Đảm bảo an toàn và hiệu quả khai thác
+C. Giảm chi phí vận hành
+D. Quản lý nhân sự
+
+Q: Phương tiện phục vụ mặt đất phải hoạt động:
+A. Tự do trong sân bay
+*B. Tuân thủ theo quy trình và quy định an toàn
+C. Theo yêu cầu của hãng hàng không
+D. Theo thời gian biểu riêng
+
+Q: Trong quá trình kiểm tra sân bay, bạn phát hiện một vật thể cao 18m nằm trong khu vực tiếp cận đường CHC nhưng chưa được đánh dấu. Bạn nên:
+A. Đánh dấu bằng sơn màu xanh
+B. Đánh dấu bằng sơn màu vàng
+*C. Báo cáo và yêu cầu tháo dỡ ngay, Lắp đặt đèn cảnh báo và đánh dấu theo quy định
+D. Không cần xử lý nếu không ảnh hưởng đến hoạt động bay
+
+Q: Trong quá trình kiểm tra sân bay, bạn phát hiện biển báo bị mờ, không đọc được. Bạn nên:
+A. Đợi báo cáo định kỳ
+*B. Thay thế hoặc làm mới biển báo ngay
+C. Cho phép khai thác bình thường
+D. Đánh dấu biển báo bằng sơn
+
+Q: Tại nút giao giữa đường lăn và đường cất hạ cánh mã 4E, nơi mà đường lăn được sử dụng để thoát ly khỏi đường cất hạ cánh, vạch sơn tín hiệu tim đường lăn nên được uốn cong vào vạch sơn tín hiệu tim đường cất hạ cánh và được kéo dài tối thiểu bao nhiêu:
+A. 30 mét
+B. 40 mét
+C. 50 mét
+*D. 60 mét
+
+Q: Biển báo chỉ lối ra đường cất hạ cánh phải được đặt trước lối ra đường cất hạ cánh mã 4E, thẳng hàng với vị trí cách tiếp điểm tim đường lăn và tim đường cất hạ cánh ít nhất là bao nhiêu:
+A. 30 mét
+B. 40 mét
+C. 50 mét
+*D. 60 mét
+
+Q: Tại nút giao đường lăn, biển báo phải được đặt như thế nào?
+A. Phải được đặt trước nút giao
+B. Phải được đặt thẳng hàng với sơn tín hiệu vị trí chờ lăn trung gian
+C. Vị trí lắp đặt biển báo phải tuân thủ theo khoảng cách do ICAO quy định
+*D. Cả 3 câu trên đều đúng
+
+Q: Theo ICAO - ANNEX 14, phương tiện liên quan đến khẩn nguy hoặc an ninh, Đèn cảnh báo CNV:
+A. Màu đỏ, ánh sáng cố định, Cường độ thấp loại A
+B. Màu đỏ, ánh sáng cố định, Cường độ thấp loại B
+*C. Màu xanh dương, Chớp sáng (60-90 fpm), Cường độ thấp loại C
+D. Màu vàng, Chớp sáng (60-90 fpm), Cường độ thấp loại D
+`;
+
+// --- HÀM TIỆN ÍCH ---
+// 1. Parse Dữ Liệu bằng Code
+function parseQuestions(rawText) {
+    const questions = [];
+    const blocks = rawText.trim().split(/\n\s*\n/);
+    blocks.forEach((block, index) => {
+        const lines = block.split('\n').map(l => l.trim()).filter(l => l);
+        let qText = '';
+        let options = [];
+        
+        lines.forEach(line => {
+            if (line.startsWith('Q:')) {
+                qText = line.substring(2).trim();
+            } else if (/^[\*]?[A-D]\./i.test(line)) {
+                const isCorrect = line.startsWith('*');
+                const text = line.replace(/^[\*]?[A-D]\.\s*/i, '').trim();
+                options.push({ text, isCorrect });
+            } else if (qText !== '' && options.length === 0) {
+                qText += ' ' + line;
+            }
+        });
+        
+        if (qText && options.length > 0) {
+            questions.push({ id: index, question: qText, options });
+        }
+    });
+    return questions;
+}
+
+const ALL_QUESTIONS = parseQuestions(rawData);
+
+// 2. Thuật toán Fisher-Yates Shuffle
+function shuffleArray(array) {
+    let curId = array.length;
+    while (0 !== curId) {
+        let randId = Math.floor(Math.random() * curId);
+        curId -= 1;
+        let tmp = array[curId];
+        array[curId] = array[randId];
+        array[randId] = tmp;
+    }
+    return array;
+}
+
+// 3. Tiện ích xử lý chuỗi và Tiếng Việt cho Tìm kiếm
+function removeAccents(str) {
+    return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/g, "d").replace(/Đ/g, "D");
+}
+
+function escapeHTML(str) {
+    return str.replace(/[&<>'"]/g, tag => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+    }[tag]));
+}
+
+// Logic Highlight Realtime (Tô vàng từ khóa tìm kiếm)
+function highlightText(text, keyword) {
+    if (!keyword) return escapeHTML(text);
+    
+    const cleanText = removeAccents(text).toLowerCase();
+    const cleanKeyword = removeAccents(keyword).toLowerCase();
+    
+    if (!cleanKeyword) return escapeHTML(text);
+
+    let result = '';
+    let startIndex = 0;
+    let matchIndex = cleanText.indexOf(cleanKeyword, startIndex);
+
+    if (matchIndex === -1) return escapeHTML(text);
+
+    while (matchIndex !== -1) {
+        result += escapeHTML(text.substring(startIndex, matchIndex));
+        result += `<mark>` + escapeHTML(text.substring(matchIndex, matchIndex + keyword.length)) + `</mark>`;
+        startIndex = matchIndex + keyword.length;
+        matchIndex = cleanText.indexOf(cleanKeyword, startIndex);
+    }
+    result += escapeHTML(text.substring(startIndex));
+    return result;
+}
+
+// --- LOGIC GIAO DIỆN & TABS ---
+let isReviewRendered = false; // FLAG FIX LỖI MÀN HÌNH TRẮNG
+
+function switchTab(tab) {
+    const btnQuiz = document.getElementById('tabBtn-quiz');
+    const btnReview = document.getElementById('tabBtn-review');
+    const tabQuiz = document.getElementById('tab-quiz');
+    const tabReview = document.getElementById('tab-review');
+
+    if (tab === 'quiz') {
+        btnQuiz.className = "flex-1 py-2 text-sm font-bold border-b-4 border-white transition-all text-white";
+        btnReview.className = "flex-1 py-2 text-sm font-medium border-b-4 border-transparent text-blue-200 transition-all hover:text-white";
+        tabQuiz.classList.remove('hidden');
+        tabReview.classList.add('hidden');
+    } else {
+        btnReview.className = "flex-1 py-2 text-sm font-bold border-b-4 border-white transition-all text-white";
+        btnQuiz.className = "flex-1 py-2 text-sm font-medium border-b-4 border-transparent text-blue-200 transition-all hover:text-white";
+        tabReview.classList.remove('hidden');
+        tabQuiz.classList.add('hidden');
+        
+        // YÊU CẦU: Render ngay lập tức khi click lần đầu tiên để tránh blank screen
+        if (!isReviewRendered) {
+            renderReview();
+            isReviewRendered = true;
+        }
+    }
+}
+
+// --- LOGIC TAB 1: THI THỬ ---
+let currentQuizData = [];
+let timerInterval;
+let secondsElapsed = 0;
+let isSubmitted = false;
+let currentScore = 0;
+
+function loadHighScore() {
+    const score = localStorage.getItem('quiz_cantho_highscore') || 0;
+    document.getElementById('high-score').textContent = `Điểm cao: ${score}/40`;
+    return parseInt(score);
+}
+
+function saveHighScore(score) {
+    const currentHigh = loadHighScore();
+    if (score > currentHigh) {
+        localStorage.setItem('quiz_cantho_highscore', score);
+        loadHighScore();
+    }
+}
+
+function formatTime(secs) {
+    const m = Math.floor(secs / 60).toString().padStart(2, '0');
+    const s = (secs % 60).toString().padStart(2, '0');
+    return `${m}:${s}`;
+}
+
+function startTimer() {
+    clearInterval(timerInterval);
+    secondsElapsed = 0;
+    document.getElementById('timer').textContent = "00:00";
+    timerInterval = setInterval(() => {
+        secondsElapsed++;
+        document.getElementById('timer').textContent = formatTime(secondsElapsed);
+    }, 1000);
+}
+
+function startQuiz() {
+    isSubmitted = false;
+    currentScore = 0;
+    
+    // UI Reset
+    document.getElementById('btn-submit-top').classList.remove('hidden');
+    document.getElementById('btn-submit-bottom').classList.remove('hidden');
+    document.getElementById('btn-share-top').classList.add('hidden');
+    document.getElementById('result-text').classList.add('hidden');
+    
+    // Thuật toán: Random 40 câu & Random đáp án
+    const shuffledQuestions = shuffleArray([...ALL_QUESTIONS]).slice(0, 40);
+    
+    currentQuizData = shuffledQuestions.map((q, idx) => {
+        return {
+            ...q,
+            quizId: idx + 1,
+            options: shuffleArray([...q.options]) // Xáo trộn cả đáp án
+        };
+    });
+
+    const container = document.getElementById('quiz-container');
+    container.innerHTML = currentQuizData.map((q, qIndex) => `
+        <div class="bg-white p-3 rounded shadow-sm border border-gray-200" id="qblock-${q.id}">
+            <div class="font-bold text-sm mb-2 text-gray-800 compact-text">
+                <span class="text-blue-600">Câu ${q.quizId}:</span> ${escapeHTML(q.question)}
+            </div>
+            <div class="flex flex-col gap-1.5">
+                ${q.options.map((opt, oIndex) => `
+                    <label class="flex items-start gap-2 p-2 rounded border border-gray-200 cursor-pointer transition-colors hover:bg-gray-50 ui-option">
+                        <input type="radio" name="q_${q.id}" value="${oIndex}" class="mt-0.5 w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500">
+                        <span class="text-sm text-gray-700 compact-text flex-1">${escapeHTML(opt.text)}</span>
+                        <span class="icon-result hidden mt-0.5 text-base leading-none"></span>
+                    </label>
+                `).join('')}
+            </div>
+        </div>
+    `).join('');
+
+    loadHighScore();
+    startTimer();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function submitQuiz() {
+    if (isSubmitted) return;
+    clearInterval(timerInterval);
+    isSubmitted = true;
+    currentScore = 0;
+
+    currentQuizData.forEach((q) => {
+        const block = document.getElementById(`qblock-${q.id}`);
+        const inputs = block.querySelectorAll(`input[name="q_${q.id}"]`);
+        
+        let answeredCorrectly = false;
+        
+        inputs.forEach((input, index) => {
+            input.disabled = true; // Khóa input
+            const label = input.closest('label');
+            const icon = label.querySelector('.icon-result');
+            const isOptCorrect = q.options[index].isCorrect;
+            
+            if (isOptCorrect) {
+                // Tô xanh đáp án đúng
+                label.classList.add('bg-green-50', 'border-green-400');
+                label.classList.remove('border-gray-200', 'hover:bg-gray-50');
+                icon.innerHTML = '✔️';
+                icon.classList.remove('hidden');
+                
+                if (input.checked) {
+                    answeredCorrectly = true;
+                }
+            } else if (input.checked) {
+                // Tô đỏ đáp án chọn sai
+                label.classList.add('bg-red-50', 'border-red-400');
+                label.classList.remove('border-gray-200', 'hover:bg-gray-50');
+                icon.innerHTML = '✖️';
+                icon.classList.remove('hidden');
+            }
+        });
+
+        if (answeredCorrectly) currentScore++;
+    });
+
+    // Update UI Results
+    document.getElementById('btn-submit-top').classList.add('hidden');
+    document.getElementById('btn-submit-bottom').classList.add('hidden');
+    document.getElementById('btn-share-top').classList.remove('hidden');
+    
+    const resultText = document.getElementById('result-text');
+    resultText.textContent = `Kết quả: ${currentScore}/40`;
+    resultText.classList.remove('hidden');
+    
+    saveHighScore(currentScore);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function shareResult() {
+    const time = formatTime(secondsElapsed);
+    const text = `🎯 Ôn tập Cảng HKQT Cần Thơ\n✅ Điểm: ${currentScore}/40\n⏱ Thời gian: ${time}\nThực hành ngay!`;
+    
+    // Copy to clipboard
+    const el = document.createElement('textarea');
+    el.value = text;
+    document.body.appendChild(el);
+    el.select();
+    document.execCommand('copy');
+    document.body.removeChild(el);
+
+    // Show Toast
+    const toast = document.getElementById('toast');
+    toast.classList.remove('opacity-0');
+    setTimeout(() => {
+        toast.classList.add('opacity-0');
+    }, 2500);
+}
+
+
+// --- LOGIC TAB 2: ÔN TẬP ---
+function renderReview(keyword = '') {
+    const container = document.getElementById('review-container');
+    const cleanKeyword = removeAccents(keyword.trim()).toLowerCase();
+    
+    const filtered = ALL_QUESTIONS.filter(q => {
+        if (!cleanKeyword) return true;
+        const qText = removeAccents(q.question).toLowerCase();
+        const hasOptMatch = q.options.some(opt => removeAccents(opt.text).toLowerCase().includes(cleanKeyword));
+        return qText.includes(cleanKeyword) || hasOptMatch;
+    });
+
+    if (filtered.length === 0) {
+        container.innerHTML = `<div class="text-center text-gray-500 py-10 text-sm">Không tìm thấy kết quả phù hợp.</div>`;
+        return;
+    }
+
+    container.innerHTML = filtered.map((q, index) => `
+        <div class="bg-white p-3 rounded shadow-sm border border-gray-200">
+            <div class="font-bold text-sm mb-2 text-gray-800 compact-text">
+                <span class="text-blue-600">Câu ${q.id + 1}:</span> ${highlightText(q.question, keyword)}
+            </div>
+            <div class="flex flex-col gap-1.5 mt-2">
+                ${q.options.map(opt => `
+                    <div class="flex items-start gap-2 p-2 rounded border compact-text text-sm
+                        ${opt.isCorrect 
+                            ? 'bg-green-100 border-green-400 text-green-900 font-medium' 
+                            : 'bg-gray-50 border-gray-100 text-gray-500'}">
+                        ${opt.isCorrect ? '<span class="text-green-600 text-sm leading-none mt-0.5">✔️</span>' : '<span class="w-3"></span>'}
+                        <span class="flex-1">${highlightText(opt.text, keyword)}</span>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    `).join('');
+}
+
+// Xử lý Search Realtime
+document.getElementById('search-input').addEventListener('input', (e) => {
+    // Tối ưu render ngay khi gõ
+    renderReview(e.target.value);
+});
+
+
+// Khởi chạy App
+window.onload = () => {
+    startQuiz(); // Default tab
+};
+
+</script>
 </body>
 </html>
