@@ -1,110 +1,759 @@
+```html
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>VCA Visualizer - Phòng TC-KH</title>
-<style>
-    /* --- CẤU HÌNH GIAO DIỆN VCA (ACV STYLE) --- */
-    body, html { margin: 0; padding: 0; height: 100%; font-family: 'Segoe UI', Arial, sans-serif; background: #f5f7fa; display: flex; flex-direction: column;}
-    
-    /* Header */
-    .vca-header {
-        background: #0056b3; /* Xanh ACV */
-        color: white;
-        padding: 12px 20px;
-        border-bottom: 4px solid #d4af37; /* Vàng Gold */
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        flex-shrink: 0;
-    }
-    .vca-top { font-size: 11px; text-transform: uppercase; opacity: 0.8; letter-spacing: 0.5px; }
-    .vca-title { font-size: 13px; font-weight: 700; text-transform: uppercase; margin-top: 2px; }
-    .vca-badge { font-size: 12px; background: rgba(255,255,255,0.2); padding: 2px 8px; border-radius: 4px; display: inline-block; margin-top: 5px;}
-
-    /* Main Container */
-    .main-area { flex-grow: 1; position: relative; overflow: hidden; }
-    
-    /* Mindmap container - Full Size */
-    .markmap { width: 100%; height: 100vh; }
-
-    /* Footer */
-    .vca-footer { 
-        background: #e9ecef; color: #555; text-align: center; 
-        padding: 5px; font-size: 11px; flex-shrink: 0; border-top: 1px solid #ddd;
-    }
-</style>
-<style>.markmap-node-text { font-family: 'Segoe UI'; font-size: 14px; fill: #333; }</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Quiz & Ôn Tập CNTT</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Tối ưu thanh cuộn và các hiệu ứng nhỏ */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        input[type="radio"] { accent-color: #3b82f6; width: 1.1rem; height: 1.1rem; flex-shrink: 0; margin-top: 2px; }
+        mark { background-color: #fde047; color: #000; padding: 0 2px; border-radius: 2px; font-weight: 500; }
+        .tab-btn.active { border-bottom-width: 2px; border-color: #2563eb; color: #2563eb; font-weight: 700; background-color: #eff6ff; }
+        .toast-enter { animation: fade-in-up 0.3s ease-out forwards; }
+        @keyframes fade-in-up {
+            0% { opacity: 0; transform: translate(-50%, 20px); }
+            100% { opacity: 1; transform: translate(-50%, 0); }
+        }
+    </style>
 </head>
-<body>
+<body class="bg-gray-100 text-gray-800 font-sans antialiased text-sm md:text-base leading-tight">
 
-    <div class="vca-header">
-        <div class="vca-top">Tổng công ty Cảng hàng không Việt Nam - CTCP</div>
-        <div class="vca-title">Cảng hàng không quốc tế Cần Thơ</div>
-        <div class="vca-badge">Phòng Tài chính - Kế hoạch | Triển khai văn bản</div>
-    </div>
-
-    <div class="main-area">
-        <div class="markmap">
-            <script type="text/template">
-# BÁO CÁO PHÂN TÍCH CHUYÊN SÂU
-## So sánh QĐ 1171/2026 với QĐ 1211/2025 & QĐ 3177/2025
-
-### 1. Sự chuyển dịch về Nền tảng Pháp lý
-- **Giai đoạn 2025 (QĐ 1211 & QĐ 3177)**
-  - Căn cứ trọng tâm: **Thông tư 31/2025/TT-BCA**.
-  - Tính chất: Tập trung quản lý hình thức, tiêu chuẩn của Thẻ, Giấy phép và Chứng nhận năng định cá nhân.
-- **Giai đoạn 2026 (QĐ 1171) - BƯỚC NGOẶT**
-  - Căn cứ trọng tâm: **Thông tư 14/2026/TT-BCA**.
-  - Tính chất: Nâng cấp quản lý lên tầm vĩ mô, tập trung vào **Chương trình ANHK và Kiểm soát chất lượng**.
-
-### 2. Biến động về Phạm vi Thủ tục (Danh mục TTHC)
-- **QĐ 1211/2025 (Khởi tạo)**
-  - Công bố **13 TTHC mới** phủ rộng: Thẻ, Giấy phép, Năng định, Chương trình an ninh, Cơ sở đào tạo.
-- **QĐ 3177/2025 (Sửa đổi lần 1)**
-  - Sửa đổi **07 TTHC** (Chỉ tập trung vào 3 Thẻ, 3 Giấy phép và 1 Năng định nhân viên).
-- **QĐ 1171/2026 (Sửa đổi lần 2 - Hiện tại)**
-  - Sửa đổi **08 TTHC**.
-  - **Giữ nguyên**: 06 thủ tục về Thẻ và Giấy phép (nhưng thay đổi biểu mẫu/công nghệ).
-  - **Lược bỏ**: Không còn sửa đổi thủ tục Năng định nhân viên trong đợt này.
-  - **Bổ sung mới vào diện sửa đổi**: 02 TTHC cốt lõi về **Phê duyệt/Chấp thuận** và **Sửa đổi/Bổ sung Chương trình ANHK**.
-
-### 3. Nâng cấp Kỹ thuật & Công nghệ (Điểm nhấn QĐ 1171)
-- **Cải tiến Biểu mẫu (Phụ lục IA - TT 14/2026)**
-  - Thay thế toàn bộ form cũ: Mẫu 1A (Công văn), Mẫu 2A/4A/5A (Danh sách trích ngang), Mẫu 3A (Tờ khai cá nhân).
-  - *Lưu ý:* Tờ khai yêu cầu chi tiết hơn về khu vực hoạt động (chia nhỏ 17 khu vực) và đánh dấu cụ thể Cảng HK đăng ký.
-- **Đột phá Công nghệ Kiểm soát (Phôi thẻ/Giấy phép mới)**
-  - **Thẻ cá nhân (Dài/Ngắn hạn)**: Mặt trước bắt buộc tích hợp **Mã BE Code chứa khuôn mặt đã mã hóa**. 
-    - *Mục đích:* So khớp nhận diện sinh trắc học tự động bằng thiết bị.
-  - **Giấy phép phương tiện**: Mặt trước tích hợp **Mã BE Code chứa thông tin kèm chữ ký số**.
-    - *Mục đích:* Chống làm giả, kiểm tra nhanh qua thiết bị quét mã.
-
-### 4. Chuẩn hóa Đề cương Chương trình ANHK (Chỉ có tại QĐ 1171)
-- **Đóng gói quy chuẩn chi tiết cho từng nhóm đối tượng:**
-  - **Nhóm 1**: Người khai thác Cảng HK, Sân bay (Gồm 5 Chương chi tiết về Hạ tầng, Biện pháp phòng ngừa, Đối phó can thiệp...).
-  - **Nhóm 2**: Hãng hàng không / Người khai thác tàu bay VN.
-  - **Nhóm 3**: Quy trình ANHK bổ sung cho Hãng HK Nước ngoài tại VN.
-  - **Nhóm 4**: Doanh nghiệp cung cấp dịch vụ Không lưu.
-  - **Nhóm 5**: Doanh nghiệp Dịch vụ Khác (Xử lý hàng hóa, Sửa chữa bảo dưỡng, Suất ăn, Xăng dầu, Phục vụ mặt đất).
-  - **Nhóm 6**: Đơn vị kiểm soát ANHK chuyên trách.
-
-### 5. KẾ HOẠCH HÀNH ĐỘNG CHO PHÒNG TC-KH (CẢNG HKQT CẦN THƠ)
-- **Công tác Kế hoạch - Dự toán (Quan trọng):**
-  - **Lệ phí TTHC**: Không thay đổi (Thẻ dài hạn 150k, Giấy phép dài hạn 100k, Ngắn hạn 20k). Tiếp tục áp dụng TT 193/2016/TT-BTC -> *Dòng tiền ngân sách TTHC ổn định*.
-  - **Dự toán thiết bị MỚI**: Cần tham mưu lập dự toán mua sắm/nâng cấp **Hệ thống máy quét (Scanner) có khả năng đọc mã BE Code sinh trắc học và chữ ký số** tại các điểm kiểm tra an ninh (Cổng/Cửa) để tương thích với phôi thẻ mới của Bộ Công an.
-- **Công tác Triển khai Hành chính:**
-  - Lập tức ban hành thông báo nội bộ: **Đình chỉ sử dụng các biểu mẫu xin cấp thẻ cũ**. Áp dụng bộ Mẫu 1A, 2A, 3A, 4A, 5A theo QĐ 1171.
-- **Công tác Phối hợp Chuyên môn:**
-  - Tham mưu Ban Giám đốc Cảng chỉ đạo Đội An ninh Hàng không rà soát lại **"Chương trình ANHK Cảng HKQT Cần Thơ"**.
-  - Bắt buộc phải viết lại/điều chỉnh theo đúng **khung đề cương mới tại mục 7.12.2** của QĐ 1171 để trình Cục Quản lý Xuất nhập cảnh (Bộ Công an) phê duyệt lại (nếu có yêu cầu chuyển tiếp).
-            </script>
+    <!-- HEADER -->
+    <header class="bg-white shadow-sm pt-2 pb-1 px-3 sticky top-0 z-40">
+        <div class="max-w-3xl mx-auto">
+            <div class="text-xs italic text-gray-500 mb-0.5">Huấn luyện Đào tạo Cảng HKQT Cần Thơ</div>
+            <div class="flex justify-between items-center mb-1">
+                <h1 class="text-lg md:text-xl font-bold text-gray-900 truncate">TRẮC NGHIỆM TỔNG HỢP</h1>
+                <div class="text-xs font-semibold text-blue-700 bg-blue-100 px-2 py-1 rounded shadow-inner whitespace-nowrap" id="highScoreDisplay">Điểm cao: 0/40</div>
+            </div>
+            <!-- TABS -->
+            <div class="flex border-b border-gray-200 mt-2">
+                <button onclick="switchTab('quiz')" id="tabQuiz" class="tab-btn active flex-1 py-1.5 text-center text-gray-600 font-medium transition-colors">Thi Thử (40)</button>
+                <button onclick="switchTab('review')" id="tabReview" class="tab-btn flex-1 py-1.5 text-center text-gray-600 font-medium transition-colors">Ôn Tập (Full)</button>
+            </div>
         </div>
+    </header>
+
+    <main class="max-w-3xl mx-auto bg-white min-h-[85vh] shadow-md relative pb-16">
+        
+        <!-- TAB 1: THI THỬ -->
+        <div id="quizContainer" class="block">
+            <!-- Sticky Actions Top -->
+            <div class="sticky top-[86px] md:top-[90px] bg-white z-30 border-b border-gray-200 p-2 flex justify-between items-center shadow-sm">
+                <div class="font-mono text-lg font-bold text-red-600 bg-red-50 px-2 py-0.5 rounded border border-red-100 flex items-center gap-1">
+                    ⏱ <span id="timer">00:00</span>
+                </div>
+                <div class="flex gap-2">
+                    <button id="btnShareTop" onclick="shareScore()" class="hidden bg-green-500 hover:bg-green-600 text-white px-3 py-1.5 rounded font-semibold transition shadow-sm text-sm">Chia Sẻ</button>
+                    <button id="btnSubmitTop" onclick="submitQuiz()" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded font-semibold transition shadow-sm text-sm">Nộp Bài</button>
+                    <button onclick="restartQuiz()" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-3 py-1.5 rounded font-semibold transition shadow-sm text-sm">Làm Lại</button>
+                </div>
+            </div>
+
+            <!-- Quiz Questions -->
+            <div id="quizQuestions" class="p-2 space-y-3">
+                <!-- Nội dung câu hỏi thi sẽ render ở đây -->
+            </div>
+
+            <!-- Sticky Actions Bottom -->
+            <div class="border-t border-gray-200 p-3 bg-gray-50 flex justify-center items-center gap-3">
+                <button id="btnShareBottom" onclick="shareScore()" class="hidden bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded font-bold transition shadow text-base">Chia Sẻ Kết Quả</button>
+                <button id="btnSubmitBottom" onclick="submitQuiz()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded font-bold transition shadow text-base">Nộp Bài</button>
+                <button onclick="restartQuiz()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-6 py-2 rounded font-bold transition shadow text-base">Làm Lại Lần Nữa</button>
+            </div>
+        </div>
+
+        <!-- TAB 2: ÔN TẬP -->
+        <div id="reviewContainer" class="hidden">
+            <!-- Sticky Search -->
+            <div class="sticky top-[86px] md:top-[90px] bg-white z-30 border-b border-gray-200 p-2 shadow-sm">
+                <div class="relative">
+                    <input type="text" id="searchInput" oninput="onSearchInput(event)" placeholder="🔍 Tìm kiếm câu hỏi hoặc đáp án (không dấu)..." 
+                           class="w-full bg-gray-100 border border-gray-300 text-gray-900 rounded-md focus:ring-blue-500 focus:border-blue-500 block p-2 pl-8 text-sm outline-none transition-colors">
+                </div>
+                <div class="text-xs text-gray-500 mt-1 italic" id="searchCount">Đang hiển thị toàn bộ câu hỏi.</div>
+            </div>
+
+            <!-- Review Questions -->
+            <div id="reviewQuestions" class="p-2 space-y-2">
+                <!-- Nội dung ôn tập sẽ render ở đây -->
+            </div>
+        </div>
+    </main>
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="toast" class="fixed bottom-5 left-1/2 -translate-x-1/2 bg-gray-900 text-white px-4 py-2 rounded shadow-lg text-sm font-medium z-50 hidden">
+        Đã copy kết quả!
     </div>
 
-    <div class="vca-footer">
-        Hệ thống hỗ trợ triển khai văn bản nội bộ - VCA
-    </div>
+<script>
+/**
+ * DỮ LIỆU RAW TEXT (Trích xuất từ PDF)
+ * Lưu ý: Mặc định đáp án A (đáp án đầu tiên) được coi là ĐÚNG vì PDF không đánh dấu.
+ * Nếu bạn muốn đổi đáp án đúng, chỉ cần thêm dấu * trước chữ A/B/C/D (Ví dụ: *B. Cấu tạo...)
+ */
+const RAW_DATA = `
+Modul 1: Hiểu biết về CNTT cơ bản
+Câu 1: Phần cứng máy tính là gì?
+A. Cấu tạo của phần mềm về mặt logic
+B. Cấu tạo của phần mềm về mặt vật lý
+C. Các bộ phận cụ thể của máy tính về mặt vật lý như màn hình, chuột, bàn phím,...
+D. Cả 3 phương án đều sai
+Câu 2: Lựa chọn nào cho thấy máy tính xách tay có lợi thế hơn so với máy tính để bàn?
+A. Một máy tính xách tay có thể tái sử dụng các thành phần của nó có thể được sử dụng cho máy tính xách tay khác
+B. Sửa máy tính xách tay ít tốn kém hơn
+C. Máy tính xách tay có thể mang đi bất kì đâu
+D. Máy tính xách tay thường có kích thước lớn hơn máy tính để bàn
+Câu 3: Trong máy tính, PC là chữ viết tắt của từ nào?
+A. Performance Computer
+B. Personnal Connector
+C. Personal Computer
+D. Printing Computer
+Câu 4: Một loại máy tính có màn hình cảm ứng, khi sử dụng người dùng có thể dùng bút hoặc công cụ chọn để chạm vào, lựa chọn một đối tượng nào đó hoặc có thể nhập thông tin qua bàn phím ảo tích hợp trong máy là?
+A. Máy chủ
+B. Máy tính để bàn
+C. Máy tính bảng
+D. Máy tính FX500
+Câu 5: Điện thoại thông minh (smartphone) là gì?
+A. Hỗ trợ tất cả các kiểu hệ điều hành
+B. Bền hơn so với điện thoại di động khác
+C. Điện thoại tích hợp một nền tảng hệ điều hành di động với nhiều tính năng hỗ trợ tiên tiến
+D. Điện thoại chỉ có chức năng nghe và gọi
+Câu 6: Thiết bị ngoại vi của máy tính là thiết bị nào?
+A. Máy nghe nhạc Mp3
+B. Máy tính bảng
+C. Máy in
+D. Sách điện tử
+Câu 7: Các thiết bị dùng để nhập dữ liệu vào máy tính là?
+A. Loa máy tính
+B. Máy fax
+C. Bàn phím, máy ghi hình trực tiếp, chuột, máy quét
+D. Máy in
+Câu 8: Những thiết bị nào sau đây được xếp vào nhóm thiết bị ngoại vi?
+A. Mainboard, CPU, CD-ROM Drive, Chuột
+B. HDD, CD-ROM Drive, FDD, bàn phím
+C. Bàn phím, chuột, màn hình, máy in
+D. Màn hình, CPU, RAM, Main
+Câu 9: Các thành phần: RAM, CPU, thiết bị nhập xuất là?
+A. Phần mềm máy tính
+B. Thiết bị lưu trữ
+C. Phần cứng máy tính
+D. Thiết bị mạng và truyền thông
+Câu 10: Thuật ngữ “RAM” là từ viết tắt của cụm từ?
+A. Read Access Memory
+B. Recent Access Memory
+C. Random Access Memory
+D. Read And Modify
+Câu 11: ROM là bộ nhớ gì?
+A. Bộ nhớ tạm thời
+B. Bộ nhớ đọc, ghi
+C. Bộ nhớ chỉ đọc
+D. Bộ nhớ ngoài
+Câu 12: CPU là gì?
+A. Thiết bị lưu trữ của máy tính
+B. Thiết bị nhập liệu của máy tính
+C. Bộ xử lý trung tâm của máy tính
+D. Thiết bị hiển thị của máy tính
+Câu 13: MB (Megabyte) là đơn vị đo gì?
+A. Đo tốc độ mạng
+B. Đo tốc độ của nguồn máy tính
+C. Đo dung lượng của thiết bị lưu trữ như đĩa cứng
+D. Độ phân giải màn hình
+Câu 14: ROM là viết tắt của từ gì?
+A. Random Only Memory
+B. Read One Memory
+C. Read Only Memory
+D. Random One Memory
+Câu 15: Phát biểu nào là đúng khi nói đến CPU?
+A. CPU được tạo bởi bộ nhớ RAM và ROM
+B. CPU lưu trữ các phần mềm người sử dụng
+C. CPU là viết tắt của Processing Unit, là đơn vị xử lý trung tâm được tích hợp trong một chip được gọi là một vi xử lý, để xử lý dữ liệu và dịch các lệnh của chương trình
+D. CPU thường được tích hợp với một chip gọi là vi xử lý
+Câu 16: Đơn vị tính nhỏ nhất của máy tính là gì?
+A. Byte
+B. Megabyte
+C. Bit
+D. Terabyte
+Câu 17: Bit là gì?
+A. Là đơn vị nhỏ nhất của thông tin được sử dụng trong máy tính
+B. Là một phần tử nhỏ mang một trong 2 giá trị 0 và 1
+C. Tất cả các đáp án đều đúng
+D. Là một đơn vị đo thông tin
+Câu 18: 1 byte bằng?
+A. 2 bit
+B. 10 bit
+C. 8 bit
+D. 16 bit
+Câu 19: 1 KB bằng?
+A. 1000 bit
+B. 1024 bit
+C. 1024 byte
+D. 1000 byte
+Câu 20: CPU làm những công việc chủ yếu nào?
+A. Lưu trữ dữ liệu
+B. Nhập dữ liệu
+C. Xử lý dữ liệu
+D. Xuất dữ liệu
+Câu 21: Kể tên các loại bộ nhớ trong?
+A. Bộ nhớ truy cập ngẫu nhiên (RAM)
+B. Bộ nhớ chỉ đọc (ROM)
+C. Bộ nhớ truy cập ngẫu nhiên (RAM) và bộ nhớ chỉ đọc (ROM)
+D. Đĩa cứng (Hard disk)
+Câu 22: Các thiết bị nào có thể thiếu trong một bộ máy tính?
+A. Bộ nguồn
+B. Bộ nhớ RAM
+C. đĩa mềm
+D. Màn hình
+Câu 23: Cấu trúc chung của máy tính gồm có những khối chức năng nào?
+A. Bộ xử lý trung tâm, bộ nhớ
+B. Bộ nhớ, thiết bị nhập/xuất, màn hình
+C. Bộ xử lý trung tâm, bộ nhớ, thiết bị nhập/xuất
+D. Bộ xử lý trung tâm, bộ nhớ, thiết bị nhập
+Câu 24: Các thành phần cơ bản của 1 máy tính?
+A. CPU, các thiết bị lưu trữ, bộ nhớ
+B. CPU, bộ nhớ, các thiết bị nhập dữ liệu
+C. CPU, các thiết bị lưu trữ, bộ nhớ, các thiết bị nhập và các thiết bị xuất dữ liệu
+D. Bộ nhớ, các thiết bị nhập, thiết bị xuất dữ liệu và con người
+Câu 25: Phát biểu nào là đúng khi nói đến bộ nhớ RAM và ROM??
+A. Bộ nhớ ROM thường được dùng bởi các chương trình ứng dụng để lưu trữ tạm thời. Bộ nhớ RAM được dùng để lưu các file dữ liệu
+B. Bộ nhớ RAM không bị xoá khi máy tính đã tắt. Bộ nhớ ROM bị xoá khi máy tính tắt
+C. Bộ nhớ RAM là bộ nhớ đọc và ghi, trong khi ROM là bộ nhớ chỉ đọc
+D. RAM và ROM là hai bộ nhớ truy cập ngẫu nhiên
+Câu 26: Khi đọc các thông số cấu hình của một máy tính thông thường: 2GHZ-320GB-4.00GB, con số 4.00GB chỉ điều gì?
+A. Chỉ tốc độ của bộ vi xử lý
+B. Chỉ dung lượng của đĩa cứng
+C. Chỉ dung lượng bộ nhớ truy cập ngẫu nhiên RAM
+D. Chỉ dung lượng của bộ nhớ chỉ đọc ROM
+Câu 27: Đâu là thiết bị lưu trữ dữ liệu?
+A. Máy in
+B. Webcam
+C. USB
+D. Cần điểu khiển
+Câu 28: Thành phần nào của máy tính có thể ngăn máy tính khởi động, nếu nó bị hư hỏng hoặc kết nối không đúng cách?
+A. Chuột
+B. Bàn phím
+C. đĩa cứng
+D. Máy in
+Câu 29: Nhóm nào sau đây bao gồm các thiết bị được xếp vào cùng loại?
+A. Đĩa cứng trong, máy in, các loại đĩa quang (CD, DVD), thẻ nhớ, ô nhớ di động
+B. Đĩa cứng trong, đĩa cứng ngoài, USB, thẻ nhớ, máy scan, nhớ di động
+C. Đĩa cứng trong, đĩa cứng ngoài, các loại đĩa quang (CD, DVD), thẻ nhớ, ô nhớ di động
+D. Máy in, máy scan, màn hình, loa
+Câu 30: Máy Scanner được kết nối với máy tính thông qua cổng nào sau đây?
+A. RJ 45
+B. Jack 3.5
+C. USB
+D. RJ 11
+Câu 31: Bàn phím máy tính là thiết bị nào trong các thiết bị sau?
+A. Thiết bị xuất thông tin
+B. Thiết bị nhập thông tin
+C. Thiết bị lưu trữ thông tin
+D. Thiết bị thoát thông tin
+Câu 32: Hãy chỉ ra đâu là thiết bị nhập?
+A. Máy in
+B. Máy quét
+C. Loa
+D. Màn hình
+Câu 33: Thiết bị nào thực hiện thao tác nhập dữ liệu trong số các thiết bị sau: Màn hình, máy in, máy vẽ, bàn phím, ô đĩa cứng, ô đĩa mềm, chuột, loa, máy quét?
+A. Máy in, màn hình, máy quét, chuột
+B. Bàn phím, chuột, máy quét
+C. Máy vẽ, ô đĩa cứng, ô đĩa mềm, bàn phím
+D. Máy quét, Loa, chuột, màn hình
+Câu 34: Máy điện tử dùng để thu và lưu giữ hình ảnh một cách tự động thay vì phải dùng phim ảnh là máy gì?
+A. Máy ảnh thường
+B. Máy ảnh kỹ thuật số
+C. Webcam
+D. Máy quét ảnh
+Câu 35: Máy in và máy quét, thiết bị nào là thiết bị nhập thông tin vào máy tính?
+A. Máy in
+B. Máy quét
+C. Cả hai
+D. Không cái nào
+Câu 36: Thiết bị nào không thể thiếu trong một máy tính?
+A. đĩa mềm
+B. CPU
+C. đĩa CD
+D. Máy in
+Câu 37: Các thiết bị: chuột, bàn phím, máy quét, thuộc khối chức năng nào?
+A. Thiết bị xuất
+B. Thiết bị nhập
+C. Khối xử lý
+D. Các thiết bị lưu trữ
+Câu 38: Hãy chọn nhóm có thiết bị không cùng nhóm với những thiết bị còn lại?
+A. Bàn phím, chuột, máy quét, máy in, máy chiếu
+B. Bàn phím, chuột, máy scan, máy quét
+C. Máy scan, máy tính bảng, ò đĩa mềm (FDD)
+D. Màn hình, máy in, máy chủ, điện thoại thông minh
+Câu 39: Thiết bị nào thực hiện thao tác xuất ra dữ liệu trong số các thiết bị sau: Màn hình, máy in, bàn phím, máy chiếu, ô đĩa mềm, chuột, loa, máy quét?
+A. Bàn phím, chuột, máy quét, máy in
+B. Màn hình, Máy in, máy chiếu, loa
+C. Máy in, màn hình, máy quét, chuột
+D. Màn hình, ô đĩa cứng, ô đĩa mềm, bàn phím
+Câu 40: Thiết bị xuất để đưa ra kết quả đã xử lý cho người sử dụng. Các thiết bị xuất thông dụng hiện nay là?
+A. Màn hình, ò cứng
+B. Màn hình, màn hình cảm ứng, máy in, loa, tai nghe
+C. Máy in, ò mềm
+D. Màn hình, ò mềm
+Câu 41: Các thiết bị: màn hình, loa, máy in, thuộc khối chức năng nào?
+A. Thiết bị nhập
+B. Thiết bị xuất
+C. Khối xử lý
+D. Các thiết bị lưu trữ
+Câu 42: Hãy chọn nhóm có thiết bị không cùng nhóm với những thiết bị còn lại?
+A. Màn hình, máy in, bàn phím
+B. Màn hình, máy in, loa
+C. Máy in, bàn phím, chuột
+D. Máy in, máy scan, usb
+Câu 43: Phần mềm công cộng là gì?
+A. Là phần mềm có tính phí và bạn có thể chia sẻ cho những người khác mà không mất phí
+B. Là phần mềm không có bản quyền, bất cứ ai cũng có thể sử dụng miễn phí mà không bị hạn chế
+C. Là phần mềm dùng thử bị hạn chế về thời gian sử dụng và các tính năng sử dụng
+D. Là phần mềm có bản quyền và được thay đổi bởi bất cứ ai
+Câu 44: Đâu là một ví dụ về phần mềm hệ thống?
+A. Đĩa mềm
+B. Hệ điều hành
+C. Đĩa CD
+D. Bàn phím
+Câu 45: Phát biểu nào sau đây là đúng?
+A. Phần mềm là tập hợp của các thiết bị nhập như máy scan, bàn phím, chuột,...
+B. Phần mềm là một tập hợp những câu lệnh được viết bằng một hoặc nhiều ngôn ngữ lập trình, và các dữ liệu hay tài liệu liên quan nhằm tự động thực hiện một số nhiệm vụ hay chức năng
+C. Phần mềm là tập hợp của các thiết bị xuất như màn hình, máy in, máy chiếu,...
+D. Phần mềm là tập hợp của các thiết bị lưu trữ như ô cứng, đĩa mềm, USB,...
+Câu 46: Chương trình điều kiển thiết bị trong các đĩa CD kèm theo khi gắn thêm thiết bị ngoại vi cho máy tính thường gọi là gì?
+A. IOS
+B. Driver
+C. RAM
+D. ROM
+Câu 47: Chức năng chính của hệ điều hành (Operating System) là gì?
+A. Thực hiện các lệnh theo yêu cầu của người sử dụng
+B. Tất cả các đáp án đều đúng
+C. Quản lý, phân phối và thu hồi bộ nhớ
+D. Điều khiển các thiết bị ngoại vi như ô đĩa, máy in, bàn phím, màn hình
+Câu 48: Hãy chỉ ra tên của một số hệ điều hành?
+A. Linux, Turbo
+B. Linux, Windows, Mac OS
+C. Windows, Max
+D. Linux, Window
+Câu 49: Hệ thống nào là tập hợp các chương trình phần mềm chạy trên máy tính, dùng để điều hành, quản lý các thiết bị phần cứng và tài nguyên phần mềm trên máy tính?
+A. Phần mềm ứng dụng
+B. Hệ điều hành
+C. Phần cứng
+D. Các loại trình dịch trung gian
+Câu 50: Phần mềm nào dưới đây được cài đặt đầu tiên trong máy tính?
+A. Ms Office
+B. MS Windows
+C. FireFox
+D. Norton Antivirus
+Câu 51: Hãy kể tên một số hệ điều hành?
+A. Linux, Turbo
+B. Linux, Windows, Mac OS
+C. Windows, Max
+D. Mac OS, Window
+Câu 52: Phát biểu nào sau đây là đúng?
+A. Phần mềm ứng dụng không cần hệ điều hành để chạy
+B. Phần mềm ứng dụng cần hệ điều hành để chạy
+C. Hệ điều hành cần phần mềm ứng dụng để chạy
+D. Máy tính không cần hệ điều hành để chạy
+Câu 53: Hệ điều hành là?
+A. Trình duyệt web
+B. Phần mềm quản lý và phân phối tài nguyên máy tính phục vụ cho các ứng dụng
+C. Phần mềm tìm kiếm thông tin
+D. Phần mềm văn phòng
+Câu 54: Hệ điều hành nào sau đây không sử dụng cho máy tính?
+A. LINUX
+B. Android
+C. Windows 7
+D. WindowsXP
+Câu 55: Phần mềm Windows, Linux có đặc điểm gì chung?
+A. Tất cả đều là phần mềm ứng dụng
+B. Tất cả đều là phần mềm hệ điều hành
+C. Tất cả đều là dịch vụ dải tần rộng
+D. Tất cả đều là thiết bị phần cứng
+Câu 56: Trong các phần mềm sau, phần mềm nào là phần mềm ứng dụng?
+A. Windows 7
+B. Microsoft Word
+C. Linux
+D. Unix
+Câu 57: Hãy chọn phương án đúng để điền vào dấu 3 chấm: "... là một cấu trúc bao gồm tập hợp các thao tác và các kết quả tương quan sử dụng trong việc phát triển để sản xuất ra một sản phẩm phần mềm"
+A. Quy trình hoạt động của máy tính
+B. Quy trình phát triển phần mềm
+C. Quy trình sản xuất máy tính
+D. Quy trình lắp ráp máy tính
+Câu 58: Phát biểu nào chưa đúng?
+A. Phần mềm thương mại - Commercia Software: có đăng ký bản quyền, không cho phép sao chép dưới bất kỳ hình thức nào
+B. Phần mềm mã nguồn mở - Open Source Software: có đăng ký bản quyền, không cho phép sao chép dưới bất kỳ hình thức nào
+C. Phần mềm chia sẻ - Shareware: có bản quyền, dùng thử trước khi mua. Nếu muốn tiếp tục sử dụng chương trình thì được khuyến khích trả tiền cho tác giả
+D. Phần mềm miễn phí - Freeware: cho phép người khác tự do sử dụng hoàn toàn hoặc theo một số yêu cầu bắt buộc. Ví dụ kèm tên tác giả
+Câu 59: Phát biểu nào sau đây là sai?
+A. Phần mềm mã nguồn mở cho phép người dùng được sửa mã nguồn
+B. Phần mềm mã nguồn mở là phần mềm phải mua bản quyền để sử dụng
+C. Phần mềm mã nguồn mở là phần mềm miễn phí
+D. Phần mềm mã nguồn mở cho phép người dùng được chia sẻ cho người khác
+Câu 60: Phần mềm nào sau đây không phải là phần mềm mã nguồn mở?
+A. Ubuntu
+B. Microsoft Office
+C. Open Office
+D. Mozilla Firefox
+Câu 61: Phát biểu nào sau đây là đúng?
+A. Phần mềm mã nguồn mở gây hại cho người sử dụng
+B. Phần mềm mã nguồn mở không cho phép phân phối lại
+C. Phần mềm mã nguồn mở không có bản quyền
+D. Phần mềm mã nguồn mở không có bảo hành
+Câu 62: Thiết bị nào quyết định khả năng làm việc của máy tính?
+A. Chuột
+B. Bàn phím
+C. Máy in
+D. CPU
+Câu 63: Tốc độ của máy tính phụ thuộc vào các yếu tố nào sau đây?
+A. Tốc độ của bộ vi xử lý. Tốc độ, dung lượng và không gian trống của ô cứng
+B. Dung lượng bộ nhớ truy cập ngẫu nhiên RAM
+C. Hệ điều hành và quá trình tiến hành gom các tệp tin đã bị phân mảnh theo định kỳ
+D. Tất cả các đáp án đều đúng
+Câu 64: Tuỳ chọn nào cho phép cải thiện hiệu năng của máy tính?
+A. Thêm card mạng không dây
+B. Thêm các thiết bị không dây
+C. Tăng số cổng kết nối
+D. Nâng cấp RAM, CPU của máy tính
+Câu 65: Hành động nào nên thực hiện để tăng hiệu năng của máy tính?
+A. Thường xuyên khôi phục các tệp tin từ thùng rác
+B. Luôn giữ các chương trình của nhà sản xuất trên máy tính
+C. Chạy nhiều chương trình quét virus để tăng độ bảo vệ
+D. Loại bỏ các chương trình không bao giờ dùng và đóng bớt các ứng dụng cùng chạy tại một thời điểm
+`;
 
-    <script src="https://cdn.jsdelivr.net/npm/markmap-autoloader@0.15.4"></script>
+/** * LOGIC PARSE DỮ LIỆU BẰNG REGEX 
+ * Cách này đảm bảo không phụ thuộc JSON, tránh lỗi cắt xén string khi quá dài.
+ */
+function parseRawData(raw) {
+    const questions = [];
+    // Tách riêng từng block dựa trên cụm từ "Câu [số]:"
+    const blocks = raw.split(/(?=Câu \d+:)/);
+    
+    blocks.forEach(block => {
+        if (!block.trim()) return;
+        
+        // Tách dòng
+        const lines = block.split('\n').map(l => l.trim()).filter(l => l);
+        let qText = "";
+        let options = [];
+        let correctIndex = 0; // Mặc định đáp án 0 (A)
+        
+        lines.forEach(line => {
+            // Nhận diện dòng đáp án A. B. C. D. (Cũng bắt trường hợp có đánh dấu *A.)
+            const optMatch = line.match(/^(\*?[A-D])\.\s*(.*)$/i);
+            if (optMatch) {
+                let optLetter = optMatch[1].toUpperCase();
+                let isCorrect = optLetter.startsWith('*');
+                if (isCorrect) correctIndex = options.length;
+                options.push(optMatch[2]);
+            } else {
+                if (options.length === 0) {
+                    qText += (qText ? " " : "") + line;
+                } else {
+                    options[options.length - 1] += " " + line; // Gộp nối dòng dài
+                }
+            }
+        });
+        
+        if (qText && options.length > 0) {
+            questions.push({
+                question: qText.replace(/^Câu \d+:\s*/, ''), // Bỏ chữ Câu X:
+                options: options,
+                correctIndex: correctIndex
+            });
+        }
+    });
+    return questions;
+}
 
+// Bảng map bỏ dấu cực kỳ an toàn, bảo toàn length của chuỗi để highlight index không bị lệch
+const charMap = {
+    'á':'a','à':'a','ả':'a','ã':'a','ạ':'a','ă':'a','ắ':'a','ằ':'a','ẳ':'a','ẵ':'a','ặ':'a','â':'a','ấ':'a','ầ':'a','ẩ':'a','ẫ':'a','ậ':'a',
+    'đ':'d',
+    'é':'e','è':'e','ẻ':'e','ẽ':'e','ẹ':'e','ê':'e','ế':'e','ề':'e','ể':'e','ễ':'e','ệ':'e',
+    'í':'i','ì':'i','ỉ':'i','ĩ':'i','ị':'i',
+    'ó':'o','ò':'o','ỏ':'o','õ':'o','ọ':'o','ô':'o','ố':'o','ồ':'o','ổ':'o','ỗ':'o','ộ':'o','ơ':'o','ớ':'o','ờ':'o','ở':'o','ỡ':'o','ợ':'o',
+    'ú':'u','ù':'u','ủ':'u','ũ':'u','ụ':'u','ư':'u','ứ':'u','ừ':'u','ử':'u','ữ':'u','ự':'u',
+    'ý':'y','ỳ':'y','ỷ':'y','ỹ':'y','ỵ':'y'
+};
+
+function removeAccentsPreserveLength(str) {
+    return str.split('').map(c => {
+        const lower = c.toLowerCase();
+        if (charMap[lower]) return (c === c.toUpperCase()) ? charMap[lower].toUpperCase() : charMap[lower];
+        return c;
+    }).join('');
+}
+
+function escapeHTML(str) {
+    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function highlightText(text, keyword) {
+    if (!keyword.trim()) return escapeHTML(text);
+    
+    const safeText = escapeHTML(text);
+    const normText = removeAccentsPreserveLength(safeText).toLowerCase();
+    const normKey = removeAccentsPreserveLength(keyword).toLowerCase();
+    
+    let result = '';
+    let lastIdx = 0;
+    let idx = normText.indexOf(normKey);
+    
+    while (idx !== -1) {
+        result += safeText.substring(lastIdx, idx);
+        result += `<mark>` + safeText.substring(idx, idx + normKey.length) + `</mark>`;
+        lastIdx = idx + normKey.length;
+        idx = normText.indexOf(normKey, lastIdx);
+    }
+    result += safeText.substring(lastIdx);
+    return result;
+}
+
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+}
+
+// Global States
+const ALL_QUESTIONS = parseRawData(RAW_DATA);
+let quizQuestions = [];
+let userAnswers = [];
+let timerInterval = null;
+let secondsElapsed = 0;
+let isQuizSubmitted = false;
+let isReviewRendered = false; // Cờ hiệu Fix Bug Tab Trắng
+let currentScore = 0;
+let highScore = parseInt(localStorage.getItem('quizHighScore') || '0');
+
+// Khởi tạo
+document.addEventListener("DOMContentLoaded", () => {
+    document.getElementById('highScoreDisplay').innerText = `Điểm cao: ${highScore}/40`;
+    initQuiz();
+});
+
+// Chuyển Tab
+function switchTab(tab) {
+    document.getElementById('tabQuiz').classList.toggle('active', tab === 'quiz');
+    document.getElementById('tabReview').classList.toggle('active', tab === 'review');
+    document.getElementById('quizContainer').style.display = tab === 'quiz' ? 'block' : 'none';
+    document.getElementById('reviewContainer').style.display = tab === 'review' ? 'block' : 'none';
+    
+    // YÊU CẦU QUAN TRỌNG: Render Tab Ôn tập lần đầu
+    if (tab === 'review') {
+        const reviewContainer = document.getElementById('reviewQuestions');
+        if (reviewContainer.children.length === 0 || !isReviewRendered) {
+            renderReviewList("");
+            isReviewRendered = true;
+        }
+    }
+}
+
+// LOGIC TAB 1: THI THỬ
+function initQuiz() {
+    clearInterval(timerInterval);
+    secondsElapsed = 0;
+    isQuizSubmitted = false;
+    userAnswers = new Array(40).fill(null);
+    updateTimerDisplay();
+    
+    // Pick 40 random
+    const pool = [...ALL_QUESTIONS];
+    shuffleArray(pool);
+    quizQuestions = pool.slice(0, 40).map(q => {
+        // Xáo trộn Option
+        const opts = q.options.map((opt, i) => ({ text: opt, isCorrect: i === q.correctIndex }));
+        shuffleArray(opts);
+        return { question: q.question, options: opts };
+    });
+
+    renderQuiz();
+    
+    // Bắt đầu đếm giờ
+    timerInterval = setInterval(() => {
+        secondsElapsed++;
+        updateTimerDisplay();
+    }, 1000);
+
+    // Reset UI
+    document.getElementById('btnShareTop').classList.add('hidden');
+    document.getElementById('btnShareBottom').classList.add('hidden');
+    document.getElementById('btnSubmitTop').classList.remove('hidden');
+    document.getElementById('btnSubmitBottom').classList.remove('hidden');
+}
+
+function updateTimerDisplay() {
+    const m = Math.floor(secondsElapsed / 60).toString().padStart(2, '0');
+    const s = (secondsElapsed % 60).toString().padStart(2, '0');
+    document.getElementById('timer').innerText = `${m}:${s}`;
+}
+
+function renderQuiz() {
+    const container = document.getElementById('quizQuestions');
+    container.innerHTML = quizQuestions.map((q, qIndex) => `
+        <div class="bg-white border border-gray-200 rounded p-3 shadow-sm mb-2" id="qBox_${qIndex}">
+            <div class="font-bold text-blue-900 mb-2">Câu ${qIndex + 1}: ${escapeHTML(q.question)}</div>
+            <div class="space-y-1.5 pl-1 md:pl-2">
+                ${q.options.map((opt, oIndex) => `
+                    <label class="flex items-start p-1.5 border border-transparent rounded hover:bg-gray-50 cursor-pointer transition-colors" id="label_${qIndex}_${oIndex}">
+                        <input type="radio" name="q_${qIndex}" value="${oIndex}" onchange="selectAnswer(${qIndex}, ${oIndex})">
+                        <span class="ml-2 text-gray-700">${escapeHTML(opt.text)}</span>
+                    </label>
+                `).join('')}
+            </div>
+        </div>
+    `).join('');
+}
+
+function selectAnswer(qIndex, oIndex) {
+    if(isQuizSubmitted) return;
+    userAnswers[qIndex] = oIndex;
+}
+
+function submitQuiz() {
+    if (isQuizSubmitted) return;
+    
+    const unanswered = userAnswers.filter(a => a === null).length;
+    if (unanswered > 0) {
+        if (!confirm(`Bạn còn ${unanswered} câu chưa làm. Bạn có chắc chắn muốn nộp bài?`)) return;
+    }
+
+    isQuizSubmitted = true;
+    clearInterval(timerInterval);
+    currentScore = 0;
+
+    quizQuestions.forEach((q, qIndex) => {
+        const selectedOpt = userAnswers[qIndex];
+        const correctOpt = q.options.findIndex(o => o.isCorrect);
+        
+        if (selectedOpt === correctOpt) currentScore++;
+
+        // Render kết quả (Lock input, tô màu)
+        const labels = document.querySelectorAll(`[id^="label_${qIndex}_"]`);
+        labels.forEach((label, oIndex) => {
+            const input = label.querySelector('input');
+            input.disabled = true;
+            const span = label.querySelector('span');
+
+            if (oIndex === correctOpt) {
+                label.classList.add('bg-green-100', 'border-green-400', 'font-semibold');
+                span.classList.add('text-green-800');
+                span.innerHTML = `✔️ ` + span.innerHTML;
+            } else if (oIndex === selectedOpt && selectedOpt !== correctOpt) {
+                label.classList.add('bg-red-50', 'border-red-300');
+                span.classList.add('text-red-700', 'line-through');
+                span.innerHTML = `✖️ ` + span.innerHTML;
+            }
+        });
+    });
+
+    // Update điểm
+    if (currentScore > highScore) {
+        highScore = currentScore;
+        localStorage.setItem('quizHighScore', highScore);
+        document.getElementById('highScoreDisplay').innerText = `Điểm cao: ${highScore}/40`;
+    }
+
+    // Cuộn lên đầu và đổi nút
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    document.getElementById('timer').innerText = `Điểm: ${currentScore}/40`;
+    document.getElementById('btnSubmitTop').classList.add('hidden');
+    document.getElementById('btnSubmitBottom').classList.add('hidden');
+    document.getElementById('btnShareTop').classList.remove('hidden');
+    document.getElementById('btnShareBottom').classList.remove('hidden');
+}
+
+function restartQuiz() {
+    if (!isQuizSubmitted && !confirm("Bài thi đang làm dở, bạn có chắc muốn tạo đề mới?")) return;
+    initQuiz();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function shareScore() {
+    const m = Math.floor(secondsElapsed / 60).toString().padStart(2, '0');
+    const s = (secondsElapsed % 60).toString().padStart(2, '0');
+    const text = `🏆 Huấn luyện CNTT - Cảng HKQT Cần Thơ\nĐiểm của tôi: ${currentScore}/40\nThời gian: ${m}:${s}\nThử sức ngay!`;
+    
+    // Copy to clipboard
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textarea);
+
+    // Toast
+    const toast = document.getElementById('toast');
+    toast.classList.remove('hidden');
+    toast.classList.add('toast-enter');
+    setTimeout(() => {
+        toast.classList.add('hidden');
+        toast.classList.remove('toast-enter');
+    }, 2500);
+}
+
+
+// LOGIC TAB 2: ÔN TẬP
+let searchTimeout;
+function onSearchInput(e) {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(() => {
+        renderReviewList(e.target.value);
+    }, 250); // Debounce chống lag
+}
+
+function renderReviewList(keyword) {
+    const container = document.getElementById('reviewQuestions');
+    const countLabel = document.getElementById('searchCount');
+    
+    const normKey = removeAccentsPreserveLength(keyword).toLowerCase().trim();
+    
+    let html = '';
+    let count = 0;
+
+    ALL_QUESTIONS.forEach((q, index) => {
+        const normQ = removeAccentsPreserveLength(q.question).toLowerCase();
+        const normOpts = q.options.map(opt => removeAccentsPreserveLength(opt).toLowerCase());
+        
+        let isMatch = false;
+        if (!normKey || normQ.includes(normKey) || normOpts.some(o => o.includes(normKey))) {
+            isMatch = true;
+        }
+
+        if (isMatch) {
+            count++;
+            html += `
+                <div class="bg-white border border-gray-200 rounded p-2.5 shadow-sm">
+                    <div class="font-bold text-gray-800 mb-1.5">Câu ${index + 1}: ${highlightText(q.question, normKey)}</div>
+                    <div class="space-y-1 pl-1">
+                        ${q.options.map((opt, oIndex) => {
+                            const isCorrect = (oIndex === q.correctIndex);
+                            const cssClass = isCorrect ? 'bg-blue-50 border-blue-200 text-blue-800 font-semibold' : 'text-gray-500';
+                            const icon = isCorrect ? '✔️ ' : '';
+                            return `
+                            <div class="p-1.5 border rounded ${cssClass} text-sm">
+                                ${icon}${highlightText(opt, normKey)}
+                            </div>`;
+                        }).join('')}
+                    </div>
+                </div>
+            `;
+        }
+    });
+
+    container.innerHTML = html || `<div class="text-center text-gray-500 py-10">Không tìm thấy kết quả phù hợp.</div>`;
+    countLabel.innerText = normKey ? `Tìm thấy ${count} câu hỏi.` : `Đang hiển thị toàn bộ ${ALL_QUESTIONS.length} câu hỏi.`;
+}
+</script>
 </body>
 </html>
+
+```
