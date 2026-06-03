@@ -1,759 +1,540 @@
-```html
 <!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Quiz & Ôn Tập CNTT</title>
+    <title>Quiz Khẩn Nguy Sân Bay</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Tối ưu thanh cuộn và các hiệu ứng nhỏ */
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: #f1f1f1; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-        input[type="radio"] { accent-color: #3b82f6; width: 1.1rem; height: 1.1rem; flex-shrink: 0; margin-top: 2px; }
-        mark { background-color: #fde047; color: #000; padding: 0 2px; border-radius: 2px; font-weight: 500; }
-        .tab-btn.active { border-bottom-width: 2px; border-color: #2563eb; color: #2563eb; font-weight: 700; background-color: #eff6ff; }
-        .toast-enter { animation: fade-in-up 0.3s ease-out forwards; }
-        @keyframes fade-in-up {
-            0% { opacity: 0; transform: translate(-50%, 20px); }
-            100% { opacity: 1; transform: translate(-50%, 0); }
-        }
+        /* Tối ưu typography cho đọc lướt */
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        .leading-tightest { line-height: 1.2; }
+        
+        /* Ẩn scrollbar nhưng vẫn cho cuộn */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Custom Radio Button cho gọn */
+        input[type="radio"] { width: 1.1rem; height: 1.1rem; margin-top: 0.1rem; flex-shrink: 0; cursor: pointer; }
+        
+        /* Hiệu ứng mượt mà */
+        .tab-content { display: none; animation: fadeIn 0.3s ease-in-out; }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Toast Notification */
+        #toast { transition: opacity 0.3s, transform 0.3s; pointer-events: none; }
+        .toast-show { opacity: 1 !important; transform: translate(-50%, 0) !important; }
     </style>
 </head>
-<body class="bg-gray-100 text-gray-800 font-sans antialiased text-sm md:text-base leading-tight">
+<body class="bg-slate-50 text-slate-800 antialiased h-screen flex flex-col overflow-hidden">
 
-    <!-- HEADER -->
-    <header class="bg-white shadow-sm pt-2 pb-1 px-3 sticky top-0 z-40">
-        <div class="max-w-3xl mx-auto">
-            <div class="text-xs italic text-gray-500 mb-0.5">Huấn luyện Đào tạo Cảng HKQT Cần Thơ</div>
-            <div class="flex justify-between items-center mb-1">
-                <h1 class="text-lg md:text-xl font-bold text-gray-900 truncate">TRẮC NGHIỆM TỔNG HỢP</h1>
-                <div class="text-xs font-semibold text-blue-700 bg-blue-100 px-2 py-1 rounded shadow-inner whitespace-nowrap" id="highScoreDisplay">Điểm cao: 0/40</div>
-            </div>
-            <!-- TABS -->
-            <div class="flex border-b border-gray-200 mt-2">
-                <button onclick="switchTab('quiz')" id="tabQuiz" class="tab-btn active flex-1 py-1.5 text-center text-gray-600 font-medium transition-colors">Thi Thử (40)</button>
-                <button onclick="switchTab('review')" id="tabReview" class="tab-btn flex-1 py-1.5 text-center text-gray-600 font-medium transition-colors">Ôn Tập (Full)</button>
-            </div>
+    <!-- Header Cố định -->
+    <header class="bg-blue-700 text-white pt-3 pb-2 px-4 shadow-md z-20 flex-shrink-0">
+        <p class="text-xs italic text-blue-100 opacity-90 mb-0.5">Huấn luyện Đào tạo Cảng HKQT Cần Thơ</p>
+        <h1 class="text-xl font-bold leading-tightest">Ôn tập: Kế Hoạch Khẩn Nguy Sân Bay 2026</h1>
+        
+        <!-- Tabs -->
+        <div class="flex mt-3 bg-blue-800 p-1 rounded-lg">
+            <button onclick="switchTab('quiz')" id="tab-quiz" class="flex-1 py-1.5 text-sm font-semibold rounded-md bg-white text-blue-700 shadow transition-colors">Thi Thử (40)</button>
+            <button onclick="switchTab('review')" id="tab-review" class="flex-1 py-1.5 text-sm font-semibold rounded-md text-blue-100 hover:text-white transition-colors">Ôn Tập (Full)</button>
         </div>
     </header>
 
-    <main class="max-w-3xl mx-auto bg-white min-h-[85vh] shadow-md relative pb-16">
+    <!-- Main Content Area (Scrollable) -->
+    <main class="flex-1 overflow-y-auto relative no-scrollbar" id="main-scroll">
         
         <!-- TAB 1: THI THỬ -->
-        <div id="quizContainer" class="block">
-            <!-- Sticky Actions Top -->
-            <div class="sticky top-[86px] md:top-[90px] bg-white z-30 border-b border-gray-200 p-2 flex justify-between items-center shadow-sm">
-                <div class="font-mono text-lg font-bold text-red-600 bg-red-50 px-2 py-0.5 rounded border border-red-100 flex items-center gap-1">
-                    ⏱ <span id="timer">00:00</span>
+        <div id="content-quiz" class="tab-content active pb-20">
+            <!-- Sticky Top Bar -->
+            <div class="sticky top-0 bg-white/95 backdrop-blur shadow-sm border-b px-3 py-2 z-10 flex justify-between items-center">
+                <div class="flex items-center gap-2">
+                    <span class="text-xl font-mono font-bold text-slate-700 w-16" id="timer">00:00</span>
+                    <span class="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded font-bold border border-yellow-300" id="high-score">Điểm cao: 0/40</span>
                 </div>
+                <div class="flex gap-2" id="quiz-top-actions">
+                    <button onclick="submitQuiz()" class="bg-green-600 active:bg-green-700 text-white px-3 py-1.5 rounded text-sm font-bold shadow-sm">Nộp Bài</button>
+                    <button onclick="startQuiz()" class="bg-blue-100 active:bg-blue-200 text-blue-700 px-3 py-1.5 rounded text-sm font-bold shadow-sm border border-blue-200">🔄 Làm Lại</button>
+                </div>
+            </div>
+
+            <!-- Quiz Container -->
+            <div id="quiz-container" class="p-3 space-y-4"></div>
+
+            <!-- Sticky Bottom Bar -->
+            <div class="fixed bottom-0 left-0 right-0 bg-white shadow-[0_-4px_15px_rgba(0,0,0,0.05)] border-t p-3 z-10 flex justify-between items-center transition-transform" id="quiz-bottom-bar">
+                <div id="score-display" class="font-bold text-lg text-slate-700">Chưa nộp bài</div>
                 <div class="flex gap-2">
-                    <button id="btnShareTop" onclick="shareScore()" class="hidden bg-green-500 hover:bg-green-600 text-white px-3 py-1.5 rounded font-semibold transition shadow-sm text-sm">Chia Sẻ</button>
-                    <button id="btnSubmitTop" onclick="submitQuiz()" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded font-semibold transition shadow-sm text-sm">Nộp Bài</button>
-                    <button onclick="restartQuiz()" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-3 py-1.5 rounded font-semibold transition shadow-sm text-sm">Làm Lại</button>
+                    <button onclick="shareResult()" id="btn-share" class="hidden bg-indigo-100 text-indigo-700 px-3 py-2 rounded text-sm font-bold shadow-sm border border-indigo-200">📤 Chia sẻ</button>
+                    <button onclick="submitQuiz()" id="btn-submit-bottom" class="bg-green-600 active:bg-green-700 text-white px-4 py-2 rounded text-sm font-bold shadow-sm">Nộp Bài</button>
+                    <button onclick="startQuiz()" id="btn-retry-bottom" class="hidden bg-blue-600 active:bg-blue-700 text-white px-4 py-2 rounded text-sm font-bold shadow-sm">Làm Lại</button>
                 </div>
-            </div>
-
-            <!-- Quiz Questions -->
-            <div id="quizQuestions" class="p-2 space-y-3">
-                <!-- Nội dung câu hỏi thi sẽ render ở đây -->
-            </div>
-
-            <!-- Sticky Actions Bottom -->
-            <div class="border-t border-gray-200 p-3 bg-gray-50 flex justify-center items-center gap-3">
-                <button id="btnShareBottom" onclick="shareScore()" class="hidden bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded font-bold transition shadow text-base">Chia Sẻ Kết Quả</button>
-                <button id="btnSubmitBottom" onclick="submitQuiz()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded font-bold transition shadow text-base">Nộp Bài</button>
-                <button onclick="restartQuiz()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-6 py-2 rounded font-bold transition shadow text-base">Làm Lại Lần Nữa</button>
             </div>
         </div>
 
         <!-- TAB 2: ÔN TẬP -->
-        <div id="reviewContainer" class="hidden">
-            <!-- Sticky Search -->
-            <div class="sticky top-[86px] md:top-[90px] bg-white z-30 border-b border-gray-200 p-2 shadow-sm">
+        <div id="content-review" class="tab-content pb-10">
+            <!-- Sticky Search Bar -->
+            <div class="sticky top-0 bg-white/95 backdrop-blur shadow-sm border-b px-3 py-2.5 z-10">
                 <div class="relative">
-                    <input type="text" id="searchInput" oninput="onSearchInput(event)" placeholder="🔍 Tìm kiếm câu hỏi hoặc đáp án (không dấu)..." 
-                           class="w-full bg-gray-100 border border-gray-300 text-gray-900 rounded-md focus:ring-blue-500 focus:border-blue-500 block p-2 pl-8 text-sm outline-none transition-colors">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-2 text-slate-400">🔍</span>
+                    <input type="text" id="search-input" oninput="handleSearch()" placeholder="Nhập từ khóa tìm kiếm..." class="w-full pl-8 pr-3 py-1.5 bg-slate-100 border border-slate-300 rounded text-sm focus:outline-none focus:border-blue-500 focus:bg-white transition-colors">
                 </div>
-                <div class="text-xs text-gray-500 mt-1 italic" id="searchCount">Đang hiển thị toàn bộ câu hỏi.</div>
+                <div class="text-xs text-slate-500 mt-1" id="search-stats">Đang hiển thị 55/55 câu hỏi</div>
             </div>
 
-            <!-- Review Questions -->
-            <div id="reviewQuestions" class="p-2 space-y-2">
-                <!-- Nội dung ôn tập sẽ render ở đây -->
-            </div>
+            <!-- Review Container -->
+            <div id="review-container" class="p-3 space-y-3 bg-slate-100"></div>
         </div>
     </main>
 
-    <!-- TOAST NOTIFICATION -->
-    <div id="toast" class="fixed bottom-5 left-1/2 -translate-x-1/2 bg-gray-900 text-white px-4 py-2 rounded shadow-lg text-sm font-medium z-50 hidden">
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-20 left-1/2 transform -translate-x-1/2 translate-y-4 opacity-0 bg-gray-800 text-white px-4 py-2 rounded-full text-sm font-medium shadow-lg z-50">
         Đã copy kết quả!
     </div>
 
 <script>
-/**
- * DỮ LIỆU RAW TEXT (Trích xuất từ PDF)
- * Lưu ý: Mặc định đáp án A (đáp án đầu tiên) được coi là ĐÚNG vì PDF không đánh dấu.
- * Nếu bạn muốn đổi đáp án đúng, chỉ cần thêm dấu * trước chữ A/B/C/D (Ví dụ: *B. Cấu tạo...)
- */
-const RAW_DATA = `
-Modul 1: Hiểu biết về CNTT cơ bản
-Câu 1: Phần cứng máy tính là gì?
-A. Cấu tạo của phần mềm về mặt logic
-B. Cấu tạo của phần mềm về mặt vật lý
-C. Các bộ phận cụ thể của máy tính về mặt vật lý như màn hình, chuột, bàn phím,...
-D. Cả 3 phương án đều sai
-Câu 2: Lựa chọn nào cho thấy máy tính xách tay có lợi thế hơn so với máy tính để bàn?
-A. Một máy tính xách tay có thể tái sử dụng các thành phần của nó có thể được sử dụng cho máy tính xách tay khác
-B. Sửa máy tính xách tay ít tốn kém hơn
-C. Máy tính xách tay có thể mang đi bất kì đâu
-D. Máy tính xách tay thường có kích thước lớn hơn máy tính để bàn
-Câu 3: Trong máy tính, PC là chữ viết tắt của từ nào?
-A. Performance Computer
-B. Personnal Connector
-C. Personal Computer
-D. Printing Computer
-Câu 4: Một loại máy tính có màn hình cảm ứng, khi sử dụng người dùng có thể dùng bút hoặc công cụ chọn để chạm vào, lựa chọn một đối tượng nào đó hoặc có thể nhập thông tin qua bàn phím ảo tích hợp trong máy là?
-A. Máy chủ
-B. Máy tính để bàn
-C. Máy tính bảng
-D. Máy tính FX500
-Câu 5: Điện thoại thông minh (smartphone) là gì?
-A. Hỗ trợ tất cả các kiểu hệ điều hành
-B. Bền hơn so với điện thoại di động khác
-C. Điện thoại tích hợp một nền tảng hệ điều hành di động với nhiều tính năng hỗ trợ tiên tiến
-D. Điện thoại chỉ có chức năng nghe và gọi
-Câu 6: Thiết bị ngoại vi của máy tính là thiết bị nào?
-A. Máy nghe nhạc Mp3
-B. Máy tính bảng
-C. Máy in
-D. Sách điện tử
-Câu 7: Các thiết bị dùng để nhập dữ liệu vào máy tính là?
-A. Loa máy tính
-B. Máy fax
-C. Bàn phím, máy ghi hình trực tiếp, chuột, máy quét
-D. Máy in
-Câu 8: Những thiết bị nào sau đây được xếp vào nhóm thiết bị ngoại vi?
-A. Mainboard, CPU, CD-ROM Drive, Chuột
-B. HDD, CD-ROM Drive, FDD, bàn phím
-C. Bàn phím, chuột, màn hình, máy in
-D. Màn hình, CPU, RAM, Main
-Câu 9: Các thành phần: RAM, CPU, thiết bị nhập xuất là?
-A. Phần mềm máy tính
-B. Thiết bị lưu trữ
-C. Phần cứng máy tính
-D. Thiết bị mạng và truyền thông
-Câu 10: Thuật ngữ “RAM” là từ viết tắt của cụm từ?
-A. Read Access Memory
-B. Recent Access Memory
-C. Random Access Memory
-D. Read And Modify
-Câu 11: ROM là bộ nhớ gì?
-A. Bộ nhớ tạm thời
-B. Bộ nhớ đọc, ghi
-C. Bộ nhớ chỉ đọc
-D. Bộ nhớ ngoài
-Câu 12: CPU là gì?
-A. Thiết bị lưu trữ của máy tính
-B. Thiết bị nhập liệu của máy tính
-C. Bộ xử lý trung tâm của máy tính
-D. Thiết bị hiển thị của máy tính
-Câu 13: MB (Megabyte) là đơn vị đo gì?
-A. Đo tốc độ mạng
-B. Đo tốc độ của nguồn máy tính
-C. Đo dung lượng của thiết bị lưu trữ như đĩa cứng
-D. Độ phân giải màn hình
-Câu 14: ROM là viết tắt của từ gì?
-A. Random Only Memory
-B. Read One Memory
-C. Read Only Memory
-D. Random One Memory
-Câu 15: Phát biểu nào là đúng khi nói đến CPU?
-A. CPU được tạo bởi bộ nhớ RAM và ROM
-B. CPU lưu trữ các phần mềm người sử dụng
-C. CPU là viết tắt của Processing Unit, là đơn vị xử lý trung tâm được tích hợp trong một chip được gọi là một vi xử lý, để xử lý dữ liệu và dịch các lệnh của chương trình
-D. CPU thường được tích hợp với một chip gọi là vi xử lý
-Câu 16: Đơn vị tính nhỏ nhất của máy tính là gì?
-A. Byte
-B. Megabyte
-C. Bit
-D. Terabyte
-Câu 17: Bit là gì?
-A. Là đơn vị nhỏ nhất của thông tin được sử dụng trong máy tính
-B. Là một phần tử nhỏ mang một trong 2 giá trị 0 và 1
-C. Tất cả các đáp án đều đúng
-D. Là một đơn vị đo thông tin
-Câu 18: 1 byte bằng?
-A. 2 bit
-B. 10 bit
-C. 8 bit
-D. 16 bit
-Câu 19: 1 KB bằng?
-A. 1000 bit
-B. 1024 bit
-C. 1024 byte
-D. 1000 byte
-Câu 20: CPU làm những công việc chủ yếu nào?
-A. Lưu trữ dữ liệu
-B. Nhập dữ liệu
-C. Xử lý dữ liệu
-D. Xuất dữ liệu
-Câu 21: Kể tên các loại bộ nhớ trong?
-A. Bộ nhớ truy cập ngẫu nhiên (RAM)
-B. Bộ nhớ chỉ đọc (ROM)
-C. Bộ nhớ truy cập ngẫu nhiên (RAM) và bộ nhớ chỉ đọc (ROM)
-D. Đĩa cứng (Hard disk)
-Câu 22: Các thiết bị nào có thể thiếu trong một bộ máy tính?
-A. Bộ nguồn
-B. Bộ nhớ RAM
-C. đĩa mềm
-D. Màn hình
-Câu 23: Cấu trúc chung của máy tính gồm có những khối chức năng nào?
-A. Bộ xử lý trung tâm, bộ nhớ
-B. Bộ nhớ, thiết bị nhập/xuất, màn hình
-C. Bộ xử lý trung tâm, bộ nhớ, thiết bị nhập/xuất
-D. Bộ xử lý trung tâm, bộ nhớ, thiết bị nhập
-Câu 24: Các thành phần cơ bản của 1 máy tính?
-A. CPU, các thiết bị lưu trữ, bộ nhớ
-B. CPU, bộ nhớ, các thiết bị nhập dữ liệu
-C. CPU, các thiết bị lưu trữ, bộ nhớ, các thiết bị nhập và các thiết bị xuất dữ liệu
-D. Bộ nhớ, các thiết bị nhập, thiết bị xuất dữ liệu và con người
-Câu 25: Phát biểu nào là đúng khi nói đến bộ nhớ RAM và ROM??
-A. Bộ nhớ ROM thường được dùng bởi các chương trình ứng dụng để lưu trữ tạm thời. Bộ nhớ RAM được dùng để lưu các file dữ liệu
-B. Bộ nhớ RAM không bị xoá khi máy tính đã tắt. Bộ nhớ ROM bị xoá khi máy tính tắt
-C. Bộ nhớ RAM là bộ nhớ đọc và ghi, trong khi ROM là bộ nhớ chỉ đọc
-D. RAM và ROM là hai bộ nhớ truy cập ngẫu nhiên
-Câu 26: Khi đọc các thông số cấu hình của một máy tính thông thường: 2GHZ-320GB-4.00GB, con số 4.00GB chỉ điều gì?
-A. Chỉ tốc độ của bộ vi xử lý
-B. Chỉ dung lượng của đĩa cứng
-C. Chỉ dung lượng bộ nhớ truy cập ngẫu nhiên RAM
-D. Chỉ dung lượng của bộ nhớ chỉ đọc ROM
-Câu 27: Đâu là thiết bị lưu trữ dữ liệu?
-A. Máy in
-B. Webcam
-C. USB
-D. Cần điểu khiển
-Câu 28: Thành phần nào của máy tính có thể ngăn máy tính khởi động, nếu nó bị hư hỏng hoặc kết nối không đúng cách?
-A. Chuột
-B. Bàn phím
-C. đĩa cứng
-D. Máy in
-Câu 29: Nhóm nào sau đây bao gồm các thiết bị được xếp vào cùng loại?
-A. Đĩa cứng trong, máy in, các loại đĩa quang (CD, DVD), thẻ nhớ, ô nhớ di động
-B. Đĩa cứng trong, đĩa cứng ngoài, USB, thẻ nhớ, máy scan, nhớ di động
-C. Đĩa cứng trong, đĩa cứng ngoài, các loại đĩa quang (CD, DVD), thẻ nhớ, ô nhớ di động
-D. Máy in, máy scan, màn hình, loa
-Câu 30: Máy Scanner được kết nối với máy tính thông qua cổng nào sau đây?
-A. RJ 45
-B. Jack 3.5
-C. USB
-D. RJ 11
-Câu 31: Bàn phím máy tính là thiết bị nào trong các thiết bị sau?
-A. Thiết bị xuất thông tin
-B. Thiết bị nhập thông tin
-C. Thiết bị lưu trữ thông tin
-D. Thiết bị thoát thông tin
-Câu 32: Hãy chỉ ra đâu là thiết bị nhập?
-A. Máy in
-B. Máy quét
-C. Loa
-D. Màn hình
-Câu 33: Thiết bị nào thực hiện thao tác nhập dữ liệu trong số các thiết bị sau: Màn hình, máy in, máy vẽ, bàn phím, ô đĩa cứng, ô đĩa mềm, chuột, loa, máy quét?
-A. Máy in, màn hình, máy quét, chuột
-B. Bàn phím, chuột, máy quét
-C. Máy vẽ, ô đĩa cứng, ô đĩa mềm, bàn phím
-D. Máy quét, Loa, chuột, màn hình
-Câu 34: Máy điện tử dùng để thu và lưu giữ hình ảnh một cách tự động thay vì phải dùng phim ảnh là máy gì?
-A. Máy ảnh thường
-B. Máy ảnh kỹ thuật số
-C. Webcam
-D. Máy quét ảnh
-Câu 35: Máy in và máy quét, thiết bị nào là thiết bị nhập thông tin vào máy tính?
-A. Máy in
-B. Máy quét
-C. Cả hai
-D. Không cái nào
-Câu 36: Thiết bị nào không thể thiếu trong một máy tính?
-A. đĩa mềm
-B. CPU
-C. đĩa CD
-D. Máy in
-Câu 37: Các thiết bị: chuột, bàn phím, máy quét, thuộc khối chức năng nào?
-A. Thiết bị xuất
-B. Thiết bị nhập
-C. Khối xử lý
-D. Các thiết bị lưu trữ
-Câu 38: Hãy chọn nhóm có thiết bị không cùng nhóm với những thiết bị còn lại?
-A. Bàn phím, chuột, máy quét, máy in, máy chiếu
-B. Bàn phím, chuột, máy scan, máy quét
-C. Máy scan, máy tính bảng, ò đĩa mềm (FDD)
-D. Màn hình, máy in, máy chủ, điện thoại thông minh
-Câu 39: Thiết bị nào thực hiện thao tác xuất ra dữ liệu trong số các thiết bị sau: Màn hình, máy in, bàn phím, máy chiếu, ô đĩa mềm, chuột, loa, máy quét?
-A. Bàn phím, chuột, máy quét, máy in
-B. Màn hình, Máy in, máy chiếu, loa
-C. Máy in, màn hình, máy quét, chuột
-D. Màn hình, ô đĩa cứng, ô đĩa mềm, bàn phím
-Câu 40: Thiết bị xuất để đưa ra kết quả đã xử lý cho người sử dụng. Các thiết bị xuất thông dụng hiện nay là?
-A. Màn hình, ò cứng
-B. Màn hình, màn hình cảm ứng, máy in, loa, tai nghe
-C. Máy in, ò mềm
-D. Màn hình, ò mềm
-Câu 41: Các thiết bị: màn hình, loa, máy in, thuộc khối chức năng nào?
-A. Thiết bị nhập
-B. Thiết bị xuất
-C. Khối xử lý
-D. Các thiết bị lưu trữ
-Câu 42: Hãy chọn nhóm có thiết bị không cùng nhóm với những thiết bị còn lại?
-A. Màn hình, máy in, bàn phím
-B. Màn hình, máy in, loa
-C. Máy in, bàn phím, chuột
-D. Máy in, máy scan, usb
-Câu 43: Phần mềm công cộng là gì?
-A. Là phần mềm có tính phí và bạn có thể chia sẻ cho những người khác mà không mất phí
-B. Là phần mềm không có bản quyền, bất cứ ai cũng có thể sử dụng miễn phí mà không bị hạn chế
-C. Là phần mềm dùng thử bị hạn chế về thời gian sử dụng và các tính năng sử dụng
-D. Là phần mềm có bản quyền và được thay đổi bởi bất cứ ai
-Câu 44: Đâu là một ví dụ về phần mềm hệ thống?
-A. Đĩa mềm
-B. Hệ điều hành
-C. Đĩa CD
-D. Bàn phím
-Câu 45: Phát biểu nào sau đây là đúng?
-A. Phần mềm là tập hợp của các thiết bị nhập như máy scan, bàn phím, chuột,...
-B. Phần mềm là một tập hợp những câu lệnh được viết bằng một hoặc nhiều ngôn ngữ lập trình, và các dữ liệu hay tài liệu liên quan nhằm tự động thực hiện một số nhiệm vụ hay chức năng
-C. Phần mềm là tập hợp của các thiết bị xuất như màn hình, máy in, máy chiếu,...
-D. Phần mềm là tập hợp của các thiết bị lưu trữ như ô cứng, đĩa mềm, USB,...
-Câu 46: Chương trình điều kiển thiết bị trong các đĩa CD kèm theo khi gắn thêm thiết bị ngoại vi cho máy tính thường gọi là gì?
-A. IOS
-B. Driver
-C. RAM
-D. ROM
-Câu 47: Chức năng chính của hệ điều hành (Operating System) là gì?
-A. Thực hiện các lệnh theo yêu cầu của người sử dụng
-B. Tất cả các đáp án đều đúng
-C. Quản lý, phân phối và thu hồi bộ nhớ
-D. Điều khiển các thiết bị ngoại vi như ô đĩa, máy in, bàn phím, màn hình
-Câu 48: Hãy chỉ ra tên của một số hệ điều hành?
-A. Linux, Turbo
-B. Linux, Windows, Mac OS
-C. Windows, Max
-D. Linux, Window
-Câu 49: Hệ thống nào là tập hợp các chương trình phần mềm chạy trên máy tính, dùng để điều hành, quản lý các thiết bị phần cứng và tài nguyên phần mềm trên máy tính?
-A. Phần mềm ứng dụng
-B. Hệ điều hành
-C. Phần cứng
-D. Các loại trình dịch trung gian
-Câu 50: Phần mềm nào dưới đây được cài đặt đầu tiên trong máy tính?
-A. Ms Office
-B. MS Windows
-C. FireFox
-D. Norton Antivirus
-Câu 51: Hãy kể tên một số hệ điều hành?
-A. Linux, Turbo
-B. Linux, Windows, Mac OS
-C. Windows, Max
-D. Mac OS, Window
-Câu 52: Phát biểu nào sau đây là đúng?
-A. Phần mềm ứng dụng không cần hệ điều hành để chạy
-B. Phần mềm ứng dụng cần hệ điều hành để chạy
-C. Hệ điều hành cần phần mềm ứng dụng để chạy
-D. Máy tính không cần hệ điều hành để chạy
-Câu 53: Hệ điều hành là?
-A. Trình duyệt web
-B. Phần mềm quản lý và phân phối tài nguyên máy tính phục vụ cho các ứng dụng
-C. Phần mềm tìm kiếm thông tin
-D. Phần mềm văn phòng
-Câu 54: Hệ điều hành nào sau đây không sử dụng cho máy tính?
-A. LINUX
-B. Android
-C. Windows 7
-D. WindowsXP
-Câu 55: Phần mềm Windows, Linux có đặc điểm gì chung?
-A. Tất cả đều là phần mềm ứng dụng
-B. Tất cả đều là phần mềm hệ điều hành
-C. Tất cả đều là dịch vụ dải tần rộng
-D. Tất cả đều là thiết bị phần cứng
-Câu 56: Trong các phần mềm sau, phần mềm nào là phần mềm ứng dụng?
-A. Windows 7
-B. Microsoft Word
-C. Linux
-D. Unix
-Câu 57: Hãy chọn phương án đúng để điền vào dấu 3 chấm: "... là một cấu trúc bao gồm tập hợp các thao tác và các kết quả tương quan sử dụng trong việc phát triển để sản xuất ra một sản phẩm phần mềm"
-A. Quy trình hoạt động của máy tính
-B. Quy trình phát triển phần mềm
-C. Quy trình sản xuất máy tính
-D. Quy trình lắp ráp máy tính
-Câu 58: Phát biểu nào chưa đúng?
-A. Phần mềm thương mại - Commercia Software: có đăng ký bản quyền, không cho phép sao chép dưới bất kỳ hình thức nào
-B. Phần mềm mã nguồn mở - Open Source Software: có đăng ký bản quyền, không cho phép sao chép dưới bất kỳ hình thức nào
-C. Phần mềm chia sẻ - Shareware: có bản quyền, dùng thử trước khi mua. Nếu muốn tiếp tục sử dụng chương trình thì được khuyến khích trả tiền cho tác giả
-D. Phần mềm miễn phí - Freeware: cho phép người khác tự do sử dụng hoàn toàn hoặc theo một số yêu cầu bắt buộc. Ví dụ kèm tên tác giả
-Câu 59: Phát biểu nào sau đây là sai?
-A. Phần mềm mã nguồn mở cho phép người dùng được sửa mã nguồn
-B. Phần mềm mã nguồn mở là phần mềm phải mua bản quyền để sử dụng
-C. Phần mềm mã nguồn mở là phần mềm miễn phí
-D. Phần mềm mã nguồn mở cho phép người dùng được chia sẻ cho người khác
-Câu 60: Phần mềm nào sau đây không phải là phần mềm mã nguồn mở?
-A. Ubuntu
-B. Microsoft Office
-C. Open Office
-D. Mozilla Firefox
-Câu 61: Phát biểu nào sau đây là đúng?
-A. Phần mềm mã nguồn mở gây hại cho người sử dụng
-B. Phần mềm mã nguồn mở không cho phép phân phối lại
-C. Phần mềm mã nguồn mở không có bản quyền
-D. Phần mềm mã nguồn mở không có bảo hành
-Câu 62: Thiết bị nào quyết định khả năng làm việc của máy tính?
-A. Chuột
-B. Bàn phím
-C. Máy in
-D. CPU
-Câu 63: Tốc độ của máy tính phụ thuộc vào các yếu tố nào sau đây?
-A. Tốc độ của bộ vi xử lý. Tốc độ, dung lượng và không gian trống của ô cứng
-B. Dung lượng bộ nhớ truy cập ngẫu nhiên RAM
-C. Hệ điều hành và quá trình tiến hành gom các tệp tin đã bị phân mảnh theo định kỳ
-D. Tất cả các đáp án đều đúng
-Câu 64: Tuỳ chọn nào cho phép cải thiện hiệu năng của máy tính?
-A. Thêm card mạng không dây
-B. Thêm các thiết bị không dây
-C. Tăng số cổng kết nối
-D. Nâng cấp RAM, CPU của máy tính
-Câu 65: Hành động nào nên thực hiện để tăng hiệu năng của máy tính?
-A. Thường xuyên khôi phục các tệp tin từ thùng rác
-B. Luôn giữ các chương trình của nhà sản xuất trên máy tính
-C. Chạy nhiều chương trình quét virus để tăng độ bảo vệ
-D. Loại bỏ các chương trình không bao giờ dùng và đóng bớt các ứng dụng cùng chạy tại một thời điểm
+/* ==========================================================================
+   1. DỮ LIỆU GỐC DẠNG RAW TEXT (PIPELINE DELIMITED)
+   Được trích xuất và làm sạch trực tiếp từ file PDF, cấu trúc:
+   Câu hỏi | Đáp án A | Đáp án B | Đáp án C | Đáp án D | Đáp án E | Mã Đáp Án Đúng
+   ========================================================================== */
+const rawDataString = `
+Kế hoạch khẩn nguy sân bay phải ?|Được lập tại sân bay, phù hợp với hoạt động của máy bay và các hoạt động khác diễn ra tại sân bay|Nêu rõ cách thức phối hợp các hành động trong trường hợp khẩn nguy tại sân bay và các vùng lân cận|Điều phối được các hoạt động ứng phó khẩn nguy của các cơ quan, đơn vị|Tất cả các ý trên||D
+Mục đích của kế hoạch khẩn nguy sân bay là|Là giảm thiểu tác động của tình huống khẩn nguy, đặc biệt là những tình huống liên quan đến tính mạng con người và duy trì hoạt động khai thác của sân bay.|Là cơ sở để các đơn vị trong và ngoài ngành HK đang hoạt động tại Cảng, phối hợp xử lý khẩn nguy trong phạm vi trách nhiệm của mình và các tình huống khẩn nguy ngoài phạm vi trách nhiệm của Cảng khi có yêu cầu từ các cơ quan, đơn vị liên quan hoặc từ cơ quan cấp trên.|a, b đúng|a, b sai||C
+Để ứng phó các tình huống khẩn nguy tàu bay bị sự cố tai nạn, công tác tổ chức ứng phó khẩn nguy tại các cảng hàng không, sân bay được tổ chức như thế nào?|Thành lập Trung tâm khẩn nguy, trạm báo động, Ban chỉ huy hiện trường và các vật chất khác bảo đảm cho công tác ứng phó.|Thành lập Đội cứu hỏa khẩn nguy|Thành lập Đội Y tế khẩn nguy|Thành lập Đội an ninh cơ động||A
+Nguyên tắc hoạt động của Trung tâm khẩn nguy cảng hàng không, sân bay|Chỉ kích hoạt khi có tình huống khẩn nguy. Trung tâm khẩn nguy sử dụng 01 bộ phận thường trực 24/24 giờ để tiếp nhận các nguồn tin khẩn nguy|Các thành phần phải tham gia trực thường xuyên tại trung tâm khẩn nguy|Chỉ kích hoạt khi có yêu cầu của cấp trên|Chỉ kích hoạt khi có yêu cầu của tổ bay||A
+Thẩm quyền phê duyệt kế hoạch khẩn nguy sân bay ứng phó với các tình huống khẩn nguy cứu nạn ?|Ban chỉ đạo phòng chống khủng bố cấp Tỉnh|Ban chỉ huy phòng thủ dân sự, phòng chống thiên tai và tìm kiếm cứu nạn|Cục hàng không Việt Nam|||C
+Kế hoạch khẩn nguy sân bay ứng phó với các tình huống khẩn nguy cứu nạn là|Là một kế hoạch độc lập trong hệ thống an toàn|Một phụ lục trong tài liệu khai thác sân bay|Là kế hoạch được xây dựng để ứng phó tình huống khẩn nguy can thiệp bất hợp pháp vào hoạt động hàng không dân dụng|||B
+Thẩm quyền phê duyệt Kế hoạch khẩn nguy Cảng hàng không sân bay đối phó với hành vi can thiệp bất hợp pháp vào hoạt động hàng không dân dụng|Cục hàng không Việt Nam|Ban chỉ huy phòng thủ dân sự, phòng chống thiên tai và tìm kiếm cứu nạn|Ban chỉ đạo phòng chống khủng bố cấp Tỉnh|||C
+Tại kế hoạch khẩn nguy sân bay ứng phó các tình huống khẩn nguy cứu nạn Giám đốc Cảng hàng không sân bay đảm nhiệm chức danh nào trong Trung tâm khẩn nguy ?|Chỉ huy trưởng hiện trường|Chỉ huy trưởng Trung tâm khẩn nguy|Trưởng ban chỉ huy khẩn nguy|||B
+Tại kế hoạch khẩn nguy sân bay đối phó hành vi can thiệp bất hợp pháp vào hoạt động hàng không dân dụng Giám đốc Cảng hàng không sân bay đảm nhiệm chức danh nào trong Ban chỉ huy khẩn nguy?|Trưởng ban chỉ huy khẩn nguy|Chỉ huy trưởng hiện trường|Chỉ huy trưởng Trung tâm khẩn nguy|||A
+Căn cứ để xây dựng kế hoạch khẩn nguy sân bay ứng phó các tình huống khẩn nguy cứu nạn ?|Thông tư 29/2021/TT-BGTVT|Quyết định 2034/QĐ-CHK|Doc 9137 part 7|Tất cả các ý trên||D
+Công tác khẩn nguy sân bay bao gồm những tình huống nào sau đây?|Khẩn nguy can thiệp bất hợp pháp vào hoạt động HKDD|Khẩn nguy tàu bay bị sự cố trong cảng hàng không, sân bay|Khẩn nguy tàu bay tai nạn ngoài Cảng hàng không sân bay, tổ chức tìm kiếm cứu nạn|Các tình huống khẩn nguy khác được quy định trong kế hoạch khẩn nguy sân bay|Tất cả các ý trên|E
+Kế hoạch khẩn nguy sân bay bao gồm những kế hoạch nào sau đây ?|Kế hoạch khẩn nguy sân bay đối phó với các hành vi can thiệp bất hợp pháp vào hoạt động hàng không dân dụng.|Kế hoạch khẩn nguy sân bay ứng phó các tình huống khẩn nguy cứu nạn|Kế hoạch ứng phó sự cố tai nạn tàu bay hàng không dân dụng|a và b đúng||D
+Khẩn nguy tại chỗ được xác định:|Là mức độ sẵn sàng triển khai công tác khẩn nguy, khi tàu bay đang hạ cánh xuống cảng hàng không, sân bay bị trục trặc hoặc nghi ngờ có trục trặc về kỹ thuật, nhưng chưa đến mức gặp khó khăn khi hạ cánh. Các phương tiện ứng phó khẩn nguy sẵn sàng tại chỗ.|Là mức độ sẵn sàng cao, đã triển khai công tác khẩn nguy để chuẩn bị đối phó với trường hợp tàu bay khi chuẩn bị tiếp cận hạ cánh xuống cảng hàng không, sân bay phát tín hiệu khẩn nguy vì trục trặc kỹ thuật và các tình huống khẩn nguy khác có thể dẫn đến tai nạn.|Là các tình huống khẩn nguy xảy ra tại cảng hàng không và tai nạn tàu bay xảy ra trong vùng trách nhiệm tìm kiếm, cứu nạn của cảng hàng không.|Là những tai nạn tàu bay xảy ra ngoài vùng trách nhiệm tìm kiếm, cứu nạn của cảng hàng không.||A
+Khẩn nguy hoàn toàn được xác định:|Là mức độ sẵn sàng triển khai công tác khẩn nguy, khi tàu bay đang hạ cánh xuống cảng hàng không, sân bay bị trục trặc hoặc nghi ngờ có trục trặc về kỹ thuật, nhưng chưa đến mức gặp khó khăn khi hạ cánh. Các phương tiện ứng phó khẩn nguy sẵn sàng chờ tại chỗ.|Là mức độ sẵn sàng cao, đã triển khai công tác khẩn nguy để chuẩn bị đối phó với trường hợp tàu bay khi chuẩn bị tiếp cận hạ cánh xuống cảng hàng không, sân bay phát tín hiệu khẩn nguy vì trục trặc kỹ thuật và các tình huống khẩn nguy khác có thể dẫn đến tai nạn.|Là các tình huống khẩn nguy xảy ra tại cảng hàng không và tai nạn tàu bay xảy ra trong vùng trách nhiệm tìm kiếm, cứu nạn của cảng hàng không.|Là những tai nạn tàu bay xảy ra ngoài vùng trách nhiệm tìm kiếm, cứu nạn của Cảng HKQT Tân Sơn Nhất.||B
+Khẩn nguy về y tế:|Trường hợp hành khách trên tàu bay lâm bệnh đột ngột cần sự trợ giúp của y tế cần hạ cánh khẩn cấp để cấp cứu và các trường hợp khác do Bộ Y tế quy định.|Là các tình huống khẩn nguy xảy ra tại cảng hàng không và tai nạn tàu bay xảy ra trong vùng trách nhiệm tìm kiếm, cứu nạn của cảng hàng không.||||A
+Tai nạn tàu bay:|Có người chết hoặc bị thương nặng do đang ở trong tàu bay hoặc do bị tác động trực tiếp của bất kỳ bộ phận nào của tàu bay, kể cả những bộ phận bị văng ra từ tàu bay hoặc do bị tác động trực tiếp của khí phát thải từ động cơ tàu bay.|Tàu bay hoặc kết cấu của tàu bay bị tổn hại làm ảnh hưởng xấu đến độ bền của kết cấu, tính năng bay của tàu bay dẫn đến phải sửa chữa lớn hoặc thay thế bộ phận bị hỏng.|Tàu bay bị mất tích hoặc hoàn toàn không thể tiếp cận được.|Tất cả các ý trên đều đúng.||D
+Thành phần của Trung tâm khẩn nguy Cảng hàng không bao gồm:|Đại diện cơ sở cung cấp dịch vụ bảo đảm hoạt động bay, các đơn vị cung cấp dịch vụ mặt đất, các đơn vị kỹ thuật, bảo dưỡng tàu bay.|Đại diện các hãng hàng không, các đơn vị Công an, Quân đội tại cảng hàng không.|Người khai thác cảng hàng không, các đơn vị trực thuộc và đại diện cảng vụ hàng không.|Tất cả các ý trên đều đúng.||D
+Chức năng chính của Trung tâm khẩn nguy là?|Chỉ đạo, chỉ huy phối hợp điều hành các lực lượng trong ngành hàng không tại Cảng để ứng phó các tình huống khẩn nguy, cứu nạn và đối phó ban đầu các tình huống khẩn nguy can thiệp bất hợp pháp vào hoạt động HKDD, chủ trì triển khai các phương án khẩn nguy.|Khai thác cơ sở hạ tầng tại cảng hàng không sân bay và các dịch vụ hàng không, phi hàng không.|Phối hợp, điều hành hoạt động bay tại Cảng và thực hiện công tác khẩn nguy cứu nạn hàng không.|||A
+Chức năng của Sở Chỉ huy khẩn nguy, cứu nạn (Trạm báo động)|Tiếp nhận, đánh giá thông tin, xác định tính chất, cấp độ khẩn nguy|Là cơ quan thường trực 24/24 giờ của Trung tâm khẩn nguy|Thông báo và triển khai khẩn nguy đến các đơn vị trong và ngoài ngành hàng không để triển khai ứng phó giai đoạn ban đầu|Tất cả các ý trên đều đúng.||D
+"Cứu nạn" là hoạt động cứu người bị nạn khỏi nguy hiểm đe dọa đến sức khỏe, tính mạng của họ.|Đúng.|Sai.||||A
+"Cứu hộ" là hoạt động cứu phương tiện và tài sản.|Đúng.|Sai.||||A
+"Khu vực tập kết" là khu vực được chuẩn bị trước nằm trong hoặc ngoài cảng hàng không, sân bay dành để tập kết phương tiện và trang thiết bị.|Đúng.|Sai.||||A
+"Vị trí đỗ biệt lập" là khu vực trong sân bay dành cho tàu bay đỗ nhằm cách ly với các tàu bay khác và các công trình của cảng hàng không, sân bay kể cả các công trình, thiết bị ngầm dưới mặt đất để triển khai phương án khẩn nguy.|Đúng.|Sai.||||A
+Nhiệm vụ của Ban chỉ huy hiện trường|Thực hiện phương án Di dời tàu bay mất khả năng di chuyển ra khỏi hiện trường và làm vệ sinh, thu dọn hiện trường, khôi phục hoạt động bình thường tại cảng hàng không.|Chỉ huy các đơn vị thực hiện phương án khẩn nguy tại hiện trường|a, b đúng|a, b sai||C
+Các bước triển khai khẩn nguy cứu nạn|Tiếp nhận thông tin, đánh giá phân loại|Báo cáo, triển khai và Thực hiện phương án ứng phó|Kết thúc, lưu hồ sơ|Tất cả các ý trên đều đúng||D
+Hệ thống chỉ huy, phối hợp khi xảy ra tình huống khẩn nguy|Khi có tình huống Chỉ huy trưởng TTKN lệnh kích hoạt khẩn nguy để ứng phó, lãnh đạo các đơn vị thành viên của TTKN được thông báo có mặt tại TTKN để Chỉ đạo, Chỉ huy đơn vị của mình|CHT hiện trường, các đơn vị thực hiện nhiệm vụ theo phương án và yêu cầu của Chỉ huy trưởng TTKN|BCH hiện trường thực hiện nhiệm vụ theo sự phân công của CHT hiện trường và trực tiếp chỉ huy LL của đơn vị mình thực hiện nhiệm vụ ngoài hiện trường|Tất cả các ý trên đều đúng||D
+Việc tổ chức di dời tàu bay mất khả năng di chuyển là trách nhiệm của đơn vị nào?|Cảng hàng không, sân bay.|Hãng hàng không có tàu bay mất khả năng di chuyển|Cảng Vụ hàng không khu vực|||B
+Danh mục hệ thống kỹ thuật, trang bị thiết bị tối thiểu sử dụng cho Trung tâm khẩn nguy cảng hàng không sân bay được hướng dẫn tại văn bản nào ?|Quyết định 16/2017/QĐ-TTg ngày 16 tháng 5 năm 2017|Quyết định Số 1445/QĐ-CHK ngày 14 tháng 7 năm 2023|Quyết định 01/2019/QĐ-TTg ngày 05 tháng 9 năm 2019|||B
+Danh mục vũ khí, công cụ hỗ trợ, trang thiết bị, phương tiện tài liệu phục vụ khẩn nguy được quy định tại văn bản quy phạm pháp luật nào sau đây?|Thông tư 13/2019/TT-BGTVT|Quyết định Số 1445/QĐ-CHK ngày 14 tháng 7 năm 2023|Quyết định 01/2019/QĐ-TTg ngày 05 tháng 9 năm 2019 - phụ lục 4|||C
+Hệ thống thông tin liên lạc thường sử dụng trong khẩn nguy gồm những phương tiện nào sau đây ?|Điện thoại Hotline|Điện thoại cố định có mã vùng gọi liên tỉnh và quốc tế|Điện thoại nội bộ|Bộ đàm, máy Fax|Tất cả các ý trên đều đúng.|E
+Mạng lưới tham gia vào các tình huống khẩn nguy gồm:|Bên trong: Lãnh đạo và các thành viên trung tâm khẩn nguy/Ban chỉ huy khẩn nguy Cảng hàng không, sân bay|Bên ngoài: Các đơn vị chức năng của Ban chỉ đạo, chỉ huy ứng phó tình trạng khẩn nguy của địa phương|Tất cả các ý trên đều đúng.|||C
+Trách nhiệm của hãng hàng không trong ứng phó khẩn nguy cứu nạn|Thông báo sự cố kỹ thuật của máy bay cho cơ quan không lưu biết|Triển khai phương án ứng phó theo kế hoạch khẩn nguy của hãng|Chịu trách nhiệm chính và phối hợp với Cảng hàng không để di dời tàu bay mất khả năng di chuyển|Bàn giao hộp đen cho cơ quan điều tra tai nạn, xác nhận thanh toán các chi phí liên quan|Tất cả các ý trên đều đúng.|E
+Trách nhiệm của các thành viên Trung tâm khẩn nguy/ban chỉ huy khẩn nguy|Duy trì lực lượng, phương tiện ứng phó khẩn nguy theo kế hoạch|Triển khai phương án khẩn nguy theo chức năng, nhiệm vụ của đơn vị được xác định trong kế hoạch khẩn nguy|Chịu sự chỉ huy của Chỉ huy trưởng/Trưởng ban chỉ huy khẩn nguy để thực hiện phương án ứng phó|Tất cả các ý trên đều đúng.||D
+Trách nhiệm thực hiện việc khôi phục để đưa Cảng hàng không sân bay vào hoạt động trở lại được giao cho đơn vị nào sau đây|Đơn vị khai thác khu bay chịu trách nhiệm khôi phục các công trình, cơ sở hạ tầng khu bay như: đường CHC, đường lăn, vị trí đỗ...|Đơn vị khai thác Ga chịu trách nhiệm khôi phục các hạ tầng thuộc nhà ga như: khu làm thủ tục, phòng chờ, hệ thống điện, nước...|a, b đúng|a, b sai||C
+Chi phí khôi phục được xác định|Cảng hàng không, sân bay chủ trì phối hợp với các đơn vị liên quan, tổng hợp chi phí khôi phục và yêu cầu cá nhân, tổ chức bồi thường theo quy định|Hãng hàng không có trách nhiệm xác nhận và thanh toán các chi phí liên quan đến xử lý khẩn nguy và giải quyết hậu quả theo quy định của pháp luật|a, b đúng|a, b sai||C
+Mục tiêu cốt lõi của Kế hoạch khẩn nguy sân bay (AEP) là?|Bảo vệ tài sản|Giảm thiểu gián đoạn khai thác|Bảo vệ tính mạng con người và phối hợp hiệu quả|Tuân thủ quy định pháp luật||C
+Phân loại cứu nạn cứu hỏa sân bay (ARFF Category) phụ thuộc chủ yếu|Số chuyến bay/ngày|Loại tàu bay dài nhất và rộng nhất khai thác|Diện tích sân bay|Số nhân viên cứu hỏa||B
+Cách nhận biết thứ tự động cơ gắn trên tàu bay.|Từ trái qua phải|Từ phải qua trái|Từ trái, đuôi, phải|Từ trên xuống dưới||C
+Diễn tập khẩn nguy tàu bay phải được tổ chức tối thiểu:|6 tháng/lần|1 năm/lần|2 năm/lần|5 năm/lần||C
+Tài liệu quốc tế quy định tiêu chuẩn cứu nạn cứu hỏa sân bay :|Annex 6|Annex 17|Annex 14|Doc 4444||C
+Khi xảy ra 2 sự cố đồng thời, nguyên tắc ưu tiên là:|Theo thứ tự xảy ra|Theo mức độ rủi ro đến tính mạng|Theo chỉ đạo hãng bay|Theo truyền thông||B
+Người chỉ huy hiện trường chịu trách nhiệm:|Truyền thông|Quyết định chiến thuật tại hiện trường|Điều tra|Hậu cần nhà ga||B
+Máy bay trượt khỏi đường băng khi mưa lớn. Hành động đầu tiên:|Họp báo|Kích hoạt báo động và triển khai ARFF|Đóng sân bay ngay lập tức|Chờ xác nhận hãng bay||B
+Khi khói nhẹ từ động cơ nhưng chưa cháy:|Tiếp cận phun nước toàn diện|Chờ tự tắt|Tiếp cận đánh giá, sẵn sàng chữa cháy|Sơ tán báo chí||C
+Thông tư nào quy định người khai thác Cảng phải thành lập Trung tâm khẩn nguy|Thông tư 29/2021/TT-BGTVT|Thông tư 32|Thông tư 05|Thông tư 105||A
+Sân bay cấp cứu hỏa là cấp 9 thì cần tối thiểu bao nhiêu xe chữa cháy?|5 xe|3 xe|4 xe|2 xe||C
+Vùng trách nhiệm tìm kiếm cứu nạn của Cảng hàng không được tính từ hàng rào của CHK ra bao nhiêu km?|10 km|15 km|8 km|5 km||B
+Theo quy định của ICAO Thời gian phản ứng của xe chữa cháy đến bất kỳ điểm nào của đường cất hạ cánh trong điều kiện tầm nhìn tốt và trạng thái mặt đường sạch, không bị ướt|không quá 3 phút|không quá 5 phút|không quá 4 phút|không quá 6 phút||A
+Theo quy định của ICAO Thời gian phản ứng của xe chữa cháy sau cùng đến điểm chữa cháy|không quá 3 phút|không quá 4 phút|không quá 5 phút|không quá 6 phút||B
+Số lượng chất chữa cháy dự phòng phải đạt bao nhiêu % trang bị trên xe chữa cháy|50%|100%|200%|300%||C
+Thiết lập liên lạc giữa Trung tâm khẩn nguy và Ban chỉ huy hiện trường|Có|Không||||A
+Bản đồ phân chia ô vuông sân bay và vùng lân cận có xác định vị trí chi tiết các cổng cửa tiếp cận không?|Có|Không||||A
+Kế hoạch di dời tàu bay mất khả năng di chuyển do người khai thác cảng lập có đảm bảo như một phần của kế hoạch khẩn nguy sân bay không|Không|Có||||B
+Kế hoạch di dời tàu bay mất khả năng di chuyển được lập đảm bảo dựa trên các đặc tính của tàu bay dự kiến tại sân bay và có những nội dung bao gồm?|Danh sách thiết bị và nhân viên tại sân bay hoặc trong vùng lân cận sân bay có thể huy động cho mục đích di dời tàu bay|Phương án tiếp nhận các thiết bị hỗ trợ tàu bay có thể huy động từ các sân bay khác|Cả a và b|||C
+Sau khi diễn tập, có cần Quy trình đánh giá tổng thể tình huống khẩn nguy hoặc diễn tập khẩn nguy để rút ra biện pháp khắc phục không|Có|Không||||A
 `;
 
-/** * LOGIC PARSE DỮ LIỆU BẰNG REGEX 
- * Cách này đảm bảo không phụ thuộc JSON, tránh lỗi cắt xén string khi quá dài.
- */
-function parseRawData(raw) {
-    const questions = [];
-    // Tách riêng từng block dựa trên cụm từ "Câu [số]:"
-    const blocks = raw.split(/(?=Câu \d+:)/);
-    
-    blocks.forEach(block => {
-        if (!block.trim()) return;
-        
-        // Tách dòng
-        const lines = block.split('\n').map(l => l.trim()).filter(l => l);
-        let qText = "";
-        let options = [];
-        let correctIndex = 0; // Mặc định đáp án 0 (A)
-        
-        lines.forEach(line => {
-            // Nhận diện dòng đáp án A. B. C. D. (Cũng bắt trường hợp có đánh dấu *A.)
-            const optMatch = line.match(/^(\*?[A-D])\.\s*(.*)$/i);
-            if (optMatch) {
-                let optLetter = optMatch[1].toUpperCase();
-                let isCorrect = optLetter.startsWith('*');
-                if (isCorrect) correctIndex = options.length;
-                options.push(optMatch[2]);
-            } else {
-                if (options.length === 0) {
-                    qText += (qText ? " " : "") + line;
-                } else {
-                    options[options.length - 1] += " " + line; // Gộp nối dòng dài
-                }
-            }
-        });
-        
-        if (qText && options.length > 0) {
-            questions.push({
-                question: qText.replace(/^Câu \d+:\s*/, ''), // Bỏ chữ Câu X:
-                options: options,
-                correctIndex: correctIndex
-            });
-        }
-    });
-    return questions;
-}
-
-// Bảng map bỏ dấu cực kỳ an toàn, bảo toàn length của chuỗi để highlight index không bị lệch
-const charMap = {
-    'á':'a','à':'a','ả':'a','ã':'a','ạ':'a','ă':'a','ắ':'a','ằ':'a','ẳ':'a','ẵ':'a','ặ':'a','â':'a','ấ':'a','ầ':'a','ẩ':'a','ẫ':'a','ậ':'a',
-    'đ':'d',
-    'é':'e','è':'e','ẻ':'e','ẽ':'e','ẹ':'e','ê':'e','ế':'e','ề':'e','ể':'e','ễ':'e','ệ':'e',
-    'í':'i','ì':'i','ỉ':'i','ĩ':'i','ị':'i',
-    'ó':'o','ò':'o','ỏ':'o','õ':'o','ọ':'o','ô':'o','ố':'o','ồ':'o','ổ':'o','ỗ':'o','ộ':'o','ơ':'o','ớ':'o','ờ':'o','ở':'o','ỡ':'o','ợ':'o',
-    'ú':'u','ù':'u','ủ':'u','ũ':'u','ụ':'u','ư':'u','ứ':'u','ừ':'u','ử':'u','ữ':'u','ự':'u',
-    'ý':'y','ỳ':'y','ỷ':'y','ỹ':'y','ỵ':'y'
-};
-
-function removeAccentsPreserveLength(str) {
-    return str.split('').map(c => {
-        const lower = c.toLowerCase();
-        if (charMap[lower]) return (c === c.toUpperCase()) ? charMap[lower].toUpperCase() : charMap[lower];
-        return c;
-    }).join('');
-}
-
-function escapeHTML(str) {
-    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-}
-
-function highlightText(text, keyword) {
-    if (!keyword.trim()) return escapeHTML(text);
-    
-    const safeText = escapeHTML(text);
-    const normText = removeAccentsPreserveLength(safeText).toLowerCase();
-    const normKey = removeAccentsPreserveLength(keyword).toLowerCase();
-    
-    let result = '';
-    let lastIdx = 0;
-    let idx = normText.indexOf(normKey);
-    
-    while (idx !== -1) {
-        result += safeText.substring(lastIdx, idx);
-        result += `<mark>` + safeText.substring(idx, idx + normKey.length) + `</mark>`;
-        lastIdx = idx + normKey.length;
-        idx = normText.indexOf(normKey, lastIdx);
-    }
-    result += safeText.substring(lastIdx);
-    return result;
-}
-
-function shuffleArray(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-    }
-}
-
-// Global States
-const ALL_QUESTIONS = parseRawData(RAW_DATA);
+/* ==========================================================================
+   2. LOGIC TỰ ĐỘNG PARSE DỮ LIỆU & BIẾN TOÀN CỤC
+   ========================================================================== */
+let allQuestions = [];
 let quizQuestions = [];
-let userAnswers = [];
+let userAnswers = {};
+let isSubmitted = false;
 let timerInterval = null;
 let secondsElapsed = 0;
-let isQuizSubmitted = false;
-let isReviewRendered = false; // Cờ hiệu Fix Bug Tab Trắng
-let currentScore = 0;
-let highScore = parseInt(localStorage.getItem('quizHighScore') || '0');
+let isReviewRendered = false; // Biến cờ hiệu chống lỗi tab trắng
 
-// Khởi tạo
-document.addEventListener("DOMContentLoaded", () => {
-    document.getElementById('highScoreDisplay').innerText = `Điểm cao: ${highScore}/40`;
-    initQuiz();
-});
+// Hàm Parse chuỗi text thành mảng Object
+function parseData() {
+    const lines = rawDataString.trim().split('\n');
+    allQuestions = lines.map((line, index) => {
+        const parts = line.split('|');
+        const qText = parts[0].trim();
+        
+        // Cấu trúc options thô
+        const rawOpts = [
+            { id: 'A', text: parts[1]?.trim() },
+            { id: 'B', text: parts[2]?.trim() },
+            { id: 'C', text: parts[3]?.trim() },
+            { id: 'D', text: parts[4]?.trim() },
+            { id: 'E', text: parts[5]?.trim() }
+        ].filter(opt => opt.text !== ''); // Lọc bỏ các đáp án trống
 
-// Chuyển Tab
+        const ansId = parts[6]?.trim(); // A, B, C, D, E
+
+        // Trích xuất text của đáp án đúng để dùng khi xáo trộn
+        const correctOpt = rawOpts.find(o => o.id === ansId);
+        const correctText = correctOpt ? correctOpt.text : '';
+
+        return {
+            originalId: index + 1,
+            question: qText,
+            options: rawOpts,
+            correctText: correctText
+        };
+    });
+}
+
+// Hàm xáo trộn mảng (Fisher-Yates)
+function shuffleArray(array) {
+    let curId = array.length;
+    while (0 !== curId) {
+        let randId = Math.floor(Math.random() * curId);
+        curId -= 1;
+        let tmp = array[curId];
+        array[curId] = array[randId];
+        array[randId] = tmp;
+    }
+    return array;
+}
+
+/* ==========================================================================
+   3. CHỨC NĂNG CHUNG VÀ TABS
+   ========================================================================== */
 function switchTab(tab) {
-    document.getElementById('tabQuiz').classList.toggle('active', tab === 'quiz');
-    document.getElementById('tabReview').classList.toggle('active', tab === 'review');
-    document.getElementById('quizContainer').style.display = tab === 'quiz' ? 'block' : 'none';
-    document.getElementById('reviewContainer').style.display = tab === 'review' ? 'block' : 'none';
-    
-    // YÊU CẦU QUAN TRỌNG: Render Tab Ôn tập lần đầu
-    if (tab === 'review') {
-        const reviewContainer = document.getElementById('reviewQuestions');
-        if (reviewContainer.children.length === 0 || !isReviewRendered) {
-            renderReviewList("");
+    const btnQuiz = document.getElementById('tab-quiz');
+    const btnReview = document.getElementById('tab-review');
+    const contentQuiz = document.getElementById('content-quiz');
+    const contentReview = document.getElementById('content-review');
+
+    if (tab === 'quiz') {
+        btnQuiz.className = "flex-1 py-1.5 text-sm font-semibold rounded-md bg-white text-blue-700 shadow transition-colors";
+        btnReview.className = "flex-1 py-1.5 text-sm font-semibold rounded-md text-blue-100 hover:text-white transition-colors";
+        contentQuiz.classList.add('active');
+        contentReview.classList.remove('active');
+    } else {
+        btnReview.className = "flex-1 py-1.5 text-sm font-semibold rounded-md bg-white text-blue-700 shadow transition-colors";
+        btnQuiz.className = "flex-1 py-1.5 text-sm font-semibold rounded-md text-blue-100 hover:text-white transition-colors";
+        contentReview.classList.add('active');
+        contentQuiz.classList.remove('active');
+        
+        // QUAN TRỌNG: Render lần đầu (dùng cờ hiệu để an toàn tuyệt đối)
+        if (!isReviewRendered) {
+            renderReviewData();
             isReviewRendered = true;
         }
     }
+    document.getElementById('main-scroll').scrollTop = 0;
 }
 
-// LOGIC TAB 1: THI THỬ
-function initQuiz() {
+function updateHighScoreDisplay() {
+    const score = localStorage.getItem('knsb_highscore') || 0;
+    document.getElementById('high-score').textContent = `Điểm cao: ${score}/40`;
+}
+
+/* ==========================================================================
+   4. CHỨC NĂNG THI THỬ (QUIZ)
+   ========================================================================== */
+function startTimer() {
     clearInterval(timerInterval);
     secondsElapsed = 0;
-    isQuizSubmitted = false;
-    userAnswers = new Array(40).fill(null);
     updateTimerDisplay();
-    
-    // Pick 40 random
-    const pool = [...ALL_QUESTIONS];
-    shuffleArray(pool);
-    quizQuestions = pool.slice(0, 40).map(q => {
-        // Xáo trộn Option
-        const opts = q.options.map((opt, i) => ({ text: opt, isCorrect: i === q.correctIndex }));
-        shuffleArray(opts);
-        return { question: q.question, options: opts };
-    });
-
-    renderQuiz();
-    
-    // Bắt đầu đếm giờ
     timerInterval = setInterval(() => {
         secondsElapsed++;
         updateTimerDisplay();
     }, 1000);
-
-    // Reset UI
-    document.getElementById('btnShareTop').classList.add('hidden');
-    document.getElementById('btnShareBottom').classList.add('hidden');
-    document.getElementById('btnSubmitTop').classList.remove('hidden');
-    document.getElementById('btnSubmitBottom').classList.remove('hidden');
 }
 
 function updateTimerDisplay() {
     const m = Math.floor(secondsElapsed / 60).toString().padStart(2, '0');
     const s = (secondsElapsed % 60).toString().padStart(2, '0');
-    document.getElementById('timer').innerText = `${m}:${s}`;
+    document.getElementById('timer').textContent = `${m}:${s}`;
 }
 
-function renderQuiz() {
-    const container = document.getElementById('quizQuestions');
-    container.innerHTML = quizQuestions.map((q, qIndex) => `
-        <div class="bg-white border border-gray-200 rounded p-3 shadow-sm mb-2" id="qBox_${qIndex}">
-            <div class="font-bold text-blue-900 mb-2">Câu ${qIndex + 1}: ${escapeHTML(q.question)}</div>
-            <div class="space-y-1.5 pl-1 md:pl-2">
-                ${q.options.map((opt, oIndex) => `
-                    <label class="flex items-start p-1.5 border border-transparent rounded hover:bg-gray-50 cursor-pointer transition-colors" id="label_${qIndex}_${oIndex}">
-                        <input type="radio" name="q_${qIndex}" value="${oIndex}" onchange="selectAnswer(${qIndex}, ${oIndex})">
-                        <span class="ml-2 text-gray-700">${escapeHTML(opt.text)}</span>
-                    </label>
-                `).join('')}
-            </div>
-        </div>
-    `).join('');
+function startQuiz() {
+    isSubmitted = false;
+    userAnswers = {};
+    
+    // Giao diện
+    document.getElementById('btn-submit-bottom').classList.remove('hidden');
+    document.getElementById('btn-retry-bottom').classList.add('hidden');
+    document.getElementById('btn-share').classList.add('hidden');
+    document.getElementById('score-display').textContent = 'Chưa nộp bài';
+    document.getElementById('score-display').className = 'font-bold text-lg text-slate-700';
+    document.getElementById('quiz-top-actions').children[0].classList.remove('hidden'); // Hiện nút Nộp trên
+
+    // Bốc 40 câu ngẫu nhiên và xáo trộn đáp án
+    const shuffledAll = shuffleArray([...allQuestions]);
+    quizQuestions = shuffledAll.slice(0, 40).map(q => {
+        // Xáo trộn đáp án của câu này
+        const shuffledOpts = shuffleArray([...q.options]);
+        return {
+            ...q,
+            options: shuffledOpts
+        };
+    });
+
+    renderQuizHTML();
+    startTimer();
+    document.getElementById('main-scroll').scrollTop = 0;
 }
 
-function selectAnswer(qIndex, oIndex) {
-    if(isQuizSubmitted) return;
-    userAnswers[qIndex] = oIndex;
+function renderQuizHTML() {
+    const container = document.getElementById('quiz-container');
+    const labels = ['A', 'B', 'C', 'D', 'E'];
+    
+    let html = '';
+    quizQuestions.forEach((q, index) => {
+        html += `
+        <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-3" id="q-card-${index}">
+            <div class="font-bold text-[15px] mb-2 leading-tightest"><span class="text-blue-700">Câu ${index + 1}:</span> ${q.question}</div>
+            <div class="flex flex-col gap-1.5 pl-1">
+        `;
+        
+        q.options.forEach((opt, optIndex) => {
+            const letter = labels[optIndex];
+            html += `
+                <label class="flex items-start gap-2 p-1.5 rounded bg-slate-50 border border-transparent cursor-pointer transition-colors hover:bg-slate-100" id="label-${index}-${optIndex}">
+                    <input type="radio" name="q${index}" value="${optIndex}" onchange="selectAnswer(${index}, ${optIndex})" class="accent-blue-600 mt-0.5">
+                    <span class="text-sm font-semibold text-slate-600 w-5">${letter}.</span>
+                    <span class="text-[14px] leading-tightest text-slate-800 flex-1">${opt.text}</span>
+                    <span id="icon-${index}-${optIndex}" class="w-5 text-center text-sm font-bold"></span>
+                </label>
+            `;
+        });
+        
+        html += `</div></div>`;
+    });
+    
+    container.innerHTML = html;
+}
+
+function selectAnswer(qIndex, optIndex) {
+    if (isSubmitted) return;
+    userAnswers[qIndex] = optIndex;
+    
+    // Xóa active class các label khác
+    const labels = document.querySelectorAll(`[id^="label-${qIndex}-"]`);
+    labels.forEach(l => l.classList.remove('border-blue-300', 'bg-blue-50'));
+    
+    // Thêm active class cho label được chọn
+    const activeLabel = document.getElementById(`label-${qIndex}-${optIndex}`);
+    activeLabel.classList.add('border-blue-300', 'bg-blue-50');
 }
 
 function submitQuiz() {
-    if (isQuizSubmitted) return;
+    if (isSubmitted) return;
     
-    const unanswered = userAnswers.filter(a => a === null).length;
-    if (unanswered > 0) {
-        if (!confirm(`Bạn còn ${unanswered} câu chưa làm. Bạn có chắc chắn muốn nộp bài?`)) return;
+    // Cảnh báo nếu chưa làm hết
+    const answeredCount = Object.keys(userAnswers).length;
+    if (answeredCount < 40) {
+        if (!confirm(`Bạn mới làm ${answeredCount}/40 câu. Bạn có chắc chắn muốn nộp bài?`)) return;
     }
 
-    isQuizSubmitted = true;
+    isSubmitted = true;
     clearInterval(timerInterval);
-    currentScore = 0;
 
+    let score = 0;
+    
     quizQuestions.forEach((q, qIndex) => {
-        const selectedOpt = userAnswers[qIndex];
-        const correctOpt = q.options.findIndex(o => o.isCorrect);
+        const userOptIndex = userAnswers[qIndex];
+        let correctOptIndex = -1;
         
-        if (selectedOpt === correctOpt) currentScore++;
-
-        // Render kết quả (Lock input, tô màu)
-        const labels = document.querySelectorAll(`[id^="label_${qIndex}_"]`);
-        labels.forEach((label, oIndex) => {
-            const input = label.querySelector('input');
-            input.disabled = true;
-            const span = label.querySelector('span');
-
-            if (oIndex === correctOpt) {
-                label.classList.add('bg-green-100', 'border-green-400', 'font-semibold');
-                span.classList.add('text-green-800');
-                span.innerHTML = `✔️ ` + span.innerHTML;
-            } else if (oIndex === selectedOpt && selectedOpt !== correctOpt) {
-                label.classList.add('bg-red-50', 'border-red-300');
-                span.classList.add('text-red-700', 'line-through');
-                span.innerHTML = `✖️ ` + span.innerHTML;
-            }
+        // Tìm index của đáp án đúng trong mảng đã xáo trộn
+        q.options.forEach((opt, idx) => {
+            if (opt.text === q.correctText) correctOptIndex = idx;
         });
+
+        // Disable tất cả input
+        const inputs = document.getElementsByName(`q${qIndex}`);
+        inputs.forEach(input => input.disabled = true);
+
+        // Chấm điểm & Tô màu
+        if (userOptIndex !== undefined) {
+            if (userOptIndex === correctOptIndex) {
+                // Làm đúng
+                score++;
+                const lbl = document.getElementById(`label-${qIndex}-${userOptIndex}`);
+                lbl.className = "flex items-start gap-2 p-1.5 rounded border bg-green-100 border-green-300 transition-colors";
+                lbl.querySelector('span.flex-1').classList.add('text-green-800', 'font-medium');
+                document.getElementById(`icon-${qIndex}-${userOptIndex}`).textContent = "✔️";
+                document.getElementById(`icon-${qIndex}-${userOptIndex}`).classList.add("text-green-600");
+            } else {
+                // Làm sai
+                const lbl = document.getElementById(`label-${qIndex}-${userOptIndex}`);
+                lbl.className = "flex items-start gap-2 p-1.5 rounded border bg-red-50 border-red-200 transition-colors opacity-80";
+                lbl.querySelector('span.flex-1').classList.add('text-red-700', 'line-through');
+                document.getElementById(`icon-${qIndex}-${userOptIndex}`).textContent = "✖️";
+                document.getElementById(`icon-${qIndex}-${userOptIndex}`).classList.add("text-red-600");
+                
+                // Tô lại màu xanh cho đáp án đúng bị bỏ lỡ
+                const correctLbl = document.getElementById(`label-${qIndex}-${correctOptIndex}`);
+                correctLbl.className = "flex items-start gap-2 p-1.5 rounded border bg-green-50 border-green-200 transition-colors";
+                correctLbl.querySelector('span.flex-1').classList.add('text-green-800', 'font-medium');
+                document.getElementById(`icon-${qIndex}-${correctOptIndex}`).textContent = "✔️";
+                document.getElementById(`icon-${qIndex}-${correctOptIndex}`).classList.add("text-green-600");
+            }
+        } else {
+            // Không chọn gì, chỉ show đáp án đúng
+            const correctLbl = document.getElementById(`label-${qIndex}-${correctOptIndex}`);
+            correctLbl.className = "flex items-start gap-2 p-1.5 rounded border bg-green-50 border-green-200 transition-colors";
+            correctLbl.querySelector('span.flex-1').classList.add('text-green-800', 'font-medium');
+            document.getElementById(`icon-${qIndex}-${correctOptIndex}`).textContent = "✔️";
+            document.getElementById(`icon-${qIndex}-${correctOptIndex}`).classList.add("text-green-600");
+        }
     });
 
-    // Update điểm
-    if (currentScore > highScore) {
-        highScore = currentScore;
-        localStorage.setItem('quizHighScore', highScore);
-        document.getElementById('highScoreDisplay').innerText = `Điểm cao: ${highScore}/40`;
+    // Cập nhật HighScore
+    const currentHigh = parseInt(localStorage.getItem('knsb_highscore') || 0);
+    if (score > currentHigh) {
+        localStorage.setItem('knsb_highscore', score);
+        updateHighScoreDisplay();
     }
 
-    // Cuộn lên đầu và đổi nút
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    document.getElementById('timer').innerText = `Điểm: ${currentScore}/40`;
-    document.getElementById('btnSubmitTop').classList.add('hidden');
-    document.getElementById('btnSubmitBottom').classList.add('hidden');
-    document.getElementById('btnShareTop').classList.remove('hidden');
-    document.getElementById('btnShareBottom').classList.remove('hidden');
-}
-
-function restartQuiz() {
-    if (!isQuizSubmitted && !confirm("Bài thi đang làm dở, bạn có chắc muốn tạo đề mới?")) return;
-    initQuiz();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-function shareScore() {
-    const m = Math.floor(secondsElapsed / 60).toString().padStart(2, '0');
-    const s = (secondsElapsed % 60).toString().padStart(2, '0');
-    const text = `🏆 Huấn luyện CNTT - Cảng HKQT Cần Thơ\nĐiểm của tôi: ${currentScore}/40\nThời gian: ${m}:${s}\nThử sức ngay!`;
+    // Cập nhật UI Dưới
+    const scoreDisplay = document.getElementById('score-display');
+    scoreDisplay.innerHTML = `Điểm: <span class="${score >= 32 ? 'text-green-600' : 'text-red-600'} text-xl">${score}/40</span>`;
     
-    // Copy to clipboard
-    const textarea = document.createElement('textarea');
-    textarea.value = text;
-    document.body.appendChild(textarea);
-    textarea.select();
-    document.execCommand('copy');
-    document.body.removeChild(textarea);
+    document.getElementById('btn-submit-bottom').classList.add('hidden');
+    document.getElementById('btn-retry-bottom').classList.remove('hidden');
+    document.getElementById('btn-share').classList.remove('hidden');
+    
+    document.getElementById('quiz-top-actions').children[0].classList.add('hidden'); // Ẩn nút nộp ở trên
+}
 
-    // Toast
+function shareResult() {
+    const timeStr = document.getElementById('timer').textContent;
+    const scoreText = document.getElementById('score-display').innerText; // Lấy "Điểm: X/40"
+    const text = `🏆 Kết quả sát hạch Khẩn Nguy Sân Bay:\n🎯 ${scoreText}\n⏱️ Thời gian: ${timeStr}\n🌐 App by Gemini.`;
+    
+    navigator.clipboard.writeText(text).then(() => {
+        showToast();
+    });
+}
+
+function showToast() {
     const toast = document.getElementById('toast');
-    toast.classList.remove('hidden');
-    toast.classList.add('toast-enter');
+    toast.classList.add('toast-show');
     setTimeout(() => {
-        toast.classList.add('hidden');
-        toast.classList.remove('toast-enter');
-    }, 2500);
+        toast.classList.remove('toast-show');
+    }, 2000);
 }
 
-
-// LOGIC TAB 2: ÔN TẬP
-let searchTimeout;
-function onSearchInput(e) {
-    clearTimeout(searchTimeout);
-    searchTimeout = setTimeout(() => {
-        renderReviewList(e.target.value);
-    }, 250); // Debounce chống lag
+/* ==========================================================================
+   5. CHỨC NĂNG ÔN TẬP (REVIEW & SEARCH)
+   ========================================================================== */
+function removeAccents(str) {
+    return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D').toLowerCase();
 }
 
-function renderReviewList(keyword) {
-    const container = document.getElementById('reviewQuestions');
-    const countLabel = document.getElementById('searchCount');
-    
-    const normKey = removeAccentsPreserveLength(keyword).toLowerCase().trim();
+function escapeRegExp(string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); 
+}
+
+function renderReviewData(keyword = '') {
+    const container = document.getElementById('review-container');
+    const labels = ['A', 'B', 'C', 'D', 'E'];
+    const safeKeyword = keyword.trim();
+    const searchUnaccented = removeAccents(safeKeyword);
     
     let html = '';
     let count = 0;
 
-    ALL_QUESTIONS.forEach((q, index) => {
-        const normQ = removeAccentsPreserveLength(q.question).toLowerCase();
-        const normOpts = q.options.map(opt => removeAccentsPreserveLength(opt).toLowerCase());
+    allQuestions.forEach(q => {
+        // Thuật toán kiểm tra điều kiện lọc
+        const qTextUnaccented = removeAccents(q.question);
+        const isMatchQ = qTextUnaccented.includes(searchUnaccented);
+        const isMatchOpts = q.options.some(opt => removeAccents(opt.text).includes(searchUnaccented));
         
-        let isMatch = false;
-        if (!normKey || normQ.includes(normKey) || normOpts.some(o => o.includes(normKey))) {
-            isMatch = true;
-        }
-
-        if (isMatch) {
+        if (safeKeyword === '' || isMatchQ || isMatchOpts) {
             count++;
+            
+            // Highlight logic (Tô màu chính xác từ khóa không phân biệt hoa thường)
+            let displayQ = q.question;
+            if (safeKeyword !== '' && isMatchQ) {
+                const regex = new RegExp('(' + escapeRegExp(safeKeyword) + ')', 'gi');
+                displayQ = displayQ.replace(regex, '<mark class="bg-yellow-300 rounded px-1">$1</mark>');
+            }
+
             html += `
-                <div class="bg-white border border-gray-200 rounded p-2.5 shadow-sm">
-                    <div class="font-bold text-gray-800 mb-1.5">Câu ${index + 1}: ${highlightText(q.question, normKey)}</div>
-                    <div class="space-y-1 pl-1">
-                        ${q.options.map((opt, oIndex) => {
-                            const isCorrect = (oIndex === q.correctIndex);
-                            const cssClass = isCorrect ? 'bg-blue-50 border-blue-200 text-blue-800 font-semibold' : 'text-gray-500';
-                            const icon = isCorrect ? '✔️ ' : '';
-                            return `
-                            <div class="p-1.5 border rounded ${cssClass} text-sm">
-                                ${icon}${highlightText(opt, normKey)}
-                            </div>`;
-                        }).join('')}
-                    </div>
-                </div>
+            <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-3">
+                <div class="font-bold text-[15px] mb-2 leading-tightest"><span class="text-indigo-700">Câu ${q.originalId}:</span> ${displayQ}</div>
+                <div class="flex flex-col gap-1.5 pl-1">
             `;
+            
+            q.options.forEach((opt, optIndex) => {
+                const letter = labels[optIndex];
+                const isCorrect = opt.text === q.correctText;
+                
+                let displayOpt = opt.text;
+                if (safeKeyword !== '' && removeAccents(opt.text).includes(searchUnaccented)) {
+                    const regex = new RegExp('(' + escapeRegExp(safeKeyword) + ')', 'gi');
+                    displayOpt = displayOpt.replace(regex, '<mark class="bg-yellow-300 rounded px-1">$1</mark>');
+                }
+
+                if (isCorrect) {
+                    html += `
+                        <div class="flex items-start gap-2 p-1.5 rounded bg-blue-50 border border-blue-200">
+                            <span class="text-sm font-bold text-blue-700 w-5">${letter}.</span>
+                            <span class="text-[14px] leading-tightest text-blue-900 font-medium flex-1">${displayOpt}</span>
+                            <span class="w-5 text-center text-sm font-bold text-blue-600">✔️</span>
+                        </div>
+                    `;
+                } else {
+                    html += `
+                        <div class="flex items-start gap-2 p-1.5 rounded bg-transparent">
+                            <span class="text-sm font-semibold text-slate-400 w-5">${letter}.</span>
+                            <span class="text-[14px] leading-tightest text-slate-500 flex-1">${displayOpt}</span>
+                            <span class="w-5"></span>
+                        </div>
+                    `;
+                }
+            });
+            html += `</div></div>`;
         }
     });
 
-    container.innerHTML = html || `<div class="text-center text-gray-500 py-10">Không tìm thấy kết quả phù hợp.</div>`;
-    countLabel.innerText = normKey ? `Tìm thấy ${count} câu hỏi.` : `Đang hiển thị toàn bộ ${ALL_QUESTIONS.length} câu hỏi.`;
+    if (count === 0) {
+        html = `<div class="text-center p-8 text-slate-500">Không tìm thấy kết quả nào phù hợp với "<span class="font-bold text-slate-700">${safeKeyword}</span>"</div>`;
+    }
+
+    container.innerHTML = html;
+    document.getElementById('search-stats').textContent = `Đang hiển thị ${count}/${allQuestions.length} câu hỏi`;
 }
+
+// Tối ưu search realtime với debounce nhẹ để ko lag nếu data lớn (dù 55 câu ko lag)
+let searchTimeout;
+function handleSearch() {
+    clearTimeout(searchTimeout);
+    const val = document.getElementById('search-input').value;
+    searchTimeout = setTimeout(() => {
+        renderReviewData(val);
+    }, 200); // 200ms debounce
+}
+
+/* ==========================================================================
+   6. KHỞI CHẠY APP
+   ========================================================================== */
+window.onload = function() {
+    parseData();
+    updateHighScoreDisplay();
+    startQuiz();
+};
+
 </script>
 </body>
 </html>
-
-```
