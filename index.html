@@ -3,496 +3,804 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ngân Hàng Câu Hỏi SMS-003 (2023)</title>
+    <title>Ôn tập & Thi thử SMS-003</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Sử dụng font chữ dễ đọc và hiện đại */
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
-
-        /* Thiết lập các biến màu sắc và font chữ chung */
-        :root {
-            --background-color: #f8f9fa;
-            --card-background: #ffffff;
-            --text-color: #212529;
-            --primary-color: #007bff;
-            --border-color: #dee2e6;
-            --shadow-color: rgba(0, 0, 0, 0.05);
-            --answer-color: #d9534f; /* Màu đỏ cho đáp án */
-            --font-family: 'Inter', sans-serif;
-        }
-
-        /* Reset và thiết lập cơ bản cho body */
+        /* Tối ưu vùng nhìn: line-height nhỏ, font gọn */
         body {
-            font-family: var(--font-family);
-            background-color: var(--background-color);
-            color: var(--text-color);
-            margin: 0;
-            padding: 20px;
-            line-height: 1.6;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.2;
+            background-color: #f1f5f9; /* slate-100 */
+        }
+        
+        /* Ẩn thanh cuộn nhưng vẫn cho phép cuộn */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        /* Custom Radio Button ẩn đi, style trên label */
+        .quiz-radio { display: none; }
+        .quiz-label {
             display: flex;
-            justify-content: center;
+            align-items: flex-start;
+            padding: 8px 10px;
+            margin-bottom: 4px;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+            background-color: #f8fafc;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.95rem;
+        }
+        .quiz-radio:checked + .quiz-label {
+            background-color: #eff6ff; /* blue-50 */
+            border-color: #3b82f6; /* blue-500 */
+            font-weight: 500;
+        }
+        .quiz-radio:disabled + .quiz-label {
+            cursor: not-allowed;
         }
 
-        /* Container chính của ứng dụng */
-        .container {
-            width: 100%;
-            max-width: 800px;
+        /* Highlight tìm kiếm */
+        mark {
+            background-color: #fde047; /* yellow-300 */
+            font-weight: bold;
+            color: #000;
+            padding: 0 2px;
+            border-radius: 2px;
         }
 
-        /* Tiêu đề trang */
-        header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        header h1 {
-            color: var(--primary-color);
-            font-size: 2.2rem;
-            margin-bottom: 5px;
-        }
-
-        header p {
-            color: #6c757d;
-            font-size: 1rem;
-        }
-
-        /* Thanh tìm kiếm */
-        .search-container {
-            margin-bottom: 30px;
-            position: sticky;
-            top: 20px;
-            background: var(--background-color);
-            padding: 10px 0;
-            z-index: 10;
-        }
-
-        #searchInput {
-            width: 100%;
-            padding: 15px 20px;
-            font-size: 1rem;
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
-            box-shadow: 0 4px 12px var(--shadow-color);
-            transition: border-color 0.3s, box-shadow 0.3s;
-            box-sizing: border-box; /* Đảm bảo padding không làm thay đổi width */
-        }
-
-        #searchInput:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
-        }
-
-        /* Danh sách câu hỏi */
-        #question-container {
-            display: grid;
-            gap: 20px;
-        }
-
-        /* Thẻ chứa từng câu hỏi */
-        .question-card {
-            background-color: var(--card-background);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 4px 12px var(--shadow-color);
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-
-        .question-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
-        }
-
-        /* Phần câu hỏi trong thẻ */
-        .question-card .question {
-            font-weight: 600;
-            margin-bottom: 15px;
-            color: #343a40;
-        }
-
-        /* Phần các lựa chọn a, b, c, d */
-        .question-card .options {
-            padding-left: 20px;
-            margin-bottom: 15px;
-        }
-        
-        .question-card .options div {
-             margin-bottom: 5px;
-        }
-
-        /* Phần đáp án được tô đỏ */
-        .answer {
-            color: var(--answer-color);
-            font-weight: 600;
-            background-color: rgba(217, 83, 79, 0.05);
-            padding: 2px 6px;
-            border-radius: 4px;
-        }
-        
-        /* Thông báo khi không tìm thấy kết quả */
-        #no-results {
-            text-align: center;
-            padding: 40px;
-            color: #6c757d;
-            display: none; /* Ẩn mặc định */
-        }
-
-        /* Responsive design cho thiết bị di động */
-        @media (max-width: 600px) {
-            body {
-                padding: 15px;
-            }
-            header h1 {
-                font-size: 1.8rem;
-            }
-            .search-container {
-                top: 10px;
-            }
-        }
+        /* SVG Icons Inline */
+        .icon-check { color: #16a34a; margin-left: 6px; flex-shrink: 0; }
+        .icon-cross { color: #dc2626; margin-left: 6px; flex-shrink: 0; }
     </style>
 </head>
-<body>
+<body class="text-slate-800">
 
-    <div class="container">
-        <header>
-            <h1>Ngân Hàng Câu Hỏi</h1>
-            <p>Định kỳ Hệ thống Quản lý An toàn SMS-003 – Năm 2023</p>
+    <div class="max-w-2xl mx-auto bg-white min-h-screen shadow-lg flex flex-col relative">
+        
+        <!-- HEADER -->
+        <header class="px-4 py-3 bg-blue-700 text-white shadow-md z-20">
+            <p class="text-xs italic text-blue-200 mb-1">Huấn luyện Đào tạo Cảng HKQT Cần Thơ</p>
+            <h1 class="text-lg font-bold leading-tight">ĐỊNH KỲ HỆ THỐNG QUẢN LÝ AN TOÀN SMS-003 – NĂM 2025</h1>
         </header>
 
-        <div class="search-container">
-            <input type="text" id="searchInput" placeholder="Nhập từ khóa để tìm kiếm câu hỏi hoặc đáp án...">
+        <!-- TABS -->
+        <div class="flex border-b border-slate-200 bg-slate-50 sticky top-0 z-20 shadow-sm">
+            <button id="btn-tab-quiz" onclick="switchTab('quiz')" class="flex-1 py-2 text-sm font-bold text-blue-600 border-b-2 border-blue-600 transition-colors">
+                Thi Thử (40)
+            </button>
+            <button id="btn-tab-review" onclick="switchTab('review')" class="flex-1 py-2 text-sm font-bold text-slate-500 border-b-2 border-transparent hover:text-blue-600 transition-colors">
+                Ôn Tập (Full)
+            </button>
         </div>
 
-        <div id="question-container">
-            <!-- Dữ liệu câu hỏi sẽ được chèn vào đây bằng JavaScript -->
-        </div>
+        <!-- MAIN CONTENT AREA -->
+        <main class="flex-1 relative overflow-hidden flex flex-col">
+            
+            <!-- TAB 1: THI THỬ -->
+            <div id="tab-quiz" class="flex-1 flex flex-col h-full overflow-y-auto">
+                <!-- Top Sticky Bar -->
+                <div class="sticky top-0 bg-white/95 backdrop-blur-sm border-b border-slate-200 p-2 flex justify-between items-center z-10 shadow-sm">
+                    <div class="flex flex-col">
+                        <span id="timer" class="text-xl font-mono font-bold text-slate-700">00:00</span>
+                        <span id="high-score-display" class="text-xs text-slate-500 font-medium">Điểm cao: 0/40</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="initQuiz()" class="px-3 py-1.5 bg-slate-200 text-slate-700 text-sm font-bold rounded shadow-sm hover:bg-slate-300">Làm Lại</button>
+                        <button id="btn-submit-top" onclick="submitQuiz()" class="px-4 py-1.5 bg-blue-600 text-white text-sm font-bold rounded shadow-sm hover:bg-blue-700">Nộp Bài</button>
+                    </div>
+                </div>
+
+                <!-- Quiz Questions Container -->
+                <div id="quiz-container" class="p-3 pb-6 flex-1 space-y-3">
+                    <!-- Javascript will render questions here -->
+                </div>
+
+                <!-- Bottom Sticky Bar -->
+                <div class="bg-slate-100 border-t border-slate-200 p-3 flex justify-between items-center mt-auto">
+                    <div id="result-text" class="text-lg font-bold text-blue-700"></div>
+                    <div class="flex gap-2">
+                        <button id="btn-share" onclick="shareResult()" class="hidden px-3 py-2 bg-green-600 text-white text-sm font-bold rounded shadow hover:bg-green-700 flex items-center gap-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path></svg>
+                            Chia sẻ
+                        </button>
+                        <button onclick="initQuiz()" class="px-3 py-2 bg-slate-300 text-slate-800 text-sm font-bold rounded hover:bg-slate-400">Làm Lại</button>
+                        <button id="btn-submit-bottom" onclick="submitQuiz()" class="px-6 py-2 bg-blue-600 text-white text-sm font-bold rounded shadow hover:bg-blue-700">Nộp Bài</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 2: ÔN TẬP -->
+            <div id="tab-review" class="hidden flex-1 flex flex-col h-full overflow-y-auto bg-slate-100">
+                <!-- Sticky Search Bar -->
+                <div class="sticky top-0 bg-white shadow-sm p-3 z-10 border-b border-slate-200">
+                    <div class="relative">
+                        <input type="text" id="search-input" oninput="handleSearch()" placeholder="Tìm kiếm câu hỏi hoặc đáp án..." 
+                            class="w-full pl-9 pr-3 py-2 bg-slate-100 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all">
+                        <svg class="w-4 h-4 text-slate-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Review Questions Container -->
+                <div id="review-container" class="p-3 pb-10 space-y-3">
+                    <!-- Javascript will render questions here -->
+                </div>
+            </div>
+
+        </main>
         
-        <div id="no-results">
-            <h2>Không tìm thấy kết quả nào</h2>
-            <p>Vui lòng thử lại với một từ khóa khác.</p>
+        <!-- Toast Notification -->
+        <div id="toast" class="fixed bottom-4 left-1/2 -translate-x-1/2 bg-slate-800 text-white px-4 py-2 rounded shadow-lg text-sm transition-opacity duration-300 opacity-0 pointer-events-none z-50">
+            Thông báo
         </div>
     </div>
 
     <script>
-        // --- DỮ LIỆU NGÂN HÀNG CÂU HỎI ---
-        const questionData = [
-            {
-                "question": "Câu 1: Quy định nhà cung cấp dịch vụ phải xây dựng Hệ thống quản lý an toàn được quy định trong:",
-                "options": ["a. Annex 1", "b. Annex 19", "c. Annex 2", "d. Tất cả tài liệu trên"],
-                "answer": "b. Annex 19"
-            },
-            {
-                "question": "Câu 2: Chương trình an toàn quốc gia do ai ban hành",
-                "options": ["a. Bộ giao thông vận tải", "b. ICAO", "c. Cảng vụ hàng không", "d. Đơn vị cung cấp dịch vụ"],
-                "answer": "a. Bộ giao thông vận tải"
-            },
-            {
-                "question": "Câu 3: Phương pháp nhận diện mối nguy có mấy phương pháp?",
-                "options": ["a. Phân tích các bước của quá trình để nhận diện mối nguy (bottom up)", "b. Phân tích các nguyên nhân gây ra các hậu quả trong quá trình hoạt động để nhận diện mối nguy (top down)", "c. Cả a và b", "d. Tất cả đều sai"],
-                "answer": "c. Cả a và b"
-            },
-            {
-                "question": "Câu 4: Cấu trúc Chương trình an toàn quốc gia theo yêu cầu của ICAO gồm",
-                "options": ["a. Chính sách và mục tiêu an toàn quốc gia", "b. Chương trình quản lý rủi ro an toàn", "c. Bảo đảm an toàn quốc gia, Thúc đẩy an toàn quốc gia", "d. Tất cả yếu tố trên"],
-                "answer": "d. Tất cả yếu tố trên"
-            },
-            {
-                "question": "Câu 5: Theo yêu cầu của ICAO, Thành phần đảm bảo an toàn gồm những yếu tố nào:",
-                "options": ["a. Giám sát và đo lường an toàn, Quản lý sự thay đổi, Liên tục cải tiến hệ thống", "b. Nhận diện và đánh giá rủi ro, Cam kết của lãnh đạo, Quyền hạn và trách nhiệm an toàn", "c. Huấn luyện đào tạo và Phổ biến an toàn", "d. Tất cả các câu trên"],
-                "answer": "a. Giám sát và đo lường an toàn, Quản lý sự thay đổi, Liên tục cải tiến hệ thống"
-            },
-            {
-                "question": "Câu 6: Định nghĩa hành động khắc phục",
-                "options": ["a. Xử lý điểm không phù hợp ngay lúc phát hiện", "b. Xử lý nguyên nhân gốc rễ", "c. Xử lý điểm không phù hợp, tìm nguyên nhân gốc rễ và đề xuất biện pháp khắc phục", "d. Tất cả các câu đều đúng"],
-                "answer": "c. Xử lý điểm không phù hợp, tìm nguyên nhân gốc rễ và đề xuất biện pháp khắc phục"
-            },
-            {
-                "question": "Câu 7: Định nghĩa nào đúng",
-                "options": ["a. Quá trình là một hoạt động biến đổi đầu vào thành đầu ra", "b. Quá trình là một hoạt động không có đầu ra", "c. Quy trình là mô tả các hoạt động của một quá trình", "d. Cả a và c đều đúng"],
-                "answer": "d. Cả a và c đều đúng"
-            },
-            {
-                "question": "Câu 8: Các yêu cầu về việc triển khai Hệ thống quản lý an toàn trong Annex 19 áp dụng trong lĩnh vực nào:",
-                "options": ["a. Đảm bảo chất lượng dịch vụ", "b. Đảm bảo an toàn trong lĩnh vực hàng không", "c. Đảm bảo an toàn trong lĩnh vực hàng hải", "d. Tất cả lĩnh vực trên"],
-                "answer": "b. Đảm bảo an toàn trong lĩnh vực hàng không"
-            },
-            {
-                "question": "Câu 9: Trách nhiệm an toàn của Ban giám đốc cảng thể hiện ở tài liệu nào:",
-                "options": ["a. Tài liệu Hệ thống quản lý an toàn được Cục hàng không Việt Nam phê duyệt", "b. Bảng mô tả công việc của từng chức danh", "c. Quyết định phân công nhiệm vụ của Ban giám đốc.", "d. Tất cả các yếu tố trên"],
-                "answer": "d. Tất cả các yếu tố trên"
-            },
-            {
-                "question": "Câu 10: Chi số an toàn được xác định như thế nào",
-                "options": ["a. Dựa vào các rủi ro an toàn của cảng đang muốn kiểm soát", "b. Theo chương trình an toàn quốc gia", "c. Cả a và b đều đúng", "d. Tất cả đều sai"],
-                "answer": "c. Cả a và b đều đúng"
-            },
-            {
-                "question": "Câu 11: Mục đích của việc xây dựng Hệ thống SMS là:",
-                "options": ["a. Nhận diện các mối nguy trong quá trình hoạt động cung cấp dịch vụ của cảng để đảm bảo đạt mức độ an toàn chấp nhận được và chuyển viêc quản lý an toàn từ bị động sang chủ động", "b. Phục vụ cho việc lưu trữ hồ sơ hệ thống của tổ chức", "c. Thỏa mãn nhu cầu khách hàng, luật định", "d. Thỏa mãn yêu cầu của các hãng hàng không"],
-                "answer": "a. Nhận diện các mối nguy trong quá trình hoạt động cung cấp dịch vụ của cảng để đảm bảo đạt mức độ an toàn chấp nhận được và chuyển viêc quản lý an toàn từ bị động sang chủ động"
-            },
-            {
-                "question": "Câu 12: Nguồn để xác định mối nguy hiểm, bao gồm:",
-                "options": ["a. Các báo cáo thông báo sự cố cũng như quá trình điều tra", "b. Hệ thống báo cáo tự nguyện", "c. Khảo sát định kỳ mối nguy hiểm đối với các trang thiết bị an toàn hàng không; đánh giá an toàn/chất lượng định kỳ; đánh giá hệ thống thu thập dữ liệu hoạt động định kỳ", "d. Tất cả các câu trên"],
-                "answer": "d. Tất cả các câu trên"
-            },
-            {
-                "question": "Câu 13: Mối nguy là:",
-                "options": ["a. Hậu quả, thiệt hại về người và tài sản, giảm mức độ an toàn của Hệ thống", "b. Điều kiện hoặc đối tượng có thể gây ra những thiệt hại người, tài sản, giảm mức độ an toàn hệ thống", "c. Các yêu cầu của Annex 19", "d. Tất cả đều đúng"],
-                "answer": "b. Điều kiện hoặc đối tượng có thể gây ra những thiệt hại người, tài sản, giảm mức độ an toàn hệ thống"
-            },
-            {
-                "question": "Câu 14: Khi đánh giá rủi ro hiện tại ở mức Trung bình tổ chức cần thực hiện các hành động gì?",
-                "options": ["a. Tiến hành nhận diện mối nguy, đánh giá rui ro lại", "b. Bổ sung các biện pháp kiểm soát rủi ro tăng cường", "c. Chấm dứt hoạt động", "d. Chấp nhận mối nguy trên tồn tại trong hoạt động của tổ chức."],
-                "answer": "b. Bổ sung các biện pháp kiểm soát rủi ro tăng cường"
-            },
-            {
-                "question": "Câu 15: Sự cố tàu bay gặp hư hỏng do FOD trong năm 2022 là 0.8/10000 lần chc. Trong năm 2023 tổ chức muốn giảm 10% giá trị thực hiện năm 2018. Vậy",
-                "options": ["a. Chỉ tiêu an toàn 0.8/10000 lần chc", "b. Chỉ tiêu an toàn 0.72/10000 lần chc", "c. Chỉ tiêu an toàn giảm 8.4/100000 lần chc", "d. Tất cả đều sai"],
-                "answer": "b. Chỉ tiêu an toàn 0.72/10000 lần chc"
-            },
-            {
-                "question": "Câu 16: Mục đích đánh giá nội bộ trong Hệ thống SMS - QMS",
-                "options": ["a. Nhận diện các mối nguy đang tồn tại hiện hữu/ tiềm ẩn trong Hệ thống", "b. Xác định các khu vực cần cải tiến", "c. Xác định kế hoạch phân bổ nguồn lực", "d. Tất cả yếu tố trên"],
-                "answer": "d. Tất cả yếu tố trên"
-            },
-            {
-                "question": "Câu 17: Quá trình xem xét kỷ luật công bằng cần xem xét các yếu tố",
-                "options": ["a. Hồ sơ ghi nhận các hành vi gây mất an toàn của cá nhân trước đây", "b. Hồ sơ đào tạo về chuyên môn", "c. Ý định của cá nhân liên quan đến hành vi không phù hợp", "d. Tất cả yếu tố trên"],
-                "answer": "d. Tất cả yếu tố trên"
-            },
-            {
-                "question": "Câu 18: Quản lý sự thay đổi được triển khai thực hiện đối với các thay đổi nào",
-                "options": ["a. Thay đổi về luật định, quy định", "b. Thay đổi quy trình, quá trình, phương án khai thác", "c. Thay đổi cơ sở hạ tầng, trang thiết bị", "d. Tất cả yếu tố trên."],
-                "answer": "d. Tất cả yếu tố trên."
-            },
-            {
-                "question": "Câu 19: Phải có hành động thực hiện hành động khắc phục khi đường biểu diễn các chỉ số an toàn trong năm hiện tại:",
-                "options": ["a. 3 điểm liên tiếp nằm trên cảnh báo mức 1", "b. 2 điểm liên tiếp nằm trên cảnh báo mức 2", "c. 1 điểm nằm trên đường cảnh báo mức 3", "d. Tất cả yếu tố trên."],
-                "answer": "d. Tất cả yếu tố trên."
-            },
-            {
-                "question": "Câu 20: Theo yêu cầu của ICAO, yếu tố thúc đẩy an toàn gồm những thành phần nào:",
-                "options": ["a. Huấn luyện và đào tạo, phổ biến về an toàn", "b. Nhận diện mối nguy, đánh giá rủi ro", "c. Đánh giá nội bộ", "d. Tất cả yếu tố trên."],
-                "answer": "a. Huấn luyện và đào tạo, phổ biến về an toàn"
-            },
-            {
-                "question": "Câu 21: Các bộ phận chính cấu thành SSP gồm:",
-                "options": ["a. Hội đồng kiểm soát rủi ro an toàn hàng không (ASMRC)", "b. Bộ phận thu thập và phân tích sự cố an toàn hàng không (ASICA)", "c. Nhóm tiêu chuẩn hóa an toàn hàng không (ASST", "d. Tất cả bộ phận trên."],
-                "answer": "d. Tất cả bộ phận trên."
-            },
-            {
-                "question": "Câu 22: “Đường cất hạ cánh bị hư hỏng một vị trí, Đội bảo trì Cảng hàng không X tiến hành trám vá và thông báo cho ATC là đường CHC đủ điều kiện đưa vào khai thác. Một lúc sau, Tàu bay hạ cánh vào khu vực trám và một điểm trám vá và làm bê tông tại khu vực trám vá bị bong tróc va chạm gây hư hỏng động cơ tàu bay. Sau đó tàu bay được kéo về xưởng để thay thế động cơ” Mối nguy cụ thể trong tình huống trên được nhận diện.",
-                "options": ["a. Động cơ bị hư hỏng.", "b. Chất lượng trám vá trên đường cất hạ cánh không đảm bảo, bong tróc tạo ra FOD trên đường cất hạ cánh.", "c. Tất cả đều đúng", "d. Tất cả đều sai."],
-                "answer": "b. Chất lượng trám vá trên đường cất hạ cánh không đảm bảo, bong tróc tạo ra FOD trên đường cất hạ cánh."
-            },
-            {
-                "question": "Câu 23: “Đường cất hạ cánh bị hư hỏng một vị trí, Đội bảo trì Cảng hàng không X tiến hành trám vá và thông báo cho ATC là đường CHC đủ điều kiện đưa vào khai thác. Một lúc sau, Tàu bay hạ cánh vào khu vực trám và một điểm trám vá và làm bê tông tại khu vực trám vá bị bong tróc va chạm gây hư hỏng động cơ tàu bay. Sau đó tàu bay được kéo về xưởng để thay thế động cơ” Rủi ro an toàn hiện tại là gì.",
-                "options": ["a. Động cơ bị hư hỏng.", "b. Chất lượng trám vá trên đường cất hạ cánh không đảm bảo, bong tróc tạo ra FOD trên đường cất hạ cánh.", "c. Tất cả đều đúng", "d. Tất cả đều sai."],
-                "answer": "a. Động cơ bị hư hỏng."
-            },
-            {
-                "question": "Câu 24: Đánh giá rủi ro an toàn dựa trên các yếu tố nào.",
-                "options": ["a. Tần xuất xảy ra.", "b. Mức độ nghiêm trọng", "c. Cả a và b", "d. Tất cả đều sai."],
-                "answer": "c. Cả a và b"
-            },
-            {
-                "question": "Câu 25: Hệ thống báo cáo an toàn bao gồm",
-                "options": ["a. Hệ thống báo cáo bắt buộc", "b. Hệ thống báo cáo không bắt buộc (báo cáo an toàn tự nguyện)", "c. Cả a và b", "d. Tất cả đều sai"],
-                "answer": "c. Cả a và b"
-            },
-            {
-                "question": "Câu 26: Giám sát đo lường hệ thống quản lý an toàn thông qua các thông số nào?",
-                "options": ["a. Mục tiêu an toàn", "b. Chỉ số an toàn", "c. Chỉ tiêu an toàn", "d. Tất cả đều đúng"],
-                "answer": "d. Tất cả đều đúng"
-            },
-            {
-                "question": "Câu 27: Báo cáo tự nguyện từ cán bộ nhân viên phục vụ cho mục đích gì:",
-                "options": ["a. Cung cấp thông tin an toàn để phục vụ công tác nhận diện mối nguy, đánh giá rủi ro và đưa các biện pháp kiểm soát rủi ro an toàn.", "b. Để trừng phạt, xử lý, kỷ luật", "c. Tất cả đều sai", "d. Tất cả đều đúng"],
-                "answer": "a. Cung cấp thông tin an toàn để phục vụ công tác nhận diện mối nguy, đánh giá rủi ro và đưa các biện pháp kiểm soát rủi ro an toàn."
-            },
-            {
-                "question": "Câu 28: Phương pháp nhận diện mối nguy qua các phương pháp nào:",
-                "options": ["a. Bị động", "b. Chủ động", "c. Dự báo", "d. Tất cả đều đúng"],
-                "answer": "d. Tất cả đều đúng"
-            },
-            {
-                "question": "Câu 29: Phương pháp nhận diện mối nguy bị động thực hiện như thế nào?",
-                "options": ["a. Phân tích các sự cố, vụ việc xảy ra tại cảng", "b. Hệ thống báo cáo tự nguyện nội bộ", "c. Các đợt đánh giá, giám sát an toàn hoặc chất lượng", "d. Tất cả đều đúng"],
-                "answer": "a. Phân tích các sự cố, vụ việc xảy ra tại cảng"
-            },
-            {
-                "question": "Câu 30: Phương pháp nhận diện mối nguy chủ động thực hiện như thế nào?",
-                "options": ["a. Quá trình điều tra sự cố", "b. Hệ thống báo cáo tự nguyện nội bộ", "c. Các đợt đánh giá, giám sát an toàn hoặc chất lượng", "d. Cả b và c"],
-                "answer": "d. Cả b và c"
-            },
-            {
-                "question": "Câu 31: Khi tại cảng xảy ra sự cố xe thang va chạm với tàu bay, Tổ an toàn nhận diện các mối nguy từ các sự cố trên. Tổ an toàn sử dụng đã phương pháp gì để nhận diện mối nguy?",
-                "options": ["a. Bị động", "b. Chủ động", "c. Dự báo", "d. Tất cả đều đúng"],
-                "answer": "a. Bị động"
-            },
-            {
-                "question": "Câu 32: Khi tại cảng nhận được một báo cáo tự nguyện về sự việc an toàn, Tổ an toàn nhận diện các mối nguy từ báo cáo trên và triển khai các biện pháp kiểm soát rủi ro an toàn. Tổ an toàn sử dụng đã phương pháp gì để nhận diện mối nguy:",
-                "options": ["a. Bị động", "b. Chủ động", "c. Dự báo", "d. Tất cả đều đúng."],
-                "answer": "b. Chủ động"
-            },
-            {
-                "question": "Câu 33: Khi tại cảng xảy ra sự cố xe thang va chạm với tàu bay, Hệ thống quản lý an toàn phải kích hoạt quy trình nào đầu tiên để ngăn ngừa sự cố lặp lại trong tương lai?",
-                "options": ["a. Quy trình xem xét lãnh đạo", "b. Quy trình điều tra an toàn nội bộ", "c. Quy trình nhận diện mối nguy và đánh giá rủi ro", "d. Tất cả đều đúng"],
-                "answer": "b. Quy trình điều tra an toàn nội bộ"
-            },
-            {
-                "question": "Câu 34: Trong thời gian tới, Cảng hàng không của anh/chị sẽ tiến hành sửa chữa đường CHC. Với vai trò là cán bộ lãnh đạo của đơn vị, anh/ chị phải chỉ đạo thực hiện quy trình gì?",
-                "options": ["a. Quy trình xem xét lãnh đạo", "b. Quy trình quản lý sự thay đổi", "c. Quy trình nhận diện mối nguy và đánh giá rủi ro", "d. Tất cả đều đúng"],
-                "answer": "b. Quy trình quản lý sự thay đổi"
-            },
-            {
-                "question": "Câu 35: Nhân viên của đơn vị anh/chị thực hiện nhiệm vụ được giao vận hành phương tiện, trang thiết bị trong khu bay để phục vụ tàu bay, nhưng nhân viên này chưa được huấn luyện về vận hành phương tiện và đơn vị anh chị chưa có quy trình hướng dẫn thực hiện công việc. Nên dẫn tới chạy sai luồng tuyến và chạm với tàu bay. Vậy theo mô hình nguyên nhân tai nạn sai lỗi của nhân viên là:",
-                "options": ["a. Sai lỗi do chủ quan cá nhân tạo ra", "b. Sai lỗi do tổ chức tạo ra", "c. Tất cả đều sai", "d. Tất cả đều đúng."],
-                "answer": "b. Sai lỗi do tổ chức tạo ra"
-            },
-            {
-                "question": "Câu 36: Nhân viên tại cảng hàng không trong quá trình điều khiển cầu ống không đúng quy trình gây ra sự cố va chạm với tàu bay. Tàu bay bị hư hại và được đánh giá là mức độ nghiêm trọng là mức C. Theo thống kê trong vòng 20 năm trở lại đây chỉ xảy ra 1 sự cố như vậy. Vậy chỉ số rủi ro là",
-                "options": ["a. 3C - Cao", "b. 2C – thấp", "c. 2C – Trung bình", "d. 3C – trung bình"],
-                "answer": "c. 2C – Trung bình"
-            },
-            {
-                "question": "Câu 37: Bộ phận nào chịu trách nhiệm phát hiện và báo cáo mối nguy:",
-                "options": ["a. Bộ phận/lãnh đạo bộ phận an toàn", "b. Trưởng bộ phận khai thác", "c. Nhân viên thực hiện nhiệm vụ", "d. Tất cả mọi người thuộc đơn vị"],
-                "answer": "d. Tất cả mọi người thuộc đơn vị"
-            },
-            {
-                "question": "Câu 38: Ba thông tin chủ yếu cần được ghi chú trong bảng công tác QLRR trước khi tiến hành xác định các hành động giảm thiểu rủi ro hoặc các biện pháp bảo vệ:",
-                "options": ["a. Mối nguy, Tình tình trạng mất an toàn, và hậu quả cuối cùng", "b. Mối nguy, các biện pháp phòng ngừa, và biện pháp phục hồi", "c. Hậu quả cuối cùng, các biện pháp phòng ngừa, và biện pháp phục hồi", "d. Hậu quả cuối cùng, các biện pháp phòng ngừa, và mối nguy"],
-                "answer": "a. Mối nguy, Tình tình trạng mất an toàn, và hậu quả cuối cùng"
-            },
-            {
-                "question": "Câu 39: Cảng hàng không quốc tế X sắp tới sẽ tiến hành khai thác tàu bay B747 – 8, vậy Hệ thống quản lý an toàn cần sử dụng các quy trình nào của Hệ thống SMS để đánh giá giá an toàn trước khi đưa vào khai thác:",
-                "options": ["a. Quy trình quản lý rủi ro (QT14)", "b. Quy trình quản lý sự thay đổi (QT05)", "c. Quy trình xem xét lãnh đạo (QT10)", "d. Cả a và b đều đúng"],
-                "answer": "d. Cả a và b đều đúng"
-            },
-            {
-                "question": "Câu 40: Để thực hiện theo dõi và giám sát mục tiêu an toàn, chất lượng tại cảng, thì Chúng ta sử dụng quy trình nào để thực hiện :",
-                "options": ["a. Quy trình giám sát và đo lường (QT09)", "b. Quy trình quản lý rủi ro (QT04)", "c. Quy trình quản lý sự thay đổi (QT05)", "d. Quy trình điều tra an toàn nội bộ (QT06)"],
-                "answer": "a. Quy trình giám sát và đo lường (QT09)"
-            },
-            {
-                "question": "Câu 41: Để thực hiện quản lý rủi ro an toàn tại cảng, thì Chúng ta sử dụng quy trình nào để thực hiện:",
-                "options": ["a. Quy trình giám sát và đo lường (QT09)", "b. Quy trình quản lý rủi ro (QT04)", "c. Quy trình quản lý sự thay đổi (QT05)", "d. Quy trình điều tra an toàn nội bộ (QT06)"],
-                "answer": "b. Quy trình quản lý rủi ro (QT04)"
-            },
-            {
-                "question": "Câu 42: Để thực hiện điều tra nguyên nhân các sự cố, vụ việc mất an toàn tại cảng tại cảng, thì Chúng ta sử dụng quy trình nào để thực hiện:",
-                "options": ["a. Quy trình giám sát và đo lường (QT09)", "b. Quy trình quản lý rủi ro (QT04)", "c. Quy trình quản lý sự thay đổi (QT05)", "d. Quy trình điều tra an toàn nội bộ (QT06)"],
-                "answer": "d. Quy trình điều tra an toàn nội bộ (QT06)"
-            },
-            {
-                "question": "Câu 43: Định nghĩa Hệ thống quản lý an toàn là gì :",
-                "options": ["a. Là việc Thiết lập tổ chức để quản lý an toàn Quy định trách nhiệm đối với an toàn, Xây dựng chính sách và các quy trình quản lý an toàn.", "b. Là việc tiếp cận quản lý an toàn một cách có hệ thống, bao gồm: Thiết lập tổ chức để quản lý an toàn, Xây dựng chính sách và các quy trình quản lý an toàn.", "c. Là việc tiếp cận quản lý an toàn một cách có hệ thống, bao gồm: Thiết lập tổ chức để quản lý an toàn, Quy định trách nhiệm đối với an toàn, Xây dựng chính sách và các quy trình quản lý an toàn để đạt mục tiêu an toàn của tổ chức.", "d. Tất cả đều sai"],
-                "answer": "c. Là việc tiếp cận quản lý an toàn một cách có hệ thống, bao gồm: Thiết lập tổ chức để quản lý an toàn, Quy định trách nhiệm đối với an toàn, Xây dựng chính sách và các quy trình quản lý an toàn để đạt mục tiêu an toàn của tổ chức."
-            },
-            {
-                "question": "Câu 44: Ai ban hành chính sách mục tiêu an toàn?",
-                "options": ["a. Giám đốc cảng", "b. Phó giám đốc phụ trách an toàn", "c. Phó giám đốc phụ trách chất lượng", "d. Tất cả đều đúng"],
-                "answer": "a. Giám đốc cảng"
-            },
-            {
-                "question": "Câu 45: Để thực hiện đánh giá các ảnh hưởng an toàn khai thác để đưa một công trình sân đỗ mới xây dựng vào khai thác tại cảng, thì Chúng ta sử dụng quy trình nào để thực hiện",
-                "options": ["a. Quy trình quản lý sự thay đổi (QT05)", "b. Quy trình quản lý rủi ro (QT04)", "c. Quy trình quản lý sự thay đổi (QT05)", "d. Cả a và b"],
-                "answer": "d. Cả a và b"
-            },
-            {
-                "question": "Câu 46: An toàn là trạng thái mà các rủi ro gây tổn thương/thiệt hại cho người và tài sản được giảm thiểu và duy trì ở ………….. đó thông qua một quy trình nhận diện mối nguy hiểm và quản lý rủi ro liên tục? Điền vào chỗ trống cho đúng",
-                "options": ["a. Bằng ở mức độ chấp nhận được", "b. Thấp hơn mức độ chấp nhận được", "c. Cả a và b đều đúng", "d. Cao hơn mức độ chấp nhận được"],
-                "answer": "c. Cả a và b đều đúng"
-            },
-            {
-                "question": "Câu 47: Những biện pháp kiểm soát FOD nào dưới đây mang tính chất giảm thiểu tần suất xảy ra rủi ro an toàn do FOD gây ra",
-                "options": ["a. Nhân viên thực hiện kiểm tra, thu nhặt FOD trước khi tàu bay vào vị trí đỗ sau khi tàu bay rời khỏi vị trí đỗ", "b. Động cơ tàu bay được thiết kế với các vật liệu có khả năng chịu đựng được va đập với FOD mà vẫn hoạt động bình thường.", "c. Xây dựng kế hoạch khẩn nguy sân bay", "d. Tất cả đều đúng"],
-                "answer": "a. Nhân viên thực hiện kiểm tra, thu nhặt FOD trước khi tàu bay vào vị trí đỗ sau khi tàu bay rời khỏi vị trí đỗ"
-            },
-            {
-                "question": "Câu 48: Những biện pháp kiểm soát FOD nào dưới đây mang tính chất giảm thiểu khả năng xảy ra và mức độ nghiêm trọng của rủi ro an toàn do FOD gây ra:",
-                "options": ["a. Nhân viên thực hiện kiểm tra, thu nhặt FOD trước khi tàu bay vào vị trí đỗ sau khi tàu bay rời khỏi vị trí đỗ", "b. Động cơ tàu bay được thiết kế với các vật liệu có khả năng chịu đựng được va đập với FOD mà vẫn hoạt động bình thường.", "c. Xây dựng kế hoạch khẩn nguy sân bay", "d. Tất cả đều đúng"],
-                "answer": "d. Tất cả đều đúng"
-            },
-            {
-                "question": "Câu 49: Hệ thống quản lý an toàn thực hiện việc kiểm soát tài liệu thông qua quy trình nào",
-                "options": ["a. Quy trình kiểm soát tài liệu (QT01)", "b. Quy trình kiểm soát hồ sơ (QT02)", "c. Quy trình quản lý rủi ro (QT04)", "d. Quy trình lập và theo dõi mục tiêu (QT03)"],
-                "answer": "a. Quy trình kiểm soát tài liệu (QT01)"
-            },
-            {
-                "question": "Câu 50: Thực hiện cải tiến Hệ thống quản lý an toàn thực hiện thông qua quy trình nào",
-                "options": ["a. Quy trình họp xem xét lãnh đạo (QT10)", "b. Quy trình đánh giá nội bộ (QT11)", "c. Quy trình khắc phục và phòng ngừa (QT13)", "d. Tất cả các quy trình trên"],
-                "answer": "d. Tất cả các quy trình trên"
+        // ==========================================
+        // 1. DATA CẤP PHÁT (RAW TEXT)
+        // ==========================================
+        const rawData = `ĐỊNH KỲ HỆ THỐNG QUẢN LÝ AN TOÀN SMS-003 – NĂM 2025 (50 câu)
+Câu 1: Quy định nhà cung cấp dịch vụ phải xây dựng Hệ thống quản lý an toàn được quy định trong:
+a. Annex 1
+b. Annex 19
+c. Annex 2
+d. Tất cả tài liệu trên
+Đáp án: b. Annex 19
+Câu 2: Chương trình an toàn quốc gia do ai ban hành
+a. Bộ Xây dựng
+b. ICAO
+c. Cảng vụ hàng không
+d. Đơn vị cung cấp dịch vụ
+Đáp án: a. Bộ Xây dựng
+Câu 3: Nhận diện mối nguy có mấy phương pháp?
+a. Phân tích các bước của quá trình để nhận diện mối nguy (bottom up)
+b. Phân tích các nguyên nhân gây ra các hậu quả trong quá trình hoạt động để nhận diện mối nguy (top down)
+c. Cả a và b
+d. Tất cả đều sai
+Đáp án: c. Cả a và b
+Câu 4: Cấu trúc Chương trình an toàn quốc gia theo yêu cầu của ICAO gồm
+a. Chính sách và mục tiêu an toàn quốc gia
+b. Chương trình quản lý rủi ro an toàn
+c. Bảo đảm an toàn quốc gia, Thúc đẩy an toàn quốc gia
+d. Tất cả yếu tố trên
+Đáp án: d. Tất cả yếu tố trên
+Câu 5: Theo yêu cầu của ICAO, Thành phần đảm bảo an toàn gồm những yếu tố nào:
+a. Giám sát và đo lường an toàn, Quản lý sự thay đổi, Liên tục cải tiến hệ thống
+b. Nhận diện và đánh giá rủi ro, Cam kết của lãnh đạo, Quyền hạn và trách nhiệm an toàn
+c. Huấn luyện đào tạo và Phổ biến an toàn
+d. Tất cả các câu trên
+Đáp án: a. Giám sát và đo lường an toàn, Quản lý sự thay đổi, Liên tục cải tiến hệ thống
+Câu 6: Định nghĩa hành động khắc phục
+a. Xử lý điểm không phù hợp ngay lúc phát hiện
+b. Xử lý nguyên nhân gốc rễ
+c. Xử lý điểm không phù hợp, tìm nguyên nhân gốc rễ và đề xuất biện pháp khắc phục
+d. Tất cả các câu đều đúng
+Đáp án: c. Xử lý điểm không phù hợp, tìm nguyên nhân gốc rễ và đề xuất biện pháp khắc phục
+Câu 7: Định nghĩa nào đúng
+a. Quá trình là một hoạt động biến đổi đầu vào thành đầu ra
+b. Quá trình là một hoạt động không có đầu ra
+c. Quy trình là mô tả các hoạt động của một quá trình
+d. Cả a và c đều đúng
+Đáp án: d. Cả a và c đều đúng
+Câu 8: Các yêu cầu về việc triển khai Hệ thống quản lý an toàn trong Annex 19 áp dụng trong lĩnh vực nào:
+a. Đảm bảo chất lượng dịch vụ
+b. Đảm bảo an toàn trong lĩnh vực hàng không
+c. Đảm bảo an toàn trong lĩnh vực hàng hải
+d. Tất cả lĩnh vực trên
+Đáp án: b. Đảm bảo an toàn trong lĩnh vực hàng không
+Câu 9: Trách nhiệm an toàn của Ban giám đốc cảng thể hiện ở tài liệu nào:
+a. Tài liệu Hệ thống quản lý an toàn được Cục hàng không Việt Nam phê duyệt
+b. Bảng mô tả công việc của từng chức danh
+c. Quyết định phân công nhiệm vụ của Ban giám đốc.
+d. Tất cả các yếu tố trên
+Đáp án: d. Tất cả các yếu tố trên
+Câu 10: Chi số an toàn được xác định như thế nào
+a. Dựa vào các rủi ro an toàn của cảng đang muốn kiểm soát
+b. Theo chương trình an toàn quốc gia
+c. Cả a và b đều đúng
+d. Tất cả đều sai
+Đáp án: c. Cả a và b đều đúng
+Câu 11: Mục đích của việc xây dựng Hệ thống SMS là:
+a. Nhận diện các mối nguy trong quá trình hoạt động cung cấp dịch vụ của cảng để đảm bảo đạt mức độ an toàn chấp nhận được và chuyển viêc quản lý an toàn từ bị động sang chủ động
+b. Phục vụ cho việc lưu trữ hồ sơ hệ thống của tổ chức
+c. Thỏa mãn nhu cầu khách hàng, luật định
+d. Thỏa mãn yêu cầu của các hãng hàng không
+Đáp án: a. Nhận diện các mối nguy trong quá trình hoạt động cung cấp dịch vụ của cảng để đảm bảo đạt mức độ an toàn chấp nhận được và chuyển viêc quản lý an toàn từ bị động sang chủ động
+Câu 12: Nguồn để xác định mối nguy hiểm, bao gồm:
+a. Các báo cáo thông báo sự cố cũng như quá trình điều tra
+b. Hệ thống báo cáo tự nguyện
+c. Khảo sát định kỳ mối nguy hiểm đối với các trang thiết bị an toàn hàng không; đánh giá an toàn/chất lượng định kỳ; đánh giá hệ thống thu thập dữ liệu hoạt động định kỳ
+d. Tất cả các câu trên
+Đáp án: d. Tất cả các câu trên
+Câu 13: Mối nguy là:
+a. Hậu quả, thiệt hại về người và tài sản, giảm mức độ an toàn của Hệ thống
+b. Điều kiện hoặc đối tượng có thể gây ra những thiệt hại người, tài sản, giảm mức độ an toàn hệ thống
+c. Các yêu cầu của Annex 19
+d. Tất cả đều đúng
+Đáp án: b. Điều kiện hoặc đối tượng có thể gây ra những thiệt hại người, tài sản, giảm mức độ an toàn hệ thống
+Câu 14: Khi đánh giá rủi ro hiện tại ở mức Trung bình tổ chức cần thực hiện các hành động gì?
+a. Tiến hành nhận diện mối nguy, đánh giá rui ro lại
+b. Bổ sung các biện pháp kiểm soát rủi ro tăng cường
+c. Chấm dứt hoạt động
+d. Chấp nhận mối nguy trên tồn tại trong hoạt động của tổ chức.
+Đáp án: b. Bổ sung các biện pháp kiểm soát rủi ro tăng cường
+Câu 15: Sự cố tàu bay gặp hư hỏng do FOD trong năm 2022 là 0.8/10000 lần chc. Trong năm 2023 tổ chức muốn giảm 10% giá trị thực hiện năm 2018. Vậy
+a. Chỉ tiêu an toàn 0.8/10000 lần chc
+b. Chỉ tiêu an toàn 0.72/10000 lần chc
+c. Chỉ tiêu an toàn giảm 8.4/100000 lần chc
+d. Tất cả đều sai
+Đáp án: b. Chỉ tiêu an toàn 0.72/10000 lần chc
+Câu 16: Mục đích đánh giá nội bộ trong Hệ thống SMS - QMS
+a. Nhận diện các mối nguy đang tồn tại hiện hữu/ tiềm ẩn trong Hệ thống
+b. Xác định các khu vực cần cải tiến
+c. Xác định kế hoạch phân bổ nguồn lực
+d. Tất cả yếu tố trên
+Đáp án: d. Tất cả yếu tố trên
+Câu 17: Quá trình xem xét kỷ luật công bằng cần xem xét các yếu tố
+a. Hồ sơ ghi nhận các hành vi gây mất an toàn của cá nhân trước đây
+b. Hồ sơ đào tạo về chuyên môn
+c. Ý định của cá nhân liên quan đến hành vi không phù hợp
+d. Tất cả yếu tố trên
+Đáp án: d. Tất cả yếu tố trên
+Câu 18: Quản lý sự thay đổi được triển khai thực hiện đối với các thay đổi nào
+a. Thay đổi về luật định, quy định
+b. Thay đổi quy trình, quá trình, phương án khai thác
+c. Thay đổi cơ sở hạ tầng, trang thiết bị
+d. Tất cả yếu tố trên.
+Đáp án: d. Tất cả yếu tố trên.
+Câu 19: Phải có hành động khắc phục khi đường biểu diễn các chỉ số an toàn trong năm hiện tại:
+a. 3 điểm liên tiếp nằm trên cảnh báo mức 1
+b. 2 điểm liên tiếp nằm trên cảnh báo mức 2
+c. 1 điểm nằm trên đường cảnh báo mức 3
+d. Tất cả yếu tố trên.
+Đáp án: d. Tất cả yếu tố trên.
+Câu 20: Theo yêu cầu của ICAO, Thành phần thúc đẩy an toàn gồm những yếu tố nào:
+a. Huấn luyện và đào tạo, phổ biến về an toàn
+b. Nhận diện mối nguy, đánh giá rủi ro
+c. Đánh giá nội bộ
+d. Tất cả yếu tố trên.
+Đáp án: a. Huấn luyện và đào tạo, phổ biến về an toàn
+Câu 21: Các bộ phận chính cấu thành SSP gồm:
+a. Hội đồng kiểm soát rủi ro an toàn hàng không (ASMRC)
+b. Bộ phận thu thập và phân tích sự cố an toàn hàng không (ASICA)
+c. Nhóm tiêu chuẩn hóa an toàn hàng không (ASST)
+d. Tất cả bộ phận trên.
+Đáp án: d. Tất cả bộ phận trên.
+Câu 22: “Đường cất hạ cánh bị hư hỏng một vị trí, Đội bảo trì Cảng hàng không X tiến hành trám vá và thông báo cho ATC là đường CHC đủ điều kiện đưa vào khai thác. Một lúc sau, Tàu bay hạ cánh vào khu vực trám và một điểm trám vá và làm bê tông tại khu vực trám vá bị bong tróc va chạm gây hư hỏng động cơ tàu bay. Sau đó tàu bay được kéo về xưởng để thay thế động cơ” Mối nguy cụ thể trong tình huống trên được nhận diện.
+a. Động cơ bị hư hỏng.
+b. Chất lượng trám vá trên đường cất hạ cánh không đảm bảo, bong tróc tạo ra FOD trên đường cất hạ cánh.
+c. Tất cả đều đúng
+d. Tất cả đều sai.
+Đáp án: b. Chất lượng trám vá trên đường cất hạ cánh không đảm bảo, bong tróc tạo ra FOD trên đường cất hạ cánh.
+Câu 23: “Đường cất hạ cánh bị hư hỏng một vị trí, Đội bảo trì Cảng hàng không X tiến hành trám vá và thông báo cho ATC là đường CHC đủ điều kiện đưa vào khai thác. Một lúc sau, Tàu bay hạ cánh vào khu vực trám và một điểm trám vá và làm bê tông tại khu vực trám vá bị bong tróc va chạm gây hư hỏng động cơ tàu bay. Sau đó tàu bay được kéo về xưởng để thay thế động cơ” Rủi ro an toàn hiện tại là gì.
+a. Động cơ bị hư hỏng.
+b. Chất lượng trám vá trên đường cất hạ cánh không đảm bảo, bong tróc tạo ra FOD trên đường cất hạ cánh.
+c. Tất cả đều đúng
+d. Tất cả đều sai.
+Đáp án: a. Động cơ bị hư hỏng.
+Câu 24: Đánh giá rủi ro an toàn dựa trên các yếu tố nào.
+a. Tần xuất xảy ra.
+b. Mức độ nghiêm trọng
+c. Cả a và b
+d. Tất cả đều sai.
+Đáp án: c. Cả a và b
+Câu 25: Hệ thống báo cáo an toàn bao gồm
+a. Hệ thống báo cáo bắt buộc
+b. Hệ thống báo cáo không bắt buộc (báo cáo an toàn tự nguyện)
+c. Cả a và b
+d. Tất cả đều sai
+Đáp án: c. Cả a và b
+Câu 26: Giám sát đo lường hệ thống quản lý an toàn thông qua các thông số nào?
+a. Mục tiêu an toàn
+b. Chỉ số an toàn
+c. Chỉ tiêu an toàn
+d. Tất cả đều đúng
+Đáp án: d. Tất cả đều đúng
+Câu 27: Báo cáo tự nguyện từ cán bộ nhân viên phục vụ cho mục đích gì:
+a. Cung cấp thông tin an toàn để phục vụ công tác nhận diện mối nguy, đánh giá rủi ro và đưa các biện pháp kiểm soát rủi ro an toàn.
+b. Để trừng phạt, xử lý, kỷ luật
+c. Tất cả đều sai
+d. Tất cả đều đúng
+Đáp án: a. Cung cấp thông tin an toàn để phục vụ công tác nhận diện mối nguy, đánh giá rủi ro và đưa các biện pháp kiểm soát rủi ro an toàn.
+Câu 28: Phương pháp nhận diện mối nguy qua các phương pháp nào:
+a. Bị động
+b. Chủ động
+c. Dự báo
+d. Tất cả đều đúng
+Đáp án: d. Tất cả đều đúng
+Câu 29: Phương pháp nhận diện mối nguy bị động thực hiện như thế nào?
+a. Phân tích các sự cố, vụ việc xảy ra tại cảng
+b. Hệ thống báo cáo tự nguyện nội bộ
+c. Các đợt đánh giá, giám sát an toàn hoặc chất lượng
+d. Tất cả đều đúng
+Đáp án: a. Phân tích các sự cố, vụ việc xảy ra tại cảng
+Câu 30: Phương pháp nhận diện mối nguy chủ động thực hiện như thế nào?
+a. Quá trình điều tra sự cố
+b. Hệ thống báo cáo tự nguyện nội bộ
+c. Các đợt đánh giá, giám sát an toàn hoặc chất lượng
+d. Cả b và c
+Đáp án: d. Cả b và c
+Câu 31: Khi tại cảng xảy ra sự cố xe thang va chạm với tàu bay, Tổ an toàn nhận diện các mối nguy từ các sự cố trên. Tổ an toàn đã sử dụng phương pháp gì để nhận diện mối nguy?
+a. Bị động
+b. Chủ động
+c. Dự báo
+d. Tất cả đều đúng
+Đáp án: a. Bị động
+Câu 32: Khi tại cảng nhận được một báo cáo tự nguyện về sự việc an toàn, Tổ an toàn nhận diện các mối nguy từ báo cáo trên và triển khai các biện pháp kiểm soát rủi ro an toàn. Tổ an toàn đã sử dụng phương pháp gì để nhận diện mối nguy:
+a. Bị động
+b. Chủ động
+c. Dự báo
+d. Tất cả đều đúng.
+Đáp án: b. Chủ động
+Câu 33: Khi tại cảng xảy ra sự cố xe thang va chạm với tàu bay, Hệ thống quản lý an toàn phải kích hoạt quy trình nào đầu tiên để ngăn ngừa sự cố lặp lại trong tương lai?
+a. Quy trình xem xét lãnh đạo
+b. Quy trình điều tra an toàn nội bộ
+c. Quy trình nhận diện mối nguy và đánh giá rủi ro
+d. Tất cả đều đúng
+Đáp án: b. Quy trình điều tra an toàn nội bộ
+Câu 34: Trong thời gian tới, Cảng hàng không của anh/chị sẽ tiến hành sửa chữa đường CHC. Với vai trò là cán bộ lãnh đạo của đơn vị, anh/ chị phải chỉ đạo thực hiện quy trình gì?
+a. Quy trình xem xét lãnh đạo
+b. Quy trình quản lý sự thay đổi
+c. Quy trình nhận diện mối nguy và đánh giá rủi ro
+d. Tất cả đều đúng
+Đáp án: b. Quy trình quản lý sự thay đổi
+Câu 35: Nhân viên của đơn vị anh/chị thực hiện nhiệm vụ được giao vận hành phương tiện, trang thiết bị trong khu bay để phục vụ tàu bay, nhưng nhân viên này chưa được huấn luyện về vận hành phương tiện và đơn vị anh chị chưa có quy trình hướng dẫn thực hiện công việc. Nên dẫn tới chạy sai luồng tuyến và chạm với tàu bay. Vậy theo mô hình nguyên nhân tai nạn sai lỗi của nhân viên là:
+a. Sai lỗi do chủ quan cá nhân tạo ra
+b. Sai lỗi do tổ chức tạo ra
+c. Tất cả đều sai
+d. Tất cả đều đúng.
+Đáp án: b. Sai lỗi do tổ chức tạo ra
+Câu 36: Nhân viên tại cảng hàng không trong quá trình điều khiển cầu ống không đúng quy trình gây ra sự cố va chạm với tàu bay. Tàu bay bị hư hại và được đánh giá là mức độ nghiêm trọng là mức C. Theo thống kê trong vòng 20 năm trở lại đây chỉ xảy ra 1 sự cố như vậy. Vậy chỉ số rủi ro là
+a. 3C - Cao
+b. 2C – thấp
+c. 2C – Trung bình
+d. 3C – trung bình
+Đáp án: c. 2C – Trung bình
+Câu 37: Bộ phận nào chịu trách nhiệm phát hiện và báo cáo mối nguy:
+a. Bộ phận/lãnh đạo bộ phận an toàn
+b. Trưởng bộ phận khai thác
+c. Nhân viên thực hiện nhiệm vụ
+d. Tất cả mọi người thuộc đơn vị
+Đáp án: d. Tất cả mọi người thuộc đơn vị
+Câu 38: Ba thông tin chủ yếu cần được ghi chú trong bảng QLRR trước khi tiến hành xác định các hành động giảm thiểu rủi ro hoặc các biện pháp bảo vệ:
+a. Mối nguy, Tình tình trạng mất an toàn, và hậu quả cuối cùng
+b. Mối nguy, các biện pháp phòng ngừa, và biện pháp phục hồi
+c. Hậu quả cuối cùng, các biện pháp phòng ngừa, và biện pháp phục hồi
+d. Hậu quả cuối cùng, các biện pháp phòng ngừa, và mối nguy
+Đáp án: a. Mối nguy, Tình tình trạng mất an toàn, và hậu quả cuối cùng
+Câu 39: Cảng hàng không quốc tế X sắp tới sẽ tiến hành khai thác tàu bay B747 – 8, vậy Hệ thống quản lý an toàn cần sử dụng các quy trình nào của Hệ thống SMS để đánh giá giá an toàn trước khi đưa vào khai thác:
+a. Quy trình quản lý rủi ro (QT14)
+b. Quy trình quản lý sự thay đổi (QT05)
+c. Quy trình xem xét lãnh đạo (QT10)
+d. Cả a và b đều đúng
+Đáp án: d. Cả a và b đều đúng
+Câu 40: Để thực hiện theo dõi và giám sát mục tiêu an toàn, chất lượng tại cảng, chúng chúng ta sử dụng quy trình nào để thực hiện:
+a. Quy trình giám sát và đo lường (QT09)
+b. Quy trình quản lý rủi ro (QT04)
+c. Quy trình quản lý sự thay đổi (QT05)
+d. Quy trình điều tra an toàn nội bộ (QT06)
+Đáp án: a. Quy trình giám sát và đo lường (QT09)
+Câu 41: Để thực hiện quản lý rủi ro an toàn tại cảng, chúng ta sử dụng quy trình nào để thực hiện:
+a. Quy trình giám sát và đo lường (QT09)
+b. Quy trình quản lý rủi ro (QT04)
+c. Quy trình quản lý sự thay đổi (QT05)
+d. Quy trình điều tra an toàn nội bộ (QT06)
+Đáp án: b. Quy trình quản lý rủi ro (QT04)
+Câu 42: Để thực hiện điều tra nguyên nhân các sự cố, vụ việc mất an toàn tại cảng tại cảng, chúng ta sử dụng quy trình nào để thực hiện:
+a. Quy trình giám sát và đo lường (QT09)
+b. Quy trình quản lý rủi ro (QT04)
+c. Quy trình quản lý sự thay đổi (QT05)
+d. Quy trình điều tra an toàn nội bộ (QT06)
+Đáp án: d. Quy trình điều tra an toàn nội bộ (QT06)
+Câu 43: Hệ thống quản lý an toàn là gì :
+a. Là việc Thiết lập tổ chức để quản lý an toàn Quy định trách nhiệm đối với an toàn, Xây dựng chính sách và các quy trình quản lý an toàn.
+b. Là việc tiếp cận quản lý an toàn một cách có hệ thống, bao gồm: Thiết lập tổ chức để quản lý an toàn, Xây dựng chính sách và các quy trình quản lý an toàn.
+c. Là việc tiếp cận quản lý an toàn một cách có hệ thống, bao gồm: Thiết lập tổ chức để quản lý an toàn, Quy định trách nhiệm đối với an toàn, Xây dựng chính sách và các quy trình quản lý an toàn để đạt mục tiêu an toàn của tổ chức.
+d. Tất cả đều sai
+Đáp án: c. Là việc tiếp cận quản lý an toàn một cách có hệ thống, bao gồm: Thiết lập tổ chức để quản lý an toàn, Quy định trách nhiệm đối với an toàn, Xây dựng chính sách và các quy trình quản lý an toàn để đạt mục tiêu an toàn của tổ chức.
+Câu 44: Ai ban hành chính sách mục tiêu an toàn?
+a. Giám đốc cảng
+b. Phó giám đốc phụ trách an toàn
+c. Phó giám đốc phụ trách chất lượng
+d. Tất cả đều đúng
+Đáp án: a. Giám đốc cảng
+Câu 45: Để thực hiện đánh giá các ảnh hưởng an toàn khai thác để đưa một công trình sân đỗ mới xây dựng vào khai thác tại cảng, chúng ta sử dụng quy trình nào để thực hiện
+a. Quy trình quản lý sự thay đổi (QT05)
+b. Quy trình quản lý rủi ro (QT04)
+c. Quy trình quản lý sự thay đổi (QT05)
+d. Cả a và b
+Đáp án: d. Cả a và b
+Câu 46: An toàn là trạng thái mà các rủi ro gây tổn thương/thiệt hại cho người và tài sản được giảm thiểu và duy trì ở ………….. đó thông qua một quy trình nhận diện mối nguy hiểm và quản lý rủi ro liên tục? Điền vào chỗ trống cho đúng
+a. Bằng ở mức độ chấp nhận được
+b. Thấp hơn mức độ chấp nhận được
+c. Cả a và b đều đúng
+d. Cao hơn mức độ chấp nhận được
+Đáp án: c. Cả a và b đều đúng
+Câu 47: Những biện pháp kiểm soát FOD nào dưới đây mang tính chất giảm thiểu tần suất xảy ra rủi ro an toàn do FOD gây ra
+a. Nhân viên thực hiện kiểm tra, thu nhặt FOD trước khi tàu bay vào vị trí đỗ sau khi tàu bay rời khỏi vị trí đỗ
+b. Động cơ tàu bay được thiết kế với các vật liệu có khả năng chịu đựng được va đập với FOD mà vẫn hoạt động bình thường.
+c. Xây dựng kế hoạch khẩn nguy sân bay
+d. Tất cả đều đúng
+Đáp án: a. Nhân viên thực hiện kiểm tra, thu nhặt FOD trước khi tàu bay vào vị trí đỗ sau khi tàu bay rời khỏi vị trí đỗ
+Câu 48: Những biện pháp kiểm soát FOD nào dưới đây mang tính chất giảm thiểu khả năng xảy ra và mức độ nghiêm trọng của rủi ro an toàn do FOD gây ra:
+a. Nhân viên thực hiện kiểm tra, thu nhặt FOD trước khi tàu bay vào vị trí đỗ sau khi tàu bay rời khỏi vị trí đỗ
+b. Động cơ tàu bay được thiết kế với các vật liệu có khả năng chịu đựng được va đập với FOD mà vẫn hoạt động bình thường.
+c. Xây dựng kế hoạch khẩn nguy sân bay
+d. Tất cả đều đúng
+Đáp án: d. Tất cả đều đúng
+Câu 49: Hệ thống quản lý an toàn thực hiện việc kiểm soát tài liệu thông qua quy trình nào
+a. Quy trình kiểm soát tài liệu (QT01)
+b. Quy trình kiểm soát hồ sơ (QT02)
+c. Quy trình quản lý rủi ro (QT04)
+d. Quy trình lập và theo dõi mục tiêu (QT03)
+Đáp án: a. Quy trình kiểm soát tài liệu (QT01)
+Câu 50: Cải tiến Hệ thống quản lý an toàn được thực hiện thông qua quy trình nào
+a. Quy trình họp xem xét lãnh đạo (QT10)
+b. Quy trình đánh giá nội bộ (QT11)
+c. Quy trình khắc phục và phòng ngừa (QT13)
+d. Tất cả các quy trình trên
+Đáp án: d. Tất cả các quy trình trên`;
+
+        // ==========================================
+        // 2. LOGIC XỬ LÝ CHUNG & PARSE DỮ LIỆU
+        // ==========================================
+        
+        let questionBank = [];
+        let isReviewRendered = false; // FLAG QUAN TRỌNG ĐỂ FIX BUG TAB TRẮNG
+        
+        // Hàm loại bỏ dấu tiếng Việt để tìm kiếm
+        const removeAccents = (str) => {
+            return str.normalize('NFD')
+                      .replace(/[\u0300-\u036f]/g, '')
+                      .replace(/đ/g, 'd').replace(/Đ/g, 'D');
+        };
+
+        // Hàm xáo trộn mảng (Fisher-Yates)
+        const shuffleArray = (array) => {
+            let curId = array.length;
+            while (0 !== curId) {
+                let randId = Math.floor(Math.random() * curId);
+                curId -= 1;
+                let tmp = array[curId];
+                array[curId] = array[randId];
+                array[randId] = tmp;
             }
-        ];
+            return array;
+        };
 
+        // Thuật toán parse Raw Text thành Array Objects
+        const parseQuestions = () => {
+            const lines = rawData.split('\n').map(l => l.trim()).filter(l => l !== '');
+            let currentQ = null;
+            let currentId = 1;
 
-        // --- LOGIC CỦA ỨNG DỤNG ---
-        document.addEventListener('DOMContentLoaded', () => {
-            const questionContainer = document.getElementById('question-container');
-            const searchInput = document.getElementById('searchInput');
-            const noResults = document.getElementById('no-results');
+            for (let i = 0; i < lines.length; i++) {
+                let line = lines[i];
+                if (line.includes('ĐỊNH KỲ HỆ THỐNG')) continue; // Bỏ qua tiêu đề file
 
-            // Hàm hiển thị danh sách câu hỏi
-            const displayQuestions = (questions) => {
-                questionContainer.innerHTML = ''; // Xóa nội dung cũ
-                if (questions.length === 0) {
-                    noResults.style.display = 'block';
-                    return;
-                }
-                
-                noResults.style.display = 'none';
-
-                questions.forEach(q => {
-                    const card = document.createElement('div');
-                    card.className = 'question-card';
-
-                    // Tạo phần các lựa chọn
-                    let optionsHTML = '';
-                    q.options.forEach(opt => {
-                        // Kiểm tra nếu lựa chọn này là đáp án đúng
-                        if (opt === q.answer) {
-                            optionsHTML += `<div><span class="answer">${opt}</span></div>`;
-                        } else {
-                            optionsHTML += `<div>${opt}</div>`;
-                        }
-                    });
-
-                    card.innerHTML = `
-                        <div class="question">${q.question}</div>
-                        <div class="options">
-                            ${optionsHTML}
-                        </div>
-                    `;
-                    questionContainer.appendChild(card);
-                });
-            };
-
-            // Hàm lọc câu hỏi dựa trên từ khóa tìm kiếm
-            const filterQuestions = () => {
-                const searchTerm = searchInput.value.toLowerCase().trim();
-                
-                const filteredQuestions = questionData.filter(q => {
-                    const questionText = q.question.toLowerCase();
-                    const answerText = q.answer.toLowerCase();
-                    const optionsText = q.options.join(' ').toLowerCase();
+                // Bắt đầu một câu hỏi mới
+                if (/^Câu\s+\d+:/.test(line)) {
+                    if (currentQ) questionBank.push(currentQ);
                     
-                    return questionText.includes(searchTerm) || 
-                           answerText.includes(searchTerm) || 
-                           optionsText.includes(searchTerm);
+                    let qText = line.replace(/^Câu\s+\d+:\s*/, '');
+                    currentQ = {
+                        id: currentId++,
+                        originalQName: line.match(/^Câu\s+\d+:/)[0],
+                        question: qText,
+                        options: [],
+                        answerText: ''
+                    };
+                } 
+                // Bắt các lựa chọn a, b, c, d
+                else if (/^[a-d]\./i.test(line)) {
+                    if (currentQ) {
+                        currentQ.options.push({
+                            char: line.substring(0, 1).toLowerCase(), // a,b,c,d
+                            text: line.substring(line.indexOf('.') + 1).trim(),
+                            isCorrect: false
+                        });
+                    }
+                } 
+                // Bắt đáp án
+                else if (/^Đáp án:/i.test(line)) {
+                    if (currentQ) {
+                        currentQ.answerText = line.replace(/^Đáp án:\s*/i, '').trim();
+                        // Trích xuất ký tự đáp án đúng (a, b, c, d) từ chuỗi "a. Nội dung..."
+                        let correctCharMatch = currentQ.answerText.match(/^[a-d]/i);
+                        if (correctCharMatch) {
+                            let correctChar = correctCharMatch[0].toLowerCase();
+                            currentQ.options.forEach(opt => {
+                                if (opt.char === correctChar) opt.isCorrect = true;
+                            });
+                        }
+                    }
+                } 
+                // Nối chuỗi nếu câu hỏi bị rớt dòng (nhiều dòng)
+                else {
+                    if (currentQ && currentQ.options.length === 0) {
+                        currentQ.question += ' ' + line;
+                    }
+                }
+            }
+            if (currentQ) questionBank.push(currentQ);
+        };
+
+        // SVG Icons
+        const svgCheck = `<svg class="w-5 h-5 icon-check" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>`;
+        const svgCross = `<svg class="w-5 h-5 icon-cross" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>`;
+
+        // UI Toast
+        const showToast = (msg) => {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.classList.remove('opacity-0');
+            setTimeout(() => toast.classList.add('opacity-0'), 2500);
+        };
+
+        // Chuyển Tab
+        const switchTab = (tab) => {
+            const tabQuiz = document.getElementById('tab-quiz');
+            const tabReview = document.getElementById('tab-review');
+            const btnQuiz = document.getElementById('btn-tab-quiz');
+            const btnReview = document.getElementById('btn-tab-review');
+
+            if (tab === 'quiz') {
+                tabQuiz.classList.remove('hidden');
+                tabReview.classList.add('hidden');
+                btnQuiz.className = "flex-1 py-2 text-sm font-bold text-blue-600 border-b-2 border-blue-600 transition-colors";
+                btnReview.className = "flex-1 py-2 text-sm font-bold text-slate-500 border-b-2 border-transparent hover:text-blue-600 transition-colors";
+            } else {
+                tabQuiz.classList.add('hidden');
+                tabReview.classList.remove('hidden');
+                btnReview.className = "flex-1 py-2 text-sm font-bold text-blue-600 border-b-2 border-blue-600 transition-colors";
+                btnQuiz.className = "flex-1 py-2 text-sm font-bold text-slate-500 border-b-2 border-transparent hover:text-blue-600 transition-colors";
+                
+                // CHỈ RENDER NẾU LÀ LẦN ĐẦU TIÊN (DÙNG BIẾN CỜ HIỆU)
+                if (!isReviewRendered) {
+                    renderReview();
+                    isReviewRendered = true;
+                }
+            }
+        };
+
+        // ==========================================
+        // 3. LOGIC THI THỬ (QUIZ)
+        // ==========================================
+        
+        let quizTimerInterval;
+        let secondsElapsed = 0;
+        let isQuizSubmitted = false;
+        let currentQuizQuestions = [];
+        let finalScore = 0;
+        let timeStringForShare = "";
+
+        const loadHighScore = () => {
+            const hs = localStorage.getItem('sms_high_score') || 0;
+            document.getElementById('high-score-display').textContent = `Điểm cao: ${hs}/40`;
+            return hs;
+        };
+
+        const saveHighScore = (score) => {
+            const hs = localStorage.getItem('sms_high_score') || 0;
+            if (score > hs) {
+                localStorage.setItem('sms_high_score', score);
+                loadHighScore();
+            }
+        };
+
+        const updateTimerDisplay = () => {
+            const m = Math.floor(secondsElapsed / 60).toString().padStart(2, '0');
+            const s = (secondsElapsed % 60).toString().padStart(2, '0');
+            timeStringForShare = `${m}:${s}`;
+            document.getElementById('timer').textContent = timeStringForShare;
+        };
+
+        const initQuiz = () => {
+            // Reset state
+            clearInterval(quizTimerInterval);
+            secondsElapsed = 0;
+            isQuizSubmitted = false;
+            updateTimerDisplay();
+            
+            // UI Reset
+            document.getElementById('btn-submit-top').classList.remove('hidden');
+            document.getElementById('btn-submit-bottom').classList.remove('hidden');
+            document.getElementById('btn-share').classList.add('hidden');
+            document.getElementById('result-text').textContent = '';
+            document.getElementById('tab-quiz').scrollTop = 0;
+
+            // Prepare 40 random questions
+            let shuffledBank = shuffleArray([...questionBank]);
+            currentQuizQuestions = shuffledBank.slice(0, 40);
+
+            // Render
+            const container = document.getElementById('quiz-container');
+            container.innerHTML = '';
+
+            currentQuizQuestions.forEach((q, index) => {
+                // Shuffle options for this specific quiz instance
+                let qOptions = shuffleArray([...q.options]);
+
+                let html = `
+                    <div class="bg-white rounded-md p-3 mb-3 shadow-sm border border-slate-200" id="q-block-${index}">
+                        <h3 class="font-bold text-slate-800 mb-2 text-[0.95rem]">
+                            <span class="text-blue-600">Câu ${index + 1}:</span> ${q.question}
+                        </h3>
+                        <div class="flex flex-col">
+                            ${qOptions.map((opt, optIdx) => `
+                                <input type="radio" name="q_${index}" id="q_${index}_opt_${optIdx}" value="${opt.isCorrect}" class="quiz-radio">
+                                <label for="q_${index}_opt_${optIdx}" class="quiz-label" id="label_q_${index}_opt_${optIdx}">
+                                    <span class="font-bold mr-2 text-slate-500">${String.fromCharCode(65 + optIdx)}.</span> 
+                                    <span class="flex-1">${opt.text}</span>
+                                </label>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += html;
+            });
+
+            // Start timer
+            quizTimerInterval = setInterval(() => {
+                secondsElapsed++;
+                updateTimerDisplay();
+            }, 1000);
+        };
+
+        const submitQuiz = () => {
+            if (isQuizSubmitted) return;
+            isQuizSubmitted = true;
+            clearInterval(quizTimerInterval);
+
+            finalScore = 0;
+
+            currentQuizQuestions.forEach((q, index) => {
+                const radios = document.getElementsByName(`q_${index}`);
+                let answeredCorrectly = false;
+                
+                radios.forEach((radio) => {
+                    const label = document.getElementById(`label_${radio.id}`);
+                    const isCorrect = radio.value === "true";
+                    
+                    radio.disabled = true; // Khóa lựa chọn
+
+                    if (radio.checked) {
+                        if (isCorrect) {
+                            answeredCorrectly = true;
+                            label.classList.add('bg-green-100', 'border-green-500', 'text-green-800');
+                            label.classList.remove('bg-f8fafc');
+                            label.innerHTML += svgCheck;
+                        } else {
+                            label.classList.add('bg-red-50', 'border-red-400', 'text-red-800');
+                            label.classList.remove('bg-f8fafc', 'peer-checked:bg-blue-100');
+                            label.innerHTML += svgCross;
+                        }
+                    }
+
+                    // Luôn hiển thị đáp án đúng nếu người dùng chọn sai hoặc không chọn
+                    if (isCorrect && !radio.checked) {
+                        label.classList.add('bg-green-50', 'border-green-300', 'text-green-700');
+                        label.innerHTML += svgCheck;
+                    }
                 });
 
-                displayQuestions(filteredQuestions);
-            };
+                if (answeredCorrectly) finalScore++;
+            });
 
-            // Gắn sự kiện 'input' để tìm kiếm real-time
-            searchInput.addEventListener('input', filterQuestions);
+            // Update UI
+            document.getElementById('result-text').textContent = `Kết quả: ${finalScore}/40`;
+            document.getElementById('btn-submit-top').classList.add('hidden');
+            document.getElementById('btn-submit-bottom').classList.add('hidden');
+            document.getElementById('btn-share').classList.remove('hidden');
+            
+            saveHighScore(finalScore);
+            
+            // Cuộn xuống xem kết quả
+            document.getElementById('tab-quiz').scrollTop = document.getElementById('tab-quiz').scrollHeight;
+        };
 
-            // Hiển thị tất cả câu hỏi khi trang được tải lần đầu
-            displayQuestions(questionData);
-        });
+        const shareResult = () => {
+            const textToCopy = `✅ Sát hạch SMS-003\n🎯 Điểm số: ${finalScore}/40\n⏱️ Thời gian: ${timeStringForShare}`;
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                showToast("Đã copy kết quả vào khay nhớ tạm!");
+            }).catch(err => {
+                showToast("Lỗi khi copy!");
+            });
+        };
+
+        // ==========================================
+        // 4. LOGIC ÔN TẬP (REVIEW)
+        // ==========================================
+
+        // Thuật toán highlight text (Bỏ qua dấu tiếng việt)
+        const highlightHTML = (text, keyword) => {
+            if (!keyword.trim()) return text;
+            const textNorm = removeAccents(text).toLowerCase();
+            const kwNorm = removeAccents(keyword.trim()).toLowerCase();
+            
+            if (!textNorm.includes(kwNorm)) return text;
+
+            let result = '';
+            let lastIndex = 0;
+            let i = 0;
+
+            while ((i = textNorm.indexOf(kwNorm, lastIndex)) !== -1) {
+                result += text.substring(lastIndex, i);
+                result += `<mark>` + text.substring(i, i + kwNorm.length) + `</mark>`;
+                lastIndex = i + kwNorm.length;
+            }
+            result += text.substring(lastIndex);
+            return result;
+        };
+
+        const renderReview = (filterText = '') => {
+            const container = document.getElementById('review-container');
+            const kwNorm = removeAccents(filterText).toLowerCase();
+            
+            // Filter dữ liệu
+            const filteredData = questionBank.filter(q => {
+                if (!filterText) return true;
+                const matchQ = removeAccents(q.question).toLowerCase().includes(kwNorm);
+                const matchOpts = q.options.some(o => removeAccents(o.text).toLowerCase().includes(kwNorm));
+                return matchQ || matchOpts;
+            });
+
+            if (filteredData.length === 0) {
+                container.innerHTML = `<div class="text-center py-8 text-slate-500 italic">Không tìm thấy kết quả nào cho "${filterText}"</div>`;
+                return;
+            }
+
+            // Sinh HTML
+            let html = '';
+            filteredData.forEach(q => {
+                html += `
+                <div class="bg-white rounded-md p-3 border border-slate-200 shadow-sm">
+                    <h3 class="font-bold text-slate-800 mb-2 text-[0.95rem]">
+                        <span class="text-blue-600">${q.originalQName}</span> ${highlightHTML(q.question, filterText)}
+                    </h3>
+                    <div class="flex flex-col space-y-1">
+                        ${q.options.map(opt => {
+                            // Style cho đáp án đúng
+                            const isCorrectStyle = opt.isCorrect 
+                                ? 'bg-green-100 border-green-400 text-green-900 font-medium border' 
+                                : 'bg-slate-50 border-slate-100 text-slate-600 border';
+                            
+                            const icon = opt.isCorrect ? svgCheck : '';
+                            
+                            return `
+                                <div class="flex items-start px-2 py-1.5 rounded-md ${isCorrectStyle} text-[0.95rem]">
+                                    <span class="font-bold mr-2 w-4 inline-block">${opt.char.toUpperCase()}.</span>
+                                    <span class="flex-1">${highlightHTML(opt.text, filterText)}</span>
+                                    ${icon}
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>`;
+            });
+            
+            container.innerHTML = html;
+        };
+
+        const handleSearch = () => {
+            const val = document.getElementById('search-input').value;
+            renderReview(val);
+        };
+
+        // ==========================================
+        // 5. KHỞI TẠO APP
+        // ==========================================
+        window.onload = () => {
+            parseQuestions();
+            loadHighScore();
+            initQuiz(); // Render sẵn tab Thi Thử
+            // Tab ôn tập sẽ được render khi click vào (Fix tab trắng)
+        };
+
     </script>
 </body>
 </html>
