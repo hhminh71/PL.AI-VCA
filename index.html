@@ -2,148 +2,113 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ôn tập & Thi thử SMS-003</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Huấn luyện SMS Mức độ nâng cao</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Tối ưu vùng nhìn: line-height nhỏ, font gọn */
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            line-height: 1.2;
-            background-color: #f1f5f9; /* slate-100 */
-        }
+        /* Tối ưu vùng nhìn, thu gọn khoảng cách, line-height 1.2 */
+        body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; -webkit-tap-highlight-color: transparent; }
+        .compact-text { line-height: 1.2; }
         
-        /* Ẩn thanh cuộn nhưng vẫn cho phép cuộn */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
+        /* Hiệu ứng mượt mà */
+        .fade-in { animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Tùy chỉnh thanh cuộn nhỏ gọn */
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-
-        /* Custom Radio Button ẩn đi, style trên label */
-        .quiz-radio { display: none; }
-        .quiz-label {
-            display: flex;
-            align-items: flex-start;
-            padding: 8px 10px;
-            margin-bottom: 4px;
-            border-radius: 6px;
-            border: 1px solid #e2e8f0;
-            background-color: #f8fafc;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-size: 0.95rem;
-        }
-        .quiz-radio:checked + .quiz-label {
-            background-color: #eff6ff; /* blue-50 */
-            border-color: #3b82f6; /* blue-500 */
-            font-weight: 500;
-        }
-        .quiz-radio:disabled + .quiz-label {
-            cursor: not-allowed;
-        }
-
-        /* Highlight tìm kiếm */
-        mark {
-            background-color: #fde047; /* yellow-300 */
-            font-weight: bold;
-            color: #000;
-            padding: 0 2px;
-            border-radius: 2px;
-        }
-
-        /* SVG Icons Inline */
-        .icon-check { color: #16a34a; margin-left: 6px; flex-shrink: 0; }
-        .icon-cross { color: #dc2626; margin-left: 6px; flex-shrink: 0; }
+        
+        /* Toast notification */
+        #toast { transition: opacity 0.3s, transform 0.3s; }
+        .toast-show { opacity: 1 !important; transform: translateY(0) translateX(-50%) !important; pointer-events: auto !important;}
+        
+        /* Ngăn nội dung đè lên thanh bottom action */
+        .pb-bottom-action { padding-bottom: 80px; }
     </style>
 </head>
-<body class="text-slate-800">
+<body class="bg-gray-50 text-gray-800 h-screen flex flex-col overflow-hidden text-sm sm:text-base compact-text">
 
-    <div class="max-w-2xl mx-auto bg-white min-h-screen shadow-lg flex flex-col relative">
-        
-        <!-- HEADER -->
-        <header class="px-4 py-3 bg-blue-700 text-white shadow-md z-20">
-            <p class="text-xs italic text-blue-200 mb-1">Huấn luyện Đào tạo Cảng HKQT Cần Thơ</p>
-            <h1 class="text-lg font-bold leading-tight">ĐỊNH KỲ HỆ THỐNG QUẢN LÝ AN TOÀN SMS-003 (SMS-NC)</h1>
-        </header>
-
-        <!-- TABS -->
-        <div class="flex border-b border-slate-200 bg-slate-50 sticky top-0 z-20 shadow-sm">
-            <button id="btn-tab-quiz" onclick="switchTab('quiz')" class="flex-1 py-2 text-sm font-bold text-blue-600 border-b-2 border-blue-600 transition-colors">
-                Thi Thử (40)
-            </button>
-            <button id="btn-tab-review" onclick="switchTab('review')" class="flex-1 py-2 text-sm font-bold text-slate-500 border-b-2 border-transparent hover:text-blue-600 transition-colors">
-                Ôn Tập (Full)
-            </button>
+    <!-- Header -->
+    <header class="bg-[#1d4ed8] text-white p-2 sm:p-3 shadow-md z-20 flex-shrink-0">
+        <div class="max-w-3xl mx-auto">
+            <div class="text-xs italic text-blue-200 mb-0.5">Huấn luyện Đào tạo Cảng HKQT Cần Thơ</div>
+            <h1 class="text-base sm:text-lg font-bold uppercase tracking-wide">ĐỊNH KỲ HỆ THỐNG QUẢN LÝ AN TOÀN SMS-003 (SMS-NC)</h1>
         </div>
+    </header>
 
-        <!-- MAIN CONTENT AREA -->
-        <main class="flex-1 relative overflow-hidden flex flex-col">
-            
-            <!-- TAB 1: THI THỬ -->
-            <div id="tab-quiz" class="flex-1 flex flex-col h-full overflow-y-auto">
-                <!-- Top Sticky Bar -->
-                <div class="sticky top-0 bg-white/95 backdrop-blur-sm border-b border-slate-200 p-2 flex justify-between items-center z-10 shadow-sm">
-                    <div class="flex flex-col">
-                        <span id="timer" class="text-xl font-mono font-bold text-slate-700">00:00</span>
-                        <span id="high-score-display" class="text-xs text-slate-500 font-medium">Điểm cao: 0/40</span>
-                    </div>
-                    <div class="flex gap-2">
-                        <button onclick="initQuiz()" class="px-3 py-1.5 bg-slate-200 text-slate-700 text-sm font-bold rounded shadow-sm hover:bg-slate-300">Làm Lại</button>
-                        <button id="btn-submit-top" onclick="submitQuiz()" class="px-4 py-1.5 bg-blue-600 text-white text-sm font-bold rounded shadow-sm hover:bg-blue-700">Nộp Bài</button>
-                    </div>
-                </div>
-
-                <!-- Quiz Questions Container -->
-                <div id="quiz-container" class="p-3 pb-6 flex-1 space-y-3">
-                    <!-- Javascript will render questions here -->
-                </div>
-
-                <!-- Bottom Sticky Bar -->
-                <div class="bg-slate-100 border-t border-slate-200 p-3 flex justify-between items-center mt-auto">
-                    <div id="result-text" class="text-lg font-bold text-blue-700"></div>
-                    <div class="flex gap-2">
-                        <button id="btn-share" onclick="shareResult()" class="hidden px-3 py-2 bg-green-600 text-white text-sm font-bold rounded shadow hover:bg-green-700 flex items-center gap-1">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path></svg>
-                            Chia sẻ
-                        </button>
-                        <button onclick="initQuiz()" class="px-3 py-2 bg-slate-300 text-slate-800 text-sm font-bold rounded hover:bg-slate-400">Làm Lại</button>
-                        <button id="btn-submit-bottom" onclick="submitQuiz()" class="px-6 py-2 bg-blue-600 text-white text-sm font-bold rounded shadow hover:bg-blue-700">Nộp Bài</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- TAB 2: ÔN TẬP -->
-            <div id="tab-review" class="hidden flex-1 flex flex-col h-full overflow-y-auto bg-slate-100">
-                <!-- Sticky Search Bar -->
-                <div class="sticky top-0 bg-white shadow-sm p-3 z-10 border-b border-slate-200">
-                    <div class="relative">
-                        <input type="text" id="search-input" oninput="handleSearch()" placeholder="Tìm kiếm câu hỏi hoặc đáp án..." 
-                            class="w-full pl-9 pr-3 py-2 bg-slate-100 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all">
-                        <svg class="w-4 h-4 text-slate-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                        </svg>
-                    </div>
-                </div>
-
-                <!-- Review Questions Container -->
-                <div id="review-container" class="p-3 pb-10 space-y-3">
-                    <!-- Javascript will render questions here -->
-                </div>
-            </div>
-
-        </main>
-        
-        <!-- Toast Notification -->
-        <div id="toast" class="fixed bottom-4 left-1/2 -translate-x-1/2 bg-slate-800 text-white px-4 py-2 rounded shadow-lg text-sm transition-opacity duration-300 opacity-0 pointer-events-none z-50">
-            Thông báo
+    <!-- Tabs Navigation -->
+    <div class="bg-white border-b border-gray-200 shadow-sm z-20 flex-shrink-0">
+        <div class="max-w-3xl mx-auto flex">
+            <button id="btn-tab-quiz" onclick="switchTab('quiz')" class="flex-1 py-2 font-semibold text-blue-600 border-b-2 border-blue-600 transition-colors">Thi Thử (40)</button>
+            <button id="btn-tab-study" onclick="switchTab('study')" class="flex-1 py-2 font-semibold text-gray-500 border-b-2 border-transparent hover:text-blue-500 transition-colors">Ôn Tập (Full)</button>
         </div>
     </div>
 
+    <!-- Main Content Area -->
+    <main class="flex-1 overflow-hidden relative max-w-3xl mx-auto w-full">
+        
+        <!-- ================= TAB 1: THI THỬ ================= -->
+        <div id="tab-quiz" class="h-full overflow-y-auto pb-bottom-action fade-in bg-gray-50 relative">
+            
+            <!-- Sticky Top Actions (Quiz) -->
+            <div class="sticky top-0 bg-white shadow-sm p-2 sm:p-3 z-10 flex justify-between items-center border-b border-gray-200">
+                <div class="flex flex-col">
+                    <div id="timerDisplay" class="text-xl font-bold text-gray-800 tracking-wider">00:00</div>
+                    <div id="highScoreDisplay" class="text-xs text-gray-500 font-medium mt-0.5">Điểm cao: 0/40</div>
+                </div>
+                <div class="flex gap-2">
+                    <button id="btn-share" onclick="shareResult()" class="hidden bg-green-100 text-green-700 px-3 py-1.5 sm:px-4 sm:py-2 rounded font-bold text-sm border border-green-300">Chia sẻ</button>
+                    <button onclick="initQuiz()" class="bg-gray-100 text-gray-700 px-3 py-1.5 sm:px-4 sm:py-2 rounded font-bold text-sm hover:bg-gray-200 border border-gray-200 transition-colors">Làm Lại</button>
+                    <button id="btn-submit-top" onclick="submitQuiz()" class="bg-blue-600 text-white px-4 py-1.5 sm:px-5 sm:py-2 rounded font-bold text-sm hover:bg-blue-700 shadow transition-colors">Nộp Bài</button>
+                </div>
+            </div>
+
+            <!-- Quiz Questions Container -->
+            <div id="quiz-container" class="p-1.5 sm:p-2"></div>
+            
+            <!-- Final Score Display (Hidden initially) -->
+            <div id="score-result" class="hidden m-2 sm:m-3 p-3 sm:p-4 bg-blue-50 border border-blue-200 rounded-lg text-center shadow-sm">
+                <h2 class="text-lg font-bold text-blue-800 mb-1">Kết quả bài thi</h2>
+                <div id="score-text" class="text-3xl font-black text-blue-600"></div>
+                <div id="time-text" class="text-sm text-gray-600 mt-1"></div>
+            </div>
+
+            <!-- Sticky Bottom Actions (Quiz) -->
+            <div class="fixed bottom-0 left-0 right-0 bg-white border-t p-2 shadow-[0_-2px_10px_rgba(0,0,0,0.05)] z-20 md:static md:shadow-none md:border-none md:bg-transparent md:p-2 md:mt-2">
+                <div class="max-w-3xl mx-auto flex justify-end gap-2">
+                    <button onclick="initQuiz()" class="bg-gray-100 text-gray-700 px-4 py-2 rounded font-bold hover:bg-gray-200 border border-gray-200 flex-1 md:flex-none text-center">Làm Lại</button>
+                    <button id="btn-submit-bottom" onclick="submitQuiz()" class="bg-blue-600 text-white px-6 py-2 rounded font-bold hover:bg-blue-700 shadow flex-1 md:flex-none text-center">Nộp Bài</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= TAB 2: ÔN TẬP ================= -->
+        <div id="tab-study" class="h-full overflow-y-auto fade-in hidden bg-gray-50">
+            
+            <!-- Sticky Search Bar -->
+            <div class="sticky top-0 bg-white p-2 border-b border-gray-200 z-10 shadow-sm flex items-center gap-2">
+                <span class="text-gray-400 pl-1">🔍</span>
+                <input type="text" id="searchInput" oninput="handleSearch()" placeholder="Tìm kiếm câu hỏi hoặc đáp án (không dấu)..." 
+                    class="w-full bg-gray-50 border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 compact-text">
+                <div id="search-count" class="text-xs text-gray-500 whitespace-nowrap font-medium pr-1"></div>
+            </div>
+
+            <!-- Study Questions Container -->
+            <div id="study-container" class="p-1.5 sm:p-2 pb-10"></div>
+        </div>
+
+    </main>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed top-20 left-1/2 -translate-x-1/2 bg-gray-800 text-white px-4 py-2 rounded shadow-lg z-50 opacity-0 pointer-events-none text-sm font-medium">
+        Đã copy kết quả!
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
     <script>
-        // ==========================================
-        // 1. DATA CẤP PHÁT (RAW TEXT)
-        // ==========================================
-        const rawData = `ĐỊNH KỲ HỆ THỐNG QUẢN LÝ AN TOÀN SMS-003 (SMS-NC) (50 câu)
+        // ================= 1. DỮ LIỆU RAW TEXT =================
+        const rawDataString = `
+SMS-NC: HUẤN LUYỆN BAN ĐẦU HỆ THỐNG QUẢN LÝ AN TOÀN, MỨC ĐỘ NÂNG CAO(cập nhật ngày 25/6/2026)
 Câu 1: Quy định nhà cung cấp dịch vụ phải xây dựng Hệ thống quản lý an toàn được quy định trong:
 a. Annex 1
 b. Annex 19
@@ -156,7 +121,7 @@ b. ICAO
 c. Cảng vụ hàng không
 d. Đơn vị cung cấp dịch vụ
 Đáp án: a. Bộ Xây dựng
-Câu 3: Nhận diện mối nguy có mấy phương pháp?
+Câu 3: Phương pháp nhận diện mối nguy có mấy phương pháp?
 a. Phân tích các bước của quá trình để nhận diện mối nguy (bottom up)
 b. Phân tích các nguyên nhân gây ra các hậu quả trong quá trình hoạt động để nhận diện mối nguy (top down)
 c. Cả a và b
@@ -181,7 +146,7 @@ c. Xử lý điểm không phù hợp, tìm nguyên nhân gốc rễ và đề x
 d. Tất cả các câu đều đúng
 Đáp án: c. Xử lý điểm không phù hợp, tìm nguyên nhân gốc rễ và đề xuất biện pháp khắc phục
 Câu 7: Định nghĩa nào đúng
-a. Quá trình là một hoạt động biến đổi đầu vào thành đầu ra
+a. Quá trình là tập hợp các hoạt động để biến đổi đầu vào thành đầu ra
 b. Quá trình là một hoạt động không có đầu ra
 c. Quy trình là mô tả các hoạt động của một quá trình
 d. Cả a và c đều đúng
@@ -205,60 +170,60 @@ c. Cả a và b đều đúng
 d. Tất cả đều sai
 Đáp án: c. Cả a và b đều đúng
 Câu 11: Mục đích của việc xây dựng Hệ thống SMS là:
-a. Nhận diện các mối nguy trong quá trình hoạt động cung cấp dịch vụ của cảng để đảm bảo đạt mức độ an toàn chấp nhận được và chuyển viêc quản lý an toàn từ bị động sang chủ động
+a. Nhận diện các mối nguy trong quá trình hoạt động cung cấp dịch vụ của cảng để đảm bảo đạt mức độ an toàn chấp nhận được và chuyển việc quản lý an toàn từ bị động sang chủ động
 b. Phục vụ cho việc lưu trữ hồ sơ hệ thống của tổ chức
 c. Thỏa mãn nhu cầu khách hàng, luật định
 d. Thỏa mãn yêu cầu của các hãng hàng không
-Đáp án: a. Nhận diện các mối nguy trong quá trình hoạt động cung cấp dịch vụ của cảng để đảm bảo đạt mức độ an toàn chấp nhận được và chuyển viêc quản lý an toàn từ bị động sang chủ động
-Câu 12: Nguồn để xác định mối nguy hiểm, bao gồm:
-a. Các báo cáo thông báo sự cố cũng như quá trình điều tra
+Đáp án: a. Nhận diện các mối nguy trong quá trình hoạt động cung cấp dịch vụ của cảng để đảm bảo đạt mức độ an toàn chấp nhận được và chuyển việc quản lý an toàn từ bị động sang chủ động
+Câu 12: Nguồn để xác định mối nguy, bao gồm:
+a. Các báo cáo, thông báo sự cố cũng như quá trình điều tra
 b. Hệ thống báo cáo tự nguyện
-c. Khảo sát định kỳ mối nguy hiểm đối với các trang thiết bị an toàn hàng không; đánh giá an toàn/chất lượng định kỳ; đánh giá hệ thống thu thập dữ liệu hoạt động định kỳ
+c. Khảo sát định kỳ các mối nguy đối với các trang thiết bị an toàn hàng không; đánh giá an toàn/chất lượng định kỳ; đánh giá hệ thống thu thập dữ liệu hoạt động định kỳ
 d. Tất cả các câu trên
 Đáp án: d. Tất cả các câu trên
 Câu 13: Mối nguy là:
 a. Hậu quả, thiệt hại về người và tài sản, giảm mức độ an toàn của Hệ thống
-b. Điều kiện hoặc đối tượng có thể gây ra những thiệt hại người, tài sản, giảm mức độ an toàn hệ thống
+b. Điều kiện hoặc đối tượng có thể gây ra tổn thương cho con người, thiệt hại đến tài sản, giảm mức độ an toàn hệ thống
 c. Các yêu cầu của Annex 19
 d. Tất cả đều đúng
-Đáp án: b. Điều kiện hoặc đối tượng có thể gây ra những thiệt hại người, tài sản, giảm mức độ an toàn hệ thống
+Đáp án: b. Điều kiện hoặc đối tượng có thể gây ra tổn thương cho con người, thiệt hại đến tài sản, giảm mức độ an toàn hệ thống
 Câu 14: Khi đánh giá rủi ro hiện tại ở mức Trung bình tổ chức cần thực hiện các hành động gì?
-a. Tiến hành nhận diện mối nguy, đánh giá rui ro lại
+a. Tiến hành nhận diện mối nguy, đánh giá rủi ro lại
 b. Bổ sung các biện pháp kiểm soát rủi ro tăng cường
 c. Chấm dứt hoạt động
 d. Chấp nhận mối nguy trên tồn tại trong hoạt động của tổ chức.
 Đáp án: b. Bổ sung các biện pháp kiểm soát rủi ro tăng cường
-Câu 15: Sự cố tàu bay gặp hư hỏng do FOD trong năm 2022 là 0.8/10000 lần chc. Trong năm 2023 tổ chức muốn giảm 10% giá trị thực hiện năm 2018. Vậy
-a. Chỉ tiêu an toàn 0.8/10000 lần chc
-b. Chỉ tiêu an toàn 0.72/10000 lần chc
-c. Chỉ tiêu an toàn giảm 8.4/100000 lần chc
+Câu 15: Sự cố tàu bay gặp hư hỏng do FOD trong năm 2024 là 0.8/10.000 lần CHC. Trong năm 2025, tổ chức muốn giảm 10% sự cố này. Vậy:
+a. Mục tiêu an toàn: 0.72/10.000 lần CHC
+b. Chỉ tiêu an toàn: 0.72/10.000 lần CHC
+c. Chỉ số an toàn: 0.72/10.000 lần CHC
 d. Tất cả đều sai
-Đáp án: b. Chỉ tiêu an toàn 0.72/10000 lần chc
+Đáp án: b. Chỉ tiêu an toàn: 0.72/10.000 lần CHC
 Câu 16: Mục đích đánh giá nội bộ trong Hệ thống SMS - QMS
 a. Nhận diện các mối nguy đang tồn tại hiện hữu/ tiềm ẩn trong Hệ thống
 b. Xác định các khu vực cần cải tiến
 c. Xác định kế hoạch phân bổ nguồn lực
 d. Tất cả yếu tố trên
 Đáp án: d. Tất cả yếu tố trên
-Câu 17: Quá trình xem xét kỷ luật công bằng cần xem xét các yếu tố
+Câu 17: Quá trình xem xét kỷ luật công bằng cần xem xét các yếu tố:
 a. Hồ sơ ghi nhận các hành vi gây mất an toàn của cá nhân trước đây
 b. Hồ sơ đào tạo về chuyên môn
 c. Ý định của cá nhân liên quan đến hành vi không phù hợp
 d. Tất cả yếu tố trên
 Đáp án: d. Tất cả yếu tố trên
 Câu 18: Quản lý sự thay đổi được triển khai thực hiện đối với các thay đổi nào
-a. Thay đổi về luật định, quy định
+a. Thay đổi về luật định, chế định
 b. Thay đổi quy trình, quá trình, phương án khai thác
 c. Thay đổi cơ sở hạ tầng, trang thiết bị
 d. Tất cả yếu tố trên.
 Đáp án: d. Tất cả yếu tố trên.
-Câu 19: Phải có hành động khắc phục khi đường biểu diễn các chỉ số an toàn trong năm hiện tại:
+Câu 19: Phải có hành động thực hiện hành động khắc phục khi đường biểu diễn các chỉ số an toàn trong năm hiện tại:
 a. 3 điểm liên tiếp nằm trên cảnh báo mức 1
 b. 2 điểm liên tiếp nằm trên cảnh báo mức 2
 c. 1 điểm nằm trên đường cảnh báo mức 3
 d. Tất cả yếu tố trên.
 Đáp án: d. Tất cả yếu tố trên.
-Câu 20: Theo yêu cầu của ICAO, Thành phần thúc đẩy an toàn gồm những yếu tố nào:
+Câu 20: Theo yêu cầu của ICAO, yếu tố thúc đẩy an toàn gồm những thành phần nào:
 a. Huấn luyện và đào tạo, phổ biến về an toàn
 b. Nhận diện mối nguy, đánh giá rủi ro
 c. Đánh giá nội bộ
@@ -270,13 +235,13 @@ b. Bộ phận thu thập và phân tích sự cố an toàn hàng không (ASICA
 c. Nhóm tiêu chuẩn hóa an toàn hàng không (ASST)
 d. Tất cả bộ phận trên.
 Đáp án: d. Tất cả bộ phận trên.
-Câu 22: “Đường cất hạ cánh bị hư hỏng một vị trí, Đội bảo trì Cảng hàng không X tiến hành trám vá và thông báo cho ATC là đường CHC đủ điều kiện đưa vào khai thác. Một lúc sau, Tàu bay hạ cánh vào khu vực trám và một điểm trám vá và làm bê tông tại khu vực trám vá bị bong tróc va chạm gây hư hỏng động cơ tàu bay. Sau đó tàu bay được kéo về xưởng để thay thế động cơ” Mối nguy cụ thể trong tình huống trên được nhận diện.
+Câu 22: Đường cất hạ cánh bị hư hỏng một vị trí, Đội bảo trì Cảng hàng không X tiến hành trám vá và thông báo cho ATC là đường CHC đủ điều kiện đưa vào khai thác. Một lúc sau, tàu bay hạ cánh vào khu vực trám vá và làm bê tông tại khu vực trám vá bị bong tróc, va chạm gây hư hỏng động cơ tàu bay. Sau đó, tàu bay được kéo về xưởng để thay thế động cơ. Mối nguy cụ thể là:
 a. Động cơ bị hư hỏng.
 b. Chất lượng trám vá trên đường cất hạ cánh không đảm bảo, bong tróc tạo ra FOD trên đường cất hạ cánh.
 c. Tất cả đều đúng
 d. Tất cả đều sai.
 Đáp án: b. Chất lượng trám vá trên đường cất hạ cánh không đảm bảo, bong tróc tạo ra FOD trên đường cất hạ cánh.
-Câu 23: “Đường cất hạ cánh bị hư hỏng một vị trí, Đội bảo trì Cảng hàng không X tiến hành trám vá và thông báo cho ATC là đường CHC đủ điều kiện đưa vào khai thác. Một lúc sau, Tàu bay hạ cánh vào khu vực trám và một điểm trám vá và làm bê tông tại khu vực trám vá bị bong tróc va chạm gây hư hỏng động cơ tàu bay. Sau đó tàu bay được kéo về xưởng để thay thế động cơ” Rủi ro an toàn hiện tại là gì.
+Câu 23: Đường cất hạ cánh bị hư hỏng một vị trí, Đội bảo trì Cảng hàng không X tiến hành trám vá và thông báo cho ATC là đường CHC đủ điều kiện đưa vào khai thác. Một lúc sau, tàu bay hạ cánh vào khu vực trám vá và làm bê tông tại khu vực trám vá bị bong tróc, va chạm gây hư hỏng động cơ tàu bay. Sau đó, tàu bay được kéo về xưởng để thay thế động cơ. Rủi ro an toàn hiện tại là:
 a. Động cơ bị hư hỏng.
 b. Chất lượng trám vá trên đường cất hạ cánh không đảm bảo, bong tróc tạo ra FOD trên đường cất hạ cánh.
 c. Tất cả đều đúng
@@ -288,7 +253,7 @@ b. Mức độ nghiêm trọng
 c. Cả a và b
 d. Tất cả đều sai.
 Đáp án: c. Cả a và b
-Câu 25: Hệ thống báo cáo an toàn bao gồm
+Câu 25: Hệ thống báo cáo an toàn bao gồm:
 a. Hệ thống báo cáo bắt buộc
 b. Hệ thống báo cáo không bắt buộc (báo cáo an toàn tự nguyện)
 c. Cả a và b
@@ -324,7 +289,7 @@ b. Hệ thống báo cáo tự nguyện nội bộ
 c. Các đợt đánh giá, giám sát an toàn hoặc chất lượng
 d. Cả b và c
 Đáp án: d. Cả b và c
-Câu 31: Khi tại cảng xảy ra sự cố xe thang va chạm với tàu bay, Tổ an toàn nhận diện các mối nguy từ các sự cố trên. Tổ an toàn đã sử dụng phương pháp gì để nhận diện mối nguy?
+Câu 31: Khi tại cảng xảy ra sự cố xe thang va chạm với tàu bay, Tổ an toàn nhận diện các mối nguy từ các sự cố trên. Tổ an toàn đã sử dụng phương pháp gì để nhận diện mối nguy:
 a. Bị động
 b. Chủ động
 c. Dự báo
@@ -348,7 +313,7 @@ b. Quy trình quản lý sự thay đổi
 c. Quy trình nhận diện mối nguy và đánh giá rủi ro
 d. Tất cả đều đúng
 Đáp án: b. Quy trình quản lý sự thay đổi
-Câu 35: Nhân viên của đơn vị anh/chị thực hiện nhiệm vụ được giao vận hành phương tiện, trang thiết bị trong khu bay để phục vụ tàu bay, nhưng nhân viên này chưa được huấn luyện về vận hành phương tiện và đơn vị anh chị chưa có quy trình hướng dẫn thực hiện công việc. Nên dẫn tới chạy sai luồng tuyến và chạm với tàu bay. Vậy theo mô hình nguyên nhân tai nạn sai lỗi của nhân viên là:
+Câu 35: Nhân viên của đơn vị anh/chị thực hiện nhiệm vụ được giao vận hành phương tiện, trang thiết bị trong khu bay để phục vụ tàu bay, nhưng nhân viên này chưa được huấn luyện về vận hành phương tiện và đơn vị anh chị chưa có quy trình hướng dẫn thực hiện công việc. Nên dẫn tới chạy sai luồng tuyến và chạm với tàu bay. Vậy theo mô hình nguyên nhân tai nạn, sai lỗi của nhân viên là:
 a. Sai lỗi do chủ quan cá nhân tạo ra
 b. Sai lỗi do tổ chức tạo ra
 c. Tất cả đều sai
@@ -367,51 +332,51 @@ c. Nhân viên thực hiện nhiệm vụ
 d. Tất cả mọi người thuộc đơn vị
 Đáp án: d. Tất cả mọi người thuộc đơn vị
 Câu 38: Ba thông tin chủ yếu cần được ghi chú trong bảng QLRR trước khi tiến hành xác định các hành động giảm thiểu rủi ro hoặc các biện pháp bảo vệ:
-a. Mối nguy, Tình tình trạng mất an toàn, và hậu quả cuối cùng
+a. Mối nguy, tình tình trạng mất an toàn và hậu quả cuối cùng
 b. Mối nguy, các biện pháp phòng ngừa, và biện pháp phục hồi
-c. Hậu quả cuối cùng, các biện pháp phòng ngừa, và biện pháp phục hồi
-d. Hậu quả cuối cùng, các biện pháp phòng ngừa, và mối nguy
-Đáp án: a. Mối nguy, Tình tình trạng mất an toàn, và hậu quả cuối cùng
+c. Hậu quả cuối cùng, các biện pháp phòng ngừa và biện pháp phục hồi
+d. Hậu quả cuối cùng, các biện pháp phòng ngừa và mối nguy
+Đáp án: a. Mối nguy, tình tình trạng mất an toàn và hậu quả cuối cùng
 Câu 39: Cảng hàng không quốc tế X sắp tới sẽ tiến hành khai thác tàu bay B747 – 8, vậy Hệ thống quản lý an toàn cần sử dụng các quy trình nào của Hệ thống SMS để đánh giá giá an toàn trước khi đưa vào khai thác:
 a. Quy trình quản lý rủi ro (QT14)
 b. Quy trình quản lý sự thay đổi (QT05)
 c. Quy trình xem xét lãnh đạo (QT10)
 d. Cả a và b đều đúng
 Đáp án: d. Cả a và b đều đúng
-Câu 40: Để thực hiện theo dõi và giám sát mục tiêu an toàn, chất lượng tại cảng, chúng chúng ta sử dụng quy trình nào để thực hiện:
+Câu 40: Để thực hiện theo dõi và giám sát mục tiêu an toàn, chất lượng tại cảng, thì chúng ta sử dụng quy trình nào để thực hiện :
 a. Quy trình giám sát và đo lường (QT09)
 b. Quy trình quản lý rủi ro (QT04)
 c. Quy trình quản lý sự thay đổi (QT05)
 d. Quy trình điều tra an toàn nội bộ (QT06)
 Đáp án: a. Quy trình giám sát và đo lường (QT09)
-Câu 41: Để thực hiện quản lý rủi ro an toàn tại cảng, chúng ta sử dụng quy trình nào để thực hiện:
+Câu 41: Để thực hiện quản lý rủi ro an toàn tại cảng, thì chúng ta sử dụng quy trình nào để thực hiện:
 a. Quy trình giám sát và đo lường (QT09)
 b. Quy trình quản lý rủi ro (QT04)
 c. Quy trình quản lý sự thay đổi (QT05)
 d. Quy trình điều tra an toàn nội bộ (QT06)
 Đáp án: b. Quy trình quản lý rủi ro (QT04)
-Câu 42: Để thực hiện điều tra nguyên nhân các sự cố, vụ việc mất an toàn tại cảng tại cảng, chúng ta sử dụng quy trình nào để thực hiện:
+Câu 42: Để thực hiện điều tra nguyên nhân các sự cố, vụ việc mất an toàn tại cảng tại cảng, thì chúng ta sử dụng quy trình nào để thực hiện:
 a. Quy trình giám sát và đo lường (QT09)
 b. Quy trình quản lý rủi ro (QT04)
 c. Quy trình quản lý sự thay đổi (QT05)
 d. Quy trình điều tra an toàn nội bộ (QT06)
 Đáp án: d. Quy trình điều tra an toàn nội bộ (QT06)
-Câu 43: Hệ thống quản lý an toàn là gì :
+Câu 43: Định nghĩa Hệ thống quản lý an toàn là gì :
 a. Là việc Thiết lập tổ chức để quản lý an toàn Quy định trách nhiệm đối với an toàn, Xây dựng chính sách và các quy trình quản lý an toàn.
 b. Là việc tiếp cận quản lý an toàn một cách có hệ thống, bao gồm: Thiết lập tổ chức để quản lý an toàn, Xây dựng chính sách và các quy trình quản lý an toàn.
 c. Là việc tiếp cận quản lý an toàn một cách có hệ thống, bao gồm: Thiết lập tổ chức để quản lý an toàn, Quy định trách nhiệm đối với an toàn, Xây dựng chính sách và các quy trình quản lý an toàn để đạt mục tiêu an toàn của tổ chức.
 d. Tất cả đều sai
 Đáp án: c. Là việc tiếp cận quản lý an toàn một cách có hệ thống, bao gồm: Thiết lập tổ chức để quản lý an toàn, Quy định trách nhiệm đối với an toàn, Xây dựng chính sách và các quy trình quản lý an toàn để đạt mục tiêu an toàn của tổ chức.
-Câu 44: Ai ban hành chính sách mục tiêu an toàn?
+Câu 44: Ai ban hành chính sách an toàn?
 a. Giám đốc cảng
 b. Phó giám đốc phụ trách an toàn
 c. Phó giám đốc phụ trách chất lượng
 d. Tất cả đều đúng
 Đáp án: a. Giám đốc cảng
-Câu 45: Để thực hiện đánh giá các ảnh hưởng an toàn khai thác để đưa một công trình sân đỗ mới xây dựng vào khai thác tại cảng, chúng ta sử dụng quy trình nào để thực hiện
+Câu 45: Để thực hiện đánh giá các ảnh hưởng an toàn khai thác để đưa một công trình sân đỗ mới xây dựng vào khai thác tại cảng, thì chúng ta sử dụng quy trình nào để thực hiện
 a. Quy trình quản lý sự thay đổi (QT05)
 b. Quy trình quản lý rủi ro (QT04)
-c. Quy trình quản lý sự thay đổi (QT05)
+c. Quy trình giám sát và đo lường (QT09)
 d. Cả a và b
 Đáp án: d. Cả a và b
 Câu 46: An toàn là trạng thái mà các rủi ro gây tổn thương/thiệt hại cho người và tài sản được giảm thiểu và duy trì ở ………….. đó thông qua một quy trình nhận diện mối nguy hiểm và quản lý rủi ro liên tục? Điền vào chỗ trống cho đúng
@@ -438,29 +403,67 @@ b. Quy trình kiểm soát hồ sơ (QT02)
 c. Quy trình quản lý rủi ro (QT04)
 d. Quy trình lập và theo dõi mục tiêu (QT03)
 Đáp án: a. Quy trình kiểm soát tài liệu (QT01)
-Câu 50: Cải tiến Hệ thống quản lý an toàn được thực hiện thông qua quy trình nào
+Câu 50: Thực hiện cải tiến Hệ thống quản lý an toàn thực hiện thông qua quy trình nào
 a. Quy trình họp xem xét lãnh đạo (QT10)
 b. Quy trình đánh giá nội bộ (QT11)
-c. Quy trình khắc phục và phòng ngừa (QT13)
+c. Quy trình hành động khắc phục/phòng ngừa (QT13)
 d. Tất cả các quy trình trên
-Đáp án: d. Tất cả các quy trình trên`;
+Đáp án: d. Tất cả các quy trình trên
+`;
 
-        // ==========================================
-        // 2. LOGIC XỬ LÝ CHUNG & PARSE DỮ LIỆU
-        // ==========================================
-        
-        let questionBank = [];
-        let isReviewRendered = false; // FLAG QUAN TRỌNG ĐỂ FIX BUG TAB TRẮNG
-        
-        // Hàm loại bỏ dấu tiếng Việt để tìm kiếm
-        const removeAccents = (str) => {
-            return str.normalize('NFD')
-                      .replace(/[\u0300-\u036f]/g, '')
-                      .replace(/đ/g, 'd').replace(/Đ/g, 'D');
-        };
+        // ================= 2. PARSE DATA TỰ ĐỘNG =================
+        function parseRawData(text) {
+            const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+            let questions = [];
+            let currentQ = null;
+
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i];
+                if (line.match(/^Câu\s+\d+:/i)) {
+                    if (currentQ && currentQ.options.length > 0) questions.push(currentQ);
+                    currentQ = { 
+                        question: line.replace(/^Câu\s+\d+:\s*/i, '').trim(), 
+                        options: [],
+                        originalText: line // Save to render search properly
+                    };
+                } else if (line.match(/^[a-d]\./i) && currentQ) {
+                    currentQ.options.push({ 
+                        text: line.replace(/^[a-d]\.\s*/i, '').trim(), 
+                        isCorrect: false 
+                    });
+                } else if (line.match(/^Đáp án:/i) && currentQ) {
+                    const ansMatch = line.match(/^Đáp án:\s*([a-d])/i);
+                    if (ansMatch) {
+                        const correctIndex = ansMatch[1].toLowerCase().charCodeAt(0) - 97;
+                        if (currentQ.options[correctIndex]) {
+                            currentQ.options[correctIndex].isCorrect = true;
+                        }
+                    }
+                } else if (currentQ && currentQ.options.length === 0 && !line.match(/^---/)) {
+                    // Nối thêm text nếu câu hỏi nhiều dòng
+                    currentQ.question += " " + line;
+                    currentQ.originalText += " " + line;
+                }
+            }
+            if (currentQ && currentQ.options.length > 0) questions.push(currentQ);
+            return questions;
+        }
+
+        const fullQuestionsData = parseRawData(rawDataString);
+
+        // ================= 3. TRẠNG THÁI APP & TIỆN ÍCH =================
+        let currentQuizQuestions = [];
+        let timerInterval;
+        let secondsElapsed = 0;
+        let isSubmitted = false;
+        let isStudyRendered = false; // FLAG QUAN TRỌNG: Sửa lỗi màn hình trắng
+
+        // Lấy High Score
+        let highScore = localStorage.getItem('sms_quiz_highscore') || 0;
+        document.getElementById('highScoreDisplay').innerText = `Điểm cao: ${highScore}/40`;
 
         // Hàm xáo trộn mảng (Fisher-Yates)
-        const shuffleArray = (array) => {
+        function shuffleArray(array) {
             let curId = array.length;
             while (0 !== curId) {
                 let randId = Math.floor(Math.random() * curId);
@@ -470,335 +473,344 @@ d. Tất cả các quy trình trên
                 array[randId] = tmp;
             }
             return array;
-        };
+        }
 
-        // Thuật toán parse Raw Text thành Array Objects
-        const parseQuestions = () => {
-            const lines = rawData.split('\n').map(l => l.trim()).filter(l => l !== '');
-            let currentQ = null;
-            let currentId = 1;
+        // Bỏ dấu tiếng Việt (Hỗ trợ tìm kiếm)
+        function removeAccents(str) {
+            return str.normalize('NFD')
+                      .replace(/[\u0300-\u036f]/g, '')
+                      .replace(/đ/g, 'd').replace(/Đ/g, 'D');
+        }
 
-            for (let i = 0; i < lines.length; i++) {
-                let line = lines[i];
-                if (line.includes('ĐỊNH KỲ HỆ THỐNG')) continue; // Bỏ qua tiêu đề file
-
-                // Bắt đầu một câu hỏi mới
-                if (/^Câu\s+\d+:/.test(line)) {
-                    if (currentQ) questionBank.push(currentQ);
-                    
-                    let qText = line.replace(/^Câu\s+\d+:\s*/, '');
-                    currentQ = {
-                        id: currentId++,
-                        originalQName: line.match(/^Câu\s+\d+:/)[0],
-                        question: qText,
-                        options: [],
-                        answerText: ''
-                    };
-                } 
-                // Bắt các lựa chọn a, b, c, d
-                else if (/^[a-d]\./i.test(line)) {
-                    if (currentQ) {
-                        currentQ.options.push({
-                            char: line.substring(0, 1).toLowerCase(), // a,b,c,d
-                            text: line.substring(line.indexOf('.') + 1).trim(),
-                            isCorrect: false
-                        });
-                    }
-                } 
-                // Bắt đáp án
-                else if (/^Đáp án:/i.test(line)) {
-                    if (currentQ) {
-                        currentQ.answerText = line.replace(/^Đáp án:\s*/i, '').trim();
-                        // Trích xuất ký tự đáp án đúng (a, b, c, d) từ chuỗi "a. Nội dung..."
-                        let correctCharMatch = currentQ.answerText.match(/^[a-d]/i);
-                        if (correctCharMatch) {
-                            let correctChar = correctCharMatch[0].toLowerCase();
-                            currentQ.options.forEach(opt => {
-                                if (opt.char === correctChar) opt.isCorrect = true;
-                            });
-                        }
-                    }
-                } 
-                // Nối chuỗi nếu câu hỏi bị rớt dòng (nhiều dòng)
-                else {
-                    if (currentQ && currentQ.options.length === 0) {
-                        currentQ.question += ' ' + line;
-                    }
-                }
-            }
-            if (currentQ) questionBank.push(currentQ);
-        };
-
-        // SVG Icons
-        const svgCheck = `<svg class="w-5 h-5 icon-check" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>`;
-        const svgCross = `<svg class="w-5 h-5 icon-cross" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>`;
-
-        // UI Toast
-        const showToast = (msg) => {
-            const toast = document.getElementById('toast');
-            toast.textContent = msg;
-            toast.classList.remove('opacity-0');
-            setTimeout(() => toast.classList.add('opacity-0'), 2500);
-        };
-
-        // Chuyển Tab
-        const switchTab = (tab) => {
-            const tabQuiz = document.getElementById('tab-quiz');
-            const tabReview = document.getElementById('tab-review');
+        // ================= 4. LOGIC CHUYỂN TAB =================
+        function switchTab(tabId) {
+            const quizTab = document.getElementById('tab-quiz');
+            const studyTab = document.getElementById('tab-study');
             const btnQuiz = document.getElementById('btn-tab-quiz');
-            const btnReview = document.getElementById('btn-tab-review');
+            const btnStudy = document.getElementById('btn-tab-study');
 
-            if (tab === 'quiz') {
-                tabQuiz.classList.remove('hidden');
-                tabReview.classList.add('hidden');
-                btnQuiz.className = "flex-1 py-2 text-sm font-bold text-blue-600 border-b-2 border-blue-600 transition-colors";
-                btnReview.className = "flex-1 py-2 text-sm font-bold text-slate-500 border-b-2 border-transparent hover:text-blue-600 transition-colors";
-            } else {
-                tabQuiz.classList.add('hidden');
-                tabReview.classList.remove('hidden');
-                btnReview.className = "flex-1 py-2 text-sm font-bold text-blue-600 border-b-2 border-blue-600 transition-colors";
-                btnQuiz.className = "flex-1 py-2 text-sm font-bold text-slate-500 border-b-2 border-transparent hover:text-blue-600 transition-colors";
+            if (tabId === 'quiz') {
+                quizTab.classList.remove('hidden');
+                studyTab.classList.add('hidden');
                 
-                // CHỈ RENDER NẾU LÀ LẦN ĐẦU TIÊN (DÙNG BIẾN CỜ HIỆU)
-                if (!isReviewRendered) {
-                    renderReview();
-                    isReviewRendered = true;
+                btnQuiz.classList.replace('text-gray-500', 'text-blue-600');
+                btnQuiz.classList.replace('border-transparent', 'border-blue-600');
+                btnStudy.classList.replace('text-blue-600', 'text-gray-500');
+                btnStudy.classList.replace('border-blue-600', 'border-transparent');
+            } else {
+                quizTab.classList.add('hidden');
+                studyTab.classList.remove('hidden');
+                
+                btnStudy.classList.replace('text-gray-500', 'text-blue-600');
+                btnStudy.classList.replace('border-transparent', 'border-blue-600');
+                btnQuiz.classList.replace('text-blue-600', 'text-gray-500');
+                btnQuiz.classList.replace('border-blue-600', 'border-transparent');
+
+                // RENDER NGAY LẦN ĐẦU TIÊN BẤM VÀO TAB (Chống lỗi trống trơn)
+                if (!isStudyRendered) {
+                    renderStudyData(fullQuestionsData);
+                    isStudyRendered = true;
                 }
             }
-        };
+        }
 
-        // ==========================================
-        // 3. LOGIC THI THỬ (QUIZ)
-        // ==========================================
-        
-        let quizTimerInterval;
-        let secondsElapsed = 0;
-        let isQuizSubmitted = false;
-        let currentQuizQuestions = [];
-        let finalScore = 0;
-        let timeStringForShare = "";
+        // ================= 5. LOGIC TAB 1: THI THỬ =================
+        function formatTime(totalSeconds) {
+            const m = Math.floor(totalSeconds / 60).toString().padStart(2, '0');
+            const s = (totalSeconds % 60).toString().padStart(2, '0');
+            return `${m}:${s}`;
+        }
 
-        const loadHighScore = () => {
-            const hs = localStorage.getItem('sms_high_score') || 0;
-            document.getElementById('high-score-display').textContent = `Điểm cao: ${hs}/40`;
-            return hs;
-        };
-
-        const saveHighScore = (score) => {
-            const hs = localStorage.getItem('sms_high_score') || 0;
-            if (score > hs) {
-                localStorage.setItem('sms_high_score', score);
-                loadHighScore();
-            }
-        };
-
-        const updateTimerDisplay = () => {
-            const m = Math.floor(secondsElapsed / 60).toString().padStart(2, '0');
-            const s = (secondsElapsed % 60).toString().padStart(2, '0');
-            timeStringForShare = `${m}:${s}`;
-            document.getElementById('timer').textContent = timeStringForShare;
-        };
-
-        const initQuiz = () => {
-            // Reset state
-            clearInterval(quizTimerInterval);
+        function startTimer() {
+            clearInterval(timerInterval);
             secondsElapsed = 0;
-            isQuizSubmitted = false;
-            updateTimerDisplay();
-            
-            // UI Reset
+            document.getElementById('timerDisplay').innerText = "00:00";
+            timerInterval = setInterval(() => {
+                secondsElapsed++;
+                document.getElementById('timerDisplay').innerText = formatTime(secondsElapsed);
+            }, 1000);
+        }
+
+        function initQuiz() {
+            isSubmitted = false;
+            document.getElementById('btn-share').classList.add('hidden');
             document.getElementById('btn-submit-top').classList.remove('hidden');
             document.getElementById('btn-submit-bottom').classList.remove('hidden');
-            document.getElementById('btn-share').classList.add('hidden');
-            document.getElementById('result-text').textContent = '';
-            document.getElementById('tab-quiz').scrollTop = 0;
+            document.getElementById('score-result').classList.add('hidden');
+            
+            // Random bốc 40 câu và xáo trộn mảng
+            const shuffledFull = shuffleArray([...fullQuestionsData]);
+            currentQuizQuestions = shuffledFull.slice(0, 40).map(q => {
+                // Giữ nguyên thứ tự đáp án (không xáo trộn options)
+                return {
+                    ...q,
+                    options: [...q.options]
+                }
+            });
 
-            // Prepare 40 random questions
-            let shuffledBank = shuffleArray([...questionBank]);
-            currentQuizQuestions = shuffledBank.slice(0, 40);
-
-            // Render
             const container = document.getElementById('quiz-container');
             container.innerHTML = '';
 
             currentQuizQuestions.forEach((q, index) => {
-                // Shuffle options for this specific quiz instance
-                let qOptions = shuffleArray([...q.options]);
+                const qDiv = document.createElement('div');
+                // Tối giản padding và margin của khung câu hỏi cho điện thoại
+                qDiv.className = 'bg-white rounded-lg p-2.5 sm:p-4 mb-2 shadow-sm border border-gray-200';
+                qDiv.id = `qbox-${index}`;
+                
+                let optionsHtml = '';
+                q.options.forEach((opt, optIndex) => {
+                    const prefix = String.fromCharCode(65 + optIndex) + '.'; // A. B. C. D.
+                    // Tối giản padding bên trong các thẻ đáp án
+                    optionsHtml += `
+                        <label id="label-${index}-${optIndex}" class="flex items-start p-2 sm:p-3 rounded-lg border border-gray-200 cursor-pointer hover:bg-gray-50 transition-all mb-1.5 w-full">
+                            <input type="radio" name="question_${index}" value="${optIndex}" class="hidden" onchange="markAnswered(${index})">
+                            <span class="font-bold text-gray-500 shrink-0 w-6 sm:w-7 text-left">${prefix}</span>
+                            <span class="text-sm sm:text-base leading-snug break-words w-full text-gray-700" id="text-${index}-${optIndex}">${opt.text}</span>
+                        </label>
+                    `;
+                });
 
-                let html = `
-                    <div class="bg-white rounded-md p-3 mb-3 shadow-sm border border-slate-200" id="q-block-${index}">
-                        <h3 class="font-bold text-slate-800 mb-2 text-[0.95rem]">
-                            <span class="text-blue-600">Câu ${index + 1}:</span> ${q.question}
-                        </h3>
-                        <div class="flex flex-col">
-                            ${qOptions.map((opt, optIdx) => `
-                                <input type="radio" name="q_${index}" id="q_${index}_opt_${optIdx}" value="${opt.isCorrect}" class="quiz-radio">
-                                <label for="q_${index}_opt_${optIdx}" class="quiz-label" id="label_q_${index}_opt_${optIdx}">
-                                    <span class="font-bold mr-2 text-slate-500">${String.fromCharCode(65 + optIdx)}.</span> 
-                                    <span class="flex-1">${opt.text}</span>
-                                </label>
-                            `).join('')}
-                        </div>
+                qDiv.innerHTML = `
+                    <div class="font-bold text-sm sm:text-base mb-2 text-gray-800 flex gap-1">
+                        <span class="whitespace-nowrap text-blue-700">Câu ${index + 1}:</span>
+                        <span>${q.question}</span>
+                    </div>
+                    <div class="flex flex-col">
+                        ${optionsHtml}
                     </div>
                 `;
-                container.innerHTML += html;
+                container.appendChild(qDiv);
             });
 
-            // Start timer
-            quizTimerInterval = setInterval(() => {
-                secondsElapsed++;
-                updateTimerDisplay();
-            }, 1000);
-        };
+            startTimer();
+            // Cuộn lên đầu
+            document.getElementById('tab-quiz').scrollTop = 0;
+        }
 
-        const submitQuiz = () => {
-            if (isQuizSubmitted) return;
-            isQuizSubmitted = true;
-            clearInterval(quizTimerInterval);
+        function markAnswered(qIndex) {
+            if(isSubmitted) return;
+            // Gỡ highlight của các lựa chọn khác trong cùng 1 câu
+            const qData = currentQuizQuestions[qIndex];
+            qData.options.forEach((_, optIndex) => {
+                const label = document.getElementById(`label-${qIndex}-${optIndex}`);
+                label.classList.remove('bg-blue-50', 'border-blue-400');
+                label.classList.add('border-gray-200');
+            });
 
-            finalScore = 0;
+            // Highlight đáp án đang được chọn
+            const selectedInput = document.querySelector(`input[name="question_${qIndex}"]:checked`);
+            if (selectedInput) {
+                const selectedVal = selectedInput.value;
+                const selectedLabel = document.getElementById(`label-${qIndex}-${selectedVal}`);
+                selectedLabel.classList.remove('border-gray-200');
+                selectedLabel.classList.add('bg-blue-50', 'border-blue-400');
+            }
+        }
 
-            currentQuizQuestions.forEach((q, index) => {
-                const radios = document.getElementsByName(`q_${index}`);
-                let answeredCorrectly = false;
+        function submitQuiz() {
+            if (isSubmitted) return;
+            if (!confirm("Bạn chắc chắn muốn nộp bài?")) return;
+            
+            clearInterval(timerInterval);
+            isSubmitted = true;
+            let score = 0;
+
+            currentQuizQuestions.forEach((q, qIndex) => {
+                const selectedInput = document.querySelector(`input[name="question_${qIndex}"]:checked`);
+                const selectedVal = selectedInput ? parseInt(selectedInput.value) : -1;
                 
-                radios.forEach((radio) => {
-                    const label = document.getElementById(`label_${radio.id}`);
-                    const isCorrect = radio.value === "true";
+                q.options.forEach((opt, optIndex) => {
+                    const label = document.getElementById(`label-${qIndex}-${optIndex}`);
+                    const textSpan = document.getElementById(`text-${qIndex}-${optIndex}`);
+                    const radio = document.querySelector(`input[name="question_${qIndex}"][value="${optIndex}"]`);
                     
                     radio.disabled = true; // Khóa lựa chọn
 
-                    if (radio.checked) {
-                        if (isCorrect) {
-                            answeredCorrectly = true;
-                            label.classList.add('bg-green-100', 'border-green-500', 'text-green-800');
-                            label.classList.remove('bg-f8fafc');
-                            label.innerHTML += svgCheck;
-                        } else {
-                            label.classList.add('bg-red-50', 'border-red-400', 'text-red-800');
-                            label.classList.remove('bg-f8fafc', 'peer-checked:bg-blue-100');
-                            label.innerHTML += svgCross;
-                        }
-                    }
+                    // Khôi phục lại trạng thái mặc định không có hiệu ứng trỏ chuột
+                    label.classList.remove('bg-blue-50', 'border-blue-400', 'cursor-pointer', 'hover:bg-gray-50');
 
-                    // Luôn hiển thị đáp án đúng nếu người dùng chọn sai hoặc không chọn
-                    if (isCorrect && !radio.checked) {
-                        label.classList.add('bg-green-50', 'border-green-300', 'text-green-700');
-                        label.innerHTML += svgCheck;
+                    if (opt.isCorrect) {
+                        // Highlight đáp án ĐÚNG (màu xanh, có tick)
+                        label.classList.add('bg-green-50', 'border-green-400');
+                        label.classList.remove('border-gray-200');
+                        textSpan.classList.add('text-green-800', 'font-medium');
+                        
+                        // Chèn icon checkmark vào cuối label
+                        label.innerHTML += `<span class="text-green-600 ml-2 font-bold shrink-0">✓</span>`;
+                        
+                        if (selectedVal === optIndex) {
+                            score++; // Cộng điểm nếu chọn đúng
+                        }
+                    } else if (selectedVal === optIndex) {
+                        // Highlight đáp án SAI mà user ĐÃ CHỌN (màu đỏ, có X)
+                        label.classList.add('bg-red-50', 'border-red-300');
+                        label.classList.remove('border-gray-200');
+                        textSpan.classList.add('text-red-800');
+                        
+                        label.innerHTML += `<span class="text-red-500 ml-2 font-bold shrink-0">✗</span>`;
+                    } else {
+                        // Các đáp án sai khác không được chọn
+                        label.classList.add('bg-gray-50', 'opacity-70');
                     }
                 });
-
-                if (answeredCorrectly) finalScore++;
             });
 
-            // Update UI
-            document.getElementById('result-text').textContent = `Kết quả: ${finalScore}/40`;
+            // Lưu điểm cao
+            if (score > highScore) {
+                highScore = score;
+                localStorage.setItem('sms_quiz_highscore', highScore);
+                document.getElementById('highScoreDisplay').innerText = `Điểm cao: ${highScore}/40`;
+            }
+
+            // Hiển thị kết quả
+            const scoreText = document.getElementById('score-text');
+            scoreText.innerText = `${score} / 40`;
+            scoreText.className = `text-3xl font-black ${score >= 32 ? 'text-green-600' : (score >= 20 ? 'text-yellow-600' : 'text-red-600')}`;
+            
+            document.getElementById('time-text').innerText = `Thời gian hoàn thành: ${formatTime(secondsElapsed)}`;
+            document.getElementById('score-result').classList.remove('hidden');
+            
+            // Đổi nút bấm
             document.getElementById('btn-submit-top').classList.add('hidden');
             document.getElementById('btn-submit-bottom').classList.add('hidden');
             document.getElementById('btn-share').classList.remove('hidden');
-            
-            saveHighScore(finalScore);
-            
-            // Cuộn xuống xem kết quả
-            document.getElementById('tab-quiz').scrollTop = document.getElementById('tab-quiz').scrollHeight;
-        };
 
-        const shareResult = () => {
-            const textToCopy = `✅ Sát hạch SMS-003\n🎯 Điểm số: ${finalScore}/40\n⏱️ Thời gian: ${timeStringForShare}`;
-            navigator.clipboard.writeText(textToCopy).then(() => {
+            // Cuộn lên xem kết quả
+            document.getElementById('tab-quiz').scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        function shareResult() {
+            const score = document.getElementById('score-text').innerText;
+            const time = formatTime(secondsElapsed);
+            const textToShare = `📝 Kết quả sát hạch SMS (Nâng cao)\nĐiểm: ${score}\nThời gian: ${time}\nCảng HKQT Cần Thơ`;
+            
+            navigator.clipboard.writeText(textToShare).then(() => {
                 showToast("Đã copy kết quả vào khay nhớ tạm!");
-            }).catch(err => {
-                showToast("Lỗi khi copy!");
             });
-        };
+        }
 
-        // ==========================================
-        // 4. LOGIC ÔN TẬP (REVIEW)
-        // ==========================================
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.innerText = msg;
+            toast.classList.add('toast-show');
+            setTimeout(() => {
+                toast.classList.remove('toast-show');
+            }, 2500);
+        }
 
-        // Thuật toán highlight text (Bỏ qua dấu tiếng việt)
-        const highlightHTML = (text, keyword) => {
-            if (!keyword.trim()) return text;
-            const textNorm = removeAccents(text).toLowerCase();
-            const kwNorm = removeAccents(keyword.trim()).toLowerCase();
+        // ================= 6. LOGIC TAB 2: ÔN TẬP =================
+        function renderStudyData(dataToRender, highlightKeyword = '') {
+            const container = document.getElementById('study-container');
+            container.innerHTML = '';
             
-            if (!textNorm.includes(kwNorm)) return text;
+            document.getElementById('search-count').innerText = `(${dataToRender.length} câu)`;
 
-            let result = '';
-            let lastIndex = 0;
-            let i = 0;
-
-            while ((i = textNorm.indexOf(kwNorm, lastIndex)) !== -1) {
-                result += text.substring(lastIndex, i);
-                result += `<mark>` + text.substring(i, i + kwNorm.length) + `</mark>`;
-                lastIndex = i + kwNorm.length;
-            }
-            result += text.substring(lastIndex);
-            return result;
-        };
-
-        const renderReview = (filterText = '') => {
-            const container = document.getElementById('review-container');
-            const kwNorm = removeAccents(filterText).toLowerCase();
-            
-            // Filter dữ liệu
-            const filteredData = questionBank.filter(q => {
-                if (!filterText) return true;
-                const matchQ = removeAccents(q.question).toLowerCase().includes(kwNorm);
-                const matchOpts = q.options.some(o => removeAccents(o.text).toLowerCase().includes(kwNorm));
-                return matchQ || matchOpts;
-            });
-
-            if (filteredData.length === 0) {
-                container.innerHTML = `<div class="text-center py-8 text-slate-500 italic">Không tìm thấy kết quả nào cho "${filterText}"</div>`;
+            if (dataToRender.length === 0) {
+                container.innerHTML = `<div class="text-center text-gray-500 py-10">Không tìm thấy kết quả phù hợp.</div>`;
                 return;
             }
 
-            // Sinh HTML
-            let html = '';
-            filteredData.forEach(q => {
-                html += `
-                <div class="bg-white rounded-md p-3 border border-slate-200 shadow-sm">
-                    <h3 class="font-bold text-slate-800 mb-2 text-[0.95rem]">
-                        <span class="text-blue-600">${q.originalQName}</span> ${highlightHTML(q.question, filterText)}
-                    </h3>
-                    <div class="flex flex-col space-y-1">
-                        ${q.options.map(opt => {
-                            // Style cho đáp án đúng
-                            const isCorrectStyle = opt.isCorrect 
-                                ? 'bg-green-100 border-green-400 text-green-900 font-medium border' 
-                                : 'bg-slate-50 border-slate-100 text-slate-600 border';
-                            
-                            const icon = opt.isCorrect ? svgCheck : '';
-                            
-                            return `
-                                <div class="flex items-start px-2 py-1.5 rounded-md ${isCorrectStyle} text-[0.95rem]">
-                                    <span class="font-bold mr-2 w-4 inline-block">${opt.char.toUpperCase()}.</span>
-                                    <span class="flex-1">${highlightHTML(opt.text, filterText)}</span>
-                                    ${icon}
+            // Hàm bôi vàng từ khóa
+            const markText = (text, keyword) => {
+                if (!keyword) return text;
+                const kwUnaccent = removeAccents(keyword).toLowerCase();
+                const textUnaccent = removeAccents(text).toLowerCase();
+                
+                let result = '';
+                let currentIndex = 0;
+                let index = textUnaccent.indexOf(kwUnaccent, currentIndex);
+
+                while (index !== -1) {
+                    result += text.substring(currentIndex, index);
+                    result += `<mark class="bg-yellow-300 text-black px-0.5 rounded">${text.substring(index, index + keyword.length)}</mark>`;
+                    currentIndex = index + keyword.length;
+                    index = textUnaccent.indexOf(kwUnaccent, currentIndex);
+                }
+                result += text.substring(currentIndex);
+                return result;
+            };
+
+            let htmlString = '';
+            dataToRender.forEach((q, index) => {
+                const hlQuestion = markText(q.question, highlightKeyword);
+                
+                let optionsHtml = '';
+                q.options.forEach((opt, optIndex) => {
+                    const hlOption = markText(opt.text, highlightKeyword);
+                    const prefix = String.fromCharCode(65 + optIndex) + '.'; // A. B. C. D.
+                    
+                    // Tối giản padding bên trong các đáp án hiển thị (từ p-3 xuống p-2/p-3)
+                    if (opt.isCorrect) {
+                        optionsHtml += `
+                            <div class="border border-green-400 bg-green-50 rounded-lg p-2 sm:p-3 mb-1.5 flex justify-between items-start w-full">
+                                <div class="flex items-start">
+                                    <span class="font-bold text-gray-600 mr-2 shrink-0 w-5 sm:w-6">${prefix}</span>
+                                    <span class="text-green-900 leading-snug text-sm sm:text-base">${hlOption}</span>
                                 </div>
-                            `;
-                        }).join('')}
+                                <span class="text-green-600 ml-2 font-bold shrink-0">✓</span>
+                            </div>`;
+                    } else {
+                        optionsHtml += `
+                            <div class="border border-gray-200 bg-white rounded-lg p-2 sm:p-3 mb-1.5 flex justify-between items-start w-full">
+                                <div class="flex items-start">
+                                    <span class="font-bold text-gray-500 mr-2 shrink-0 w-5 sm:w-6">${prefix}</span>
+                                    <span class="text-gray-700 leading-snug text-sm sm:text-base">${hlOption}</span>
+                                </div>
+                            </div>`;
+                    }
+                });
+
+                htmlString += `
+                    <div class="bg-white rounded-lg border border-gray-200 p-2.5 sm:p-4 mb-2 shadow-sm">
+                        <div class="font-bold text-gray-800 text-sm sm:text-base mb-2.5 flex gap-1">
+                            <span class="whitespace-nowrap text-blue-700">Câu ${q.originalIndex || index + 1}:</span>
+                            <span>${hlQuestion}</span>
+                        </div>
+                        <div class="flex flex-col">
+                            ${optionsHtml}
+                        </div>
                     </div>
-                </div>`;
+                `;
             });
-            
-            container.innerHTML = html;
-        };
+            container.innerHTML = htmlString;
+        }
 
-        const handleSearch = () => {
-            const val = document.getElementById('search-input').value;
-            renderReview(val);
-        };
+        function handleSearch() {
+            const keyword = document.getElementById('searchInput').value.trim();
+            if (!keyword) {
+                // Khôi phục mảng ban đầu, gắn thêm index gốc để hiển thị số câu chính xác
+                const restored = fullQuestionsData.map((q, i) => ({...q, originalIndex: i + 1}));
+                renderStudyData(restored, '');
+                return;
+            }
 
-        // ==========================================
-        // 5. KHỞI TẠO APP
-        // ==========================================
+            const searchKey = removeAccents(keyword).toLowerCase();
+            const filtered = [];
+
+            fullQuestionsData.forEach((q, i) => {
+                const qTextUnaccent = removeAccents(q.question).toLowerCase();
+                let matchFound = qTextUnaccent.includes(searchKey);
+                
+                if (!matchFound) {
+                    for (let opt of q.options) {
+                        if (removeAccents(opt.text).toLowerCase().includes(searchKey)) {
+                            matchFound = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (matchFound) {
+                    filtered.push({...q, originalIndex: i + 1});
+                }
+            });
+
+            renderStudyData(filtered, keyword);
+        }
+
+        // ================= 7. KHỞI CHẠY =================
         window.onload = () => {
-            parseQuestions();
-            loadHighScore();
-            initQuiz(); // Render sẵn tab Thi Thử
-            // Tab ôn tập sẽ được render khi click vào (Fix tab trắng)
+            initQuiz();
         };
 
     </script>
