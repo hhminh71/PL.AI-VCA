@@ -7,12 +7,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
     <style>
-        body { 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
-            -webkit-tap-highlight-color: transparent;
-        }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; -webkit-tap-highlight-color: transparent; }
         .text-dense { line-height: 1.25; }
-        
         @keyframes fadeInOut {
             0% { opacity: 0; bottom: 10px; transform: translateX(-50%) scale(0.9); }
             10% { opacity: 1; bottom: 30px; transform: translateX(-50%) scale(1); }
@@ -20,15 +16,8 @@
             100% { opacity: 0; bottom: 10px; transform: translateX(-50%) scale(0.9); }
         }
         .toast-show { animation: fadeInOut 3s forwards; }
-        
-        input[type="radio"] {
-            width: 1.15rem; height: 1.15rem;
-            accent-color: #2563eb; cursor: pointer;
-        }
-        mark {
-            background-color: #fde047; color: #111827;
-            padding: 0 2px; border-radius: 2px; font-weight: 600;
-        }
+        input[type="radio"] { width: 1.15rem; height: 1.15rem; accent-color: #2563eb; cursor: pointer; }
+        mark { background-color: #fde047; color: #111827; padding: 0 2px; border-radius: 2px; font-weight: 600; }
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
@@ -41,8 +30,11 @@
         <div class="max-w-3xl mx-auto">
             <div class="flex justify-between items-start">
                 <div class="flex-1 pr-2">
-                    <div class="text-[11px] italic text-blue-200 uppercase tracking-tight">Huấn luyện Đào tạo Cảng HKQT Cần Thơ</div>
-                    <h1 id="course-title" class="text-base md:text-lg font-bold mt-0.5 mb-2 leading-tight">Đang tải dữ liệu Cloud...</h1>
+                    <div class="flex items-center gap-2 mb-0.5">
+                        <div class="text-[11px] italic text-blue-200 uppercase tracking-tight">Huấn luyện Đào tạo Cảng HKQT Cần Thơ</div>
+                        <span id="cloud-status" class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-red-500 text-white hidden">OFFLINE MODE</span>
+                    </div>
+                    <h1 id="course-title" class="text-base md:text-lg font-bold mb-2 leading-tight">Đang kết nối dữ liệu...</h1>
                 </div>
                 <button onclick="openPassModal()" class="bg-yellow-400 hover:bg-yellow-500 text-blue-900 font-bold px-3 py-1.5 rounded shadow-sm text-xs flex items-center gap-1 border border-yellow-300 mt-1 transition-colors shrink-0">
                     <span class="text-sm">⚙️</span> DATA
@@ -73,7 +65,7 @@
                 </div>
             </div>
             <div id="quiz-container" class="p-2 space-y-3 max-w-3xl mx-auto">
-                <div class="text-center p-5 text-gray-500">Đang đồng bộ dữ liệu từ Cloud...</div>
+                <div class="text-center p-5 text-gray-500 font-bold animate-pulse">Đang tải dữ liệu từ máy chủ...</div>
             </div>
             
             <div id="bottom-actions" class="p-3 flex justify-center space-x-2 max-w-3xl mx-auto mt-2 border-t border-gray-200">
@@ -107,8 +99,9 @@
     <!-- MODAL NHẬP MẬT KHẨU -->
     <div id="pass-modal" class="fixed inset-0 bg-black/70 z-[500] hidden items-center justify-center p-4">
         <div class="bg-white p-6 rounded-xl shadow-2xl w-full max-w-xs text-center">
-            <h3 class="font-bold mb-4 text-lg text-gray-800">Nhập mật khẩu</h3>
-            <input type="password" id="pass-input" class="w-full border border-gray-300 p-2.5 rounded mb-4 focus:outline-none focus:border-blue-500" placeholder="Nhập mật khẩu...">
+            <h3 class="font-bold mb-4 text-lg text-gray-800">Truy cập dữ liệu</h3>
+            <!-- Đã loại bỏ gợi ý mật khẩu -->
+            <input type="password" id="pass-input" class="w-full border border-gray-300 p-2.5 rounded mb-4 focus:outline-none focus:border-blue-500" placeholder="Nhập mật khẩu an toàn...">
             <div class="flex gap-2">
                 <button onclick="closePassModal()" class="w-1/2 bg-gray-200 text-gray-700 py-2 rounded font-bold hover:bg-gray-300 transition-colors">Hủy</button>
                 <button onclick="verifyPass()" class="w-1/2 bg-blue-600 text-white py-2 rounded font-bold hover:bg-blue-700 transition-colors">Xác nhận</button>
@@ -120,7 +113,7 @@
     <div id="data-modal" class="fixed inset-0 bg-black/60 z-[200] hidden items-center justify-center p-3">
         <div class="bg-white rounded-lg shadow-xl w-full max-w-md flex flex-col">
             <div class="p-3 border-b flex justify-between items-center bg-blue-50 rounded-t-lg">
-                <h3 class="font-bold text-lg text-blue-800">Quản lý DATA (Đám mây)</h3>
+                <h3 class="font-bold text-lg text-blue-800">Cập nhật dữ liệu Web</h3>
                 <button onclick="closeDataModal()" class="text-gray-500 hover:text-red-500 font-bold text-2xl px-2 leading-none">&times;</button>
             </div>
             <div class="p-5 flex flex-col space-y-4">
@@ -128,27 +121,25 @@
                 <div class="bg-gray-50 border border-gray-200 p-3 rounded-lg text-sm">
                     <label class="block font-bold text-gray-700 mb-1.5">Đổi tên khóa học:</label>
                     <div class="flex gap-2">
-                        <input type="text" id="course-title-input" class="flex-1 border border-gray-300 rounded px-2 py-1.5 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" placeholder="Nhập tên khóa học mới...">
+                        <input type="text" id="course-title-input" class="flex-1 border border-gray-300 rounded px-2 py-1.5 focus:outline-none focus:border-blue-500" placeholder="Nhập tên khóa học mới...">
                         <button onclick="saveCourseTitle()" class="bg-blue-600 text-white px-4 py-1.5 rounded font-bold hover:bg-blue-700 transition-colors shadow-sm">Lưu</button>
                     </div>
                 </div>
 
                 <div class="bg-blue-50 text-blue-800 p-3 rounded-lg text-sm border border-blue-200 leading-relaxed">
-                    <b>Nạp dữ liệu trắc nghiệm:</b><br/>
-                    Dữ liệu sẽ được lưu tự động lên Web. Các máy khác khi mở link này sẽ ngay lập tức được sử dụng.
+                    <b>Đồng bộ Đám mây (Cloud Sync):</b><br/>
+                    File tải lên sẽ được đẩy trực tiếp lên Database. Các máy tính khác khi mở tên miền của bạn sẽ tự động lấy dữ liệu mới nhất.
                 </div>
                 
-                <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:bg-gray-50 transition-colors">
+                <div class="border-2 border-dashed border-blue-400 bg-blue-50/50 rounded-lg p-6 text-center hover:bg-blue-100 transition-colors cursor-pointer" onclick="document.getElementById('docx-upload').click()">
                     <input type="file" id="docx-upload" accept=".docx" class="hidden" onchange="processWordFile(event)">
-                    <label for="docx-upload" class="cursor-pointer flex flex-col items-center justify-center">
-                        <span class="text-4xl mb-2">📄</span>
-                        <span class="font-bold text-blue-600 mb-1">Bấm để chọn file Word (.docx)</span>
-                        <span class="text-xs text-gray-500">Tự động đẩy lên Cloud cho mọi người dùng</span>
-                    </label>
+                    <span class="text-4xl mb-2 block">☁️📄</span>
+                    <span class="font-bold text-blue-700 mb-1 block">Tải lên File Word (.docx)</span>
+                    <span class="text-xs text-gray-600">Phân tích và đẩy lên Database</span>
                 </div>
                 
-                <div id="loading-indicator" class="hidden text-center text-sm font-bold text-blue-600 animate-pulse">
-                    Đang xử lý và đồng bộ Cloud, vui lòng đợi...
+                <div id="loading-indicator" class="hidden text-center text-sm font-bold text-blue-600 animate-pulse bg-blue-100 p-2 rounded">
+                    Đang xử lý và đồng bộ, vui lòng đợi...
                 </div>
             </div>
             <div class="p-3 border-t bg-gray-50 rounded-b-lg flex justify-end">
@@ -157,21 +148,28 @@
         </div>
     </div>
 
-    <!-- KHỐI JAVASCRIPT MODULE (Firebase Cloud Integration) -->
+    <!-- ============================================================== -->
+    <!-- JAVASCRIPT & FIREBASE CLOUD SETUP -->
+    <!-- ============================================================== -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // ================= 1. TRẠNG THÁI APP =================
-        const defaultRawData = [
-            {
-                qText: "Dữ liệu chưa được cập nhật từ Admin. Hãy đăng nhập mục DATA để tải file lên hệ thống Web.",
-                answers: ["...", "...", "...", "..."],
-                correctIdx: 0,
-                explanation: ""
-            }
-        ];
+        // =========================================================================
+        // HƯỚNG DẪN CẤU HÌNH ĐÁM MÂY (DÀNH CHO TÊN MIỀN RIÊNG CCDT.AI-VCA.COM)
+        // 1. Vào firebase.google.com -> Tạo 1 Project mới
+        // 2. Bấm vào biểu tượng Web (</>) -> Copy đoạn config dán vào biến bên dưới.
+        // 3. Bật Firestore Database (Start in test mode) & Authentication (Bật Anonymous).
+        // =========================================================================
+        const MY_FIREBASE_CONFIG = null; // Xóa chữ null và dán { apiKey: "...", authDomain: "..." } của bạn vào đây
+        const MY_APP_ID = "quiz-app-can-tho"; 
+
+        // ================= TRẠNG THÁI APP =================
+        const defaultRawData = [{
+            qText: "Dữ liệu trống. Hãy đăng nhập mục DATA để tải file câu hỏi lên.",
+            answers: ["Đáp án mẫu"], correctIdx: 0, explanation: ""
+        }];
 
         let allQuestions = defaultRawData;
         let quizQuestions = [];
@@ -182,69 +180,86 @@
         
         let db, auth, appId;
         const courseTitleEl = document.getElementById('course-title');
+        const cloudStatusEl = document.getElementById('cloud-status');
 
-        // ================= 2. FIREBASE SETUP & SYNC =================
+        // ================= FIREBASE SETUP & KẾT NỐI =================
+        const fallbackToLocal = () => {
+            cloudStatusEl.classList.remove('hidden');
+            courseTitleEl.innerText = localStorage.getItem('quizCourseTitle') || "Chứng Chỉ Đấu Thầu (OFFLINE)";
+            allQuestions = JSON.parse(localStorage.getItem('quizParsedData')) || defaultRawData;
+            window.initQuiz();
+        };
+
         const setupFirebase = async () => {
-            if (typeof __firebase_config !== 'undefined' && __firebase_config) {
-                const firebaseConfig = JSON.parse(__firebase_config);
-                const app = initializeApp(firebaseConfig);
-                auth = getAuth(app);
-                db = getFirestore(app);
-                appId = typeof __app_id !== 'undefined' ? __app_id : 'default-quiz-app';
+            let configToUse = null;
 
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
+            // Kiểm tra xem người dùng đã điền cấu hình riêng chưa
+            if (MY_FIREBASE_CONFIG && typeof MY_FIREBASE_CONFIG === 'object') {
+                configToUse = MY_FIREBASE_CONFIG;
+                appId = MY_APP_ID;
+            } else if (typeof __firebase_config !== 'undefined' && __firebase_config) {
+                // Môi trường nội bộ của hệ thống AI
+                configToUse = JSON.parse(__firebase_config);
+                appId = typeof __app_id !== 'undefined' ? __app_id : MY_APP_ID;
+            }
 
-                onAuthStateChanged(auth, (user) => {
-                    if (!user) return;
-                    
-                    // Lắng nghe dữ liệu realtime từ Cloud
-                    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'quizState', 'main');
-                    onSnapshot(docRef, (docSnap) => {
-                        if (docSnap.exists()) {
-                            const data = docSnap.data();
-                            if (data.questions) {
-                                allQuestions = JSON.parse(data.questions);
-                            }
-                            if (data.title) {
-                                courseTitleEl.innerText = data.title;
-                                document.title = "Quiz: " + data.title;
-                            }
-                            
-                            // Re-render UI based on new cloud data
-                            isReviewRendered = false; 
-                            if(!document.getElementById('tab-quiz').classList.contains('hidden')) {
-                                initQuiz();
+            if (configToUse) {
+                try {
+                    const app = initializeApp(configToUse);
+                    auth = getAuth(app);
+                    db = getFirestore(app);
+
+                    // Đăng nhập bảo mật
+                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                        await signInWithCustomToken(auth, __initial_auth_token);
+                    } else {
+                        await signInAnonymously(auth);
+                    }
+
+                    onAuthStateChanged(auth, (user) => {
+                        if (!user) return;
+                        
+                        // Lắng nghe dữ liệu Realtime
+                        const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'quizState', 'main');
+                        onSnapshot(docRef, (docSnap) => {
+                            if (docSnap.exists()) {
+                                const data = docSnap.data();
+                                if (data.questions) allQuestions = JSON.parse(data.questions);
+                                if (data.title) {
+                                    courseTitleEl.innerText = data.title;
+                                    document.title = "Quiz: " + data.title;
+                                }
+                                
+                                isReviewRendered = false; 
+                                if(!document.getElementById('tab-quiz').classList.contains('hidden')) {
+                                    window.initQuiz();
+                                } else {
+                                    window.renderReview(document.getElementById('search-input').value);
+                                    isReviewRendered = true;
+                                }
                             } else {
-                                renderReview(document.getElementById('search-input').value);
-                                isReviewRendered = true;
+                                courseTitleEl.innerText = "Hệ Thống Trắc Nghiệm Cần Thơ";
+                                window.initQuiz();
                             }
-                        } else {
-                            courseTitleEl.innerText = "Hệ Thống Trắc Nghiệm Tương Tác";
-                            initQuiz();
-                        }
-                    }, (error) => {
-                        console.error("Lỗi đồng bộ Cloud:", error);
-                        initQuiz();
+                        }, (error) => {
+                            console.error("Lỗi đồng bộ:", error);
+                            fallbackToLocal();
+                        });
                     });
-                });
+                } catch(e) {
+                    console.error("Firebase lỗi:", e);
+                    fallbackToLocal();
+                }
             } else {
-                // Fallback nếu chạy ở môi trường không có Firebase
-                courseTitleEl.innerText = localStorage.getItem('quizCourseTitle') || "Hệ Thống Trắc Nghiệm Tương Tác";
-                allQuestions = JSON.parse(localStorage.getItem('quizParsedData')) || defaultRawData;
-                initQuiz();
+                fallbackToLocal(); // Chạy trên web cá nhân nhưng chưa cấu hình Cloud
             }
         };
 
-        // Hàm Đẩy dữ liệu lên Cloud
         async function syncToCloud(questionsData, titleStr) {
             if (db && auth && auth.currentUser) {
                 try {
                     const indicator = document.getElementById('loading-indicator');
-                    indicator.innerText = "Đang đẩy dữ liệu lên Cloud...";
+                    indicator.innerText = "Đang đẩy dữ liệu lên Database...";
                     indicator.classList.remove('hidden');
                     
                     const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'quizState', 'main');
@@ -255,11 +270,11 @@
                     
                     indicator.classList.add('hidden');
                 } catch (e) {
-                    console.error("Lỗi lưu Cloud:", e);
-                    alert("Có lỗi khi đẩy dữ liệu lên Cloud.");
+                    console.error("Lỗi lưu:", e);
+                    alert("Có lỗi khi đẩy lên máy chủ. Đã lưu bản sao vào máy này.");
+                    localStorage.setItem('quizParsedData', JSON.stringify(questionsData));
                 }
             } else {
-                // Fallback local storage
                 localStorage.setItem('quizParsedData', JSON.stringify(questionsData));
                 localStorage.setItem('quizCourseTitle', titleStr);
             }
@@ -267,87 +282,76 @@
 
         setupFirebase();
 
-        // ================= 3. QUẢN LÝ MODAL =================
-        window.openPassModal = function() {
-            const modal = document.getElementById('pass-modal');
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
+        // ================= GIAO DIỆN MODAL =================
+        window.openPassModal = () => {
+            document.getElementById('pass-modal').classList.remove('hidden');
+            document.getElementById('pass-modal').classList.add('flex');
             document.getElementById('pass-input').focus();
         };
 
-        window.closePassModal = function() {
-            const modal = document.getElementById('pass-modal');
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
+        window.closePassModal = () => {
+            document.getElementById('pass-modal').classList.add('hidden');
+            document.getElementById('pass-modal').classList.remove('flex');
             document.getElementById('pass-input').value = '';
         };
 
-        window.verifyPass = function() {
+        window.verifyPass = () => {
             const pass = document.getElementById('pass-input').value;
             if (pass === "Chaulenba") {
-                closePassModal();
-                document.getElementById('course-title-input').value = courseTitleEl.innerText;
-                const dataModal = document.getElementById('data-modal');
-                dataModal.classList.remove('hidden');
-                dataModal.classList.add('flex');
+                window.closePassModal();
+                const actualTitle = courseTitleEl.innerText.replace("Đang tải dữ liệu Cloud...", "");
+                document.getElementById('course-title-input').value = actualTitle;
+                document.getElementById('data-modal').classList.remove('hidden');
+                document.getElementById('data-modal').classList.add('flex');
             } else {
-                alert("Mật khẩu không đúng!");
+                alert("Sai mật khẩu truy cập!");
             }
         };
 
-        window.closeDataModal = function() {
-            const dataModal = document.getElementById('data-modal');
-            dataModal.classList.add('hidden');
-            dataModal.classList.remove('flex');
+        window.closeDataModal = () => {
+            document.getElementById('data-modal').classList.add('hidden');
+            document.getElementById('data-modal').classList.remove('flex');
         };
 
-        window.saveCourseTitle = async function() {
+        window.saveCourseTitle = async () => {
             const newTitle = document.getElementById('course-title-input').value.trim();
             if (newTitle) {
                 courseTitleEl.innerText = newTitle;
                 await syncToCloud(allQuestions, newTitle);
-                showToast("Đã lưu Tên lên Web!");
+                window.showToast("Đã cập nhật Tên khóa học!");
             } else {
-                alert("Tên khóa học không được để trống!");
+                alert("Tên không được để trống!");
             }
         };
 
-        document.getElementById('pass-input').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') verifyPass();
+        document.getElementById('pass-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') window.verifyPass();
         });
 
-        // ================= 4. XỬ LÝ ĐỌC FILE WORD =================
+        // ================= XỬ LÝ FILE WORD (MAMMOTH) =================
         window.processWordFile = function(event) {
             const file = event.target.files[0];
             if (!file) return;
 
-            document.getElementById('loading-indicator').innerText = "Đang phân tích cấu trúc file...";
+            document.getElementById('loading-indicator').innerText = "Đang đọc cấu trúc file Word...";
             document.getElementById('loading-indicator').classList.remove('hidden');
 
             const reader = new FileReader();
             reader.onload = function(e) {
-                const arrayBuffer = e.target.result;
-                mammoth.convertToHtml({arrayBuffer: arrayBuffer})
+                mammoth.convertToHtml({arrayBuffer: e.target.result})
                     .then(async function(result) {
-                        const html = result.value;
-                        const parsedData = parseHtmlData(html);
-                        
+                        const parsedData = parseHtmlData(result.value);
                         if(parsedData.length > 0) {
                             allQuestions = parsedData;
                             const title = document.getElementById('course-title-input').value.trim() || courseTitleEl.innerText;
-                            
-                            // Đẩy lên Cloud
                             await syncToCloud(allQuestions, title);
-                            
-                            showToast(`Thành công! Cloud đã nhận ${parsedData.length} câu.`);
-                            closeDataModal();
+                            window.showToast(`Đã đồng bộ ${parsedData.length} câu hỏi lên Web!`);
+                            window.closeDataModal();
                         } else {
-                            alert("Không tìm thấy cấu trúc câu hỏi (Câu X:, A, B, C, D) trong file này!");
+                            alert("Không tìm thấy cấu trúc Câu hỏi hoặc In đậm trong file!");
                         }
                     })
-                    .catch(function(err) {
-                        alert("Lỗi đọc file: " + err.message);
-                    })
+                    .catch(err => alert("Lỗi đọc file: " + err.message))
                     .finally(() => {
                         document.getElementById('loading-indicator').classList.add('hidden');
                         document.getElementById('docx-upload').value = ''; 
@@ -358,110 +362,85 @@
 
         function parseHtmlData(htmlStr) {
             const parsed = [];
-            let text = htmlStr.replace(/<\/p>|<br\s*\/?>/gi, '\n');
-            text = text.replace(/<(?!strong|\/strong|b|\/b)[^>]+>/gi, '');
+            let text = htmlStr.replace(/<\/p>|<br\s*\/?>/gi, '\n').replace(/<(?!strong|\/strong|b|\/b)[^>]+>/gi, '');
             const blocks = text.split(/(?=Câu \d+[:\.])/);
 
             blocks.forEach(block => {
                 let lines = block.trim().split('\n');
-                let qText = "";
-                let answers = [];
-                let correctIdx = 0; 
-                let hasFoundCorrect = false;
+                let qText = "", answers = [], correctIdx = 0, hasFoundCorrect = false;
 
                 lines.forEach(line => {
                     line = line.trim();
                     if(!line) return;
-
                     let hasBoldTag = /<(strong|b)[^>]*>/i.test(line);
                     let cleanLine = line.replace(/<[^>]+>/g, '').trim();
 
                     const ansMatch = cleanLine.match(/^(A|B|C|D)\s*[:\.]\s*(.*)/i);
-                    const explicitAnsMatch = cleanLine.match(/^Đáp án:?\s*([A-D])/i);
-
                     if (ansMatch) {
                         answers.push(ansMatch[2]);
                         if (hasBoldTag && !hasFoundCorrect) {
                             correctIdx = answers.length - 1;
                             hasFoundCorrect = true;
                         }
-                    } else if (explicitAnsMatch) {
-                        correctIdx = explicitAnsMatch[1].toUpperCase().charCodeAt(0) - 65;
+                    } else if (cleanLine.match(/^Đáp án:?\s*([A-D])/i)) {
+                        correctIdx = cleanLine.match(/^Đáp án:?\s*([A-D])/i)[1].toUpperCase().charCodeAt(0) - 65;
                         hasFoundCorrect = true;
                     } else if (answers.length === 0) {
                         qText += (qText ? " " : "") + cleanLine;
                     }
                 });
-
-                if (qText && answers.length > 0) {
-                    parsed.push({
-                        qText: qText,
-                        answers: answers,
-                        correctIdx: correctIdx,
-                        explanation: ""
-                    });
-                }
+                if (qText && answers.length > 0) parsed.push({ qText, answers, correctIdx, explanation: "" });
             });
             return parsed;
         }
 
-        // ================= 5. TIỆN ÍCH =================
+        // ================= CÁC HÀM TIỆN ÍCH =================
         function removeDiacritics(str) {
             return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/g, "d").replace(/Đ/g, "D").toLowerCase();
         }
 
         function shuffleArray(array) {
-            let currentIndex = array.length, randomIndex;
-            while (currentIndex != 0) {
-                randomIndex = Math.floor(Math.random() * currentIndex);
-                currentIndex--;
-                [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+            let cur = array.length, rnd;
+            while (cur != 0) {
+                rnd = Math.floor(Math.random() * cur); cur--;
+                [array[cur], array[rnd]] = [array[rnd], array[cur]];
             }
             return array;
         }
 
-        function showToast(msg) {
-            const toast = document.getElementById('toast');
-            if(msg) toast.innerText = msg;
-            toast.classList.remove('invisible', 'opacity-0');
-            toast.classList.add('toast-show');
-            setTimeout(() => {
-                toast.classList.remove('toast-show');
-                toast.classList.add('invisible', 'opacity-0');
-            }, 3000);
-        }
+        window.showToast = (msg) => {
+            const t = document.getElementById('toast');
+            if(msg) t.innerText = msg;
+            t.classList.remove('invisible', 'opacity-0');
+            t.classList.add('toast-show');
+            setTimeout(() => { t.classList.remove('toast-show'); t.classList.add('invisible', 'opacity-0'); }, 3000);
+        };
 
-        // ================= 6. TABS & UI =================
-        window.switchTab = function(tab) {
-            const tabQuiz = document.getElementById('tab-quiz');
-            const tabReview = document.getElementById('tab-review');
-            const btnQuiz = document.getElementById('btn-tab-quiz');
-            const btnReview = document.getElementById('btn-tab-review');
-
+        window.switchTab = (tab) => {
+            const btnQuiz = document.getElementById('btn-tab-quiz'), btnRev = document.getElementById('btn-tab-review');
             if (tab === 'quiz') {
-                tabQuiz.classList.remove('hidden');
-                tabReview.classList.add('hidden');
-                btnQuiz.className = "flex-1 bg-white text-blue-700 font-bold py-1.5 rounded-t-md shadow-sm transition-colors text-sm";
-                btnReview.className = "flex-1 bg-blue-800 text-blue-100 font-bold py-1.5 rounded-t-md shadow-sm transition-colors text-sm hover:bg-blue-600";
+                document.getElementById('tab-quiz').classList.remove('hidden');
+                document.getElementById('tab-review').classList.add('hidden');
+                btnQuiz.className = "flex-1 bg-white text-blue-700 font-bold py-1.5 rounded-t-md shadow-sm text-sm";
+                btnRev.className = "flex-1 bg-blue-800 text-blue-100 font-bold py-1.5 rounded-t-md shadow-sm text-sm hover:bg-blue-600";
             } else {
-                tabQuiz.classList.add('hidden');
-                tabReview.classList.remove('hidden');
-                btnReview.className = "flex-1 bg-white text-blue-700 font-bold py-1.5 rounded-t-md shadow-sm transition-colors text-sm";
-                btnQuiz.className = "flex-1 bg-blue-800 text-blue-100 font-bold py-1.5 rounded-t-md shadow-sm transition-colors text-sm hover:bg-blue-600";
+                document.getElementById('tab-quiz').classList.add('hidden');
+                document.getElementById('tab-review').classList.remove('hidden');
+                btnRev.className = "flex-1 bg-white text-blue-700 font-bold py-1.5 rounded-t-md shadow-sm text-sm";
+                btnQuiz.className = "flex-1 bg-blue-800 text-blue-100 font-bold py-1.5 rounded-t-md shadow-sm text-sm hover:bg-blue-600";
                 
-                const revContainer = document.getElementById('review-container');
-                if (revContainer.children.length === 0 && !isReviewRendered) {
-                    renderReview();
+                if (document.getElementById('review-container').children.length === 0 && !isReviewRendered) {
+                    window.renderReview();
                     isReviewRendered = true;
                 }
             }
         };
 
-        // ================= 7. THI THỬ (QUIZ) =================
-        window.initQuiz = function() {
+        // ================= THI THỬ (CHỈ ĐẢO CÂU HỎI, KHÔNG ĐẢO ĐÁP ÁN) =================
+        window.initQuiz = () => {
             clearInterval(timerInterval);
             secondsElapsed = 0;
-            updateTimerDisplay();
+            document.getElementById('timer').innerText = "00:00";
             isSubmitted = false;
 
             document.getElementById('btn-submit-top').classList.remove('hidden');
@@ -471,28 +450,22 @@
             document.getElementById('btn-share').classList.add('hidden');
 
             let pool = [...allQuestions];
-            shuffleArray(pool); // Chỉ trộn thứ tự CÂU HỎI
+            shuffleArray(pool); // Chỉ xáo trộn thứ tự các câu hỏi
             let selected = pool.slice(0, 40); 
 
             quizQuestions = selected.map(q => {
-                // Không trộn mảng đáp án, giữ nguyên thứ tự A, B, C, D
+                // KHÔNG xáo trộn vị trí A, B, C, D nữa (giữ nguyên thứ tự gốc)
                 let ansObj = q.answers.map((text, idx) => ({ text: text, isCorrect: idx === q.correctIdx }));
                 return { qText: q.qText, originalAnswers: ansObj };
             });
 
-            renderQuiz();
-            startTimer();
-            loadHighScore();
-        };
-
-        function renderQuiz() {
             const container = document.getElementById('quiz-container');
             let html = '';
             const letters = ['A', 'B', 'C', 'D'];
 
             quizQuestions.forEach((q, index) => {
                 html += `
-                <div class="bg-white p-3 rounded shadow-sm border border-gray-100" id="qblock-${index}">
+                <div class="bg-white p-3 rounded shadow-sm border border-gray-100">
                     <p class="font-bold text-blue-800 mb-2">Câu ${index + 1}: <span class="text-gray-800 font-semibold">${q.qText.replace(/^Câu \d+:\s*/, '')}</span></p>
                     <div class="space-y-1.5 pl-1">
                         ${q.originalAnswers.map((ans, aIdx) => `
@@ -505,24 +478,22 @@
                 </div>`;
             });
             container.innerHTML = html;
-        }
+
+            startTimer();
+            loadHighScore();
+        };
 
         function startTimer() {
             timerInterval = setInterval(() => {
                 secondsElapsed++;
-                updateTimerDisplay();
+                const m = String(Math.floor(secondsElapsed / 60)).padStart(2, '0');
+                const s = String(secondsElapsed % 60).padStart(2, '0');
+                document.getElementById('timer').innerText = `${m}:${s}`;
             }, 1000);
         }
 
-        function updateTimerDisplay() {
-            const m = String(Math.floor(secondsElapsed / 60)).padStart(2, '0');
-            const s = String(secondsElapsed % 60).padStart(2, '0');
-            document.getElementById('timer').innerText = `${m}:${s}`;
-        }
-
-        window.submitQuiz = function() {
+        window.submitQuiz = () => {
             if(isSubmitted) return;
-            
             const total = quizQuestions.length;
             let answeredCount = 0;
             
@@ -541,7 +512,6 @@
 
             quizQuestions.forEach((q, index) => {
                 const radios = document.getElementsByName(`question-${index}`);
-                
                 radios.forEach((radio, aIdx) => {
                     radio.disabled = true; 
                     const label = document.getElementById(`label-${index}-${aIdx}`);
@@ -567,48 +537,32 @@
             });
 
             let highScore = parseInt(localStorage.getItem('quizHighScore') || 0);
-            if (score > highScore) {
-                localStorage.setItem('quizHighScore', score);
-                loadHighScore();
-            }
+            if (score > highScore) { localStorage.setItem('quizHighScore', score); loadHighScore(); }
 
-            document.getElementById('btn-submit-top').classList.add('hidden');
-            document.getElementById('btn-submit-bottom').classList.add('hidden');
-            document.getElementById('btn-retry-top').classList.remove('hidden');
-            document.getElementById('btn-retry-bottom').classList.remove('hidden');
+            document.getElementById('btn-submit-top').classList.add('hidden'); document.getElementById('btn-submit-bottom').classList.add('hidden');
+            document.getElementById('btn-retry-top').classList.remove('hidden'); document.getElementById('btn-retry-bottom').classList.remove('hidden');
             document.getElementById('btn-share').classList.remove('hidden');
 
             const timeStr = document.getElementById('timer').innerText;
             document.getElementById('timer').innerHTML = `<span class="text-green-600">${score}/${total}</span>`;
-            
-            const currentTitle = courseTitleEl.innerText;
-            window.lastResult = `📚 ${currentTitle}\n✅ Điểm: ${score}/${total}\n⏱️ Thời gian: ${timeStr}\nCùng thử sức nhé!`;
-            
+            window.lastResult = `📚 ${courseTitleEl.innerText}\n✅ Điểm: ${score}/${total}\n⏱️ Thời gian: ${timeStr}\nCùng thử sức nhé!`;
             window.scrollTo({ top: 0, behavior: 'smooth' });
         };
 
         function loadHighScore() {
-            let score = localStorage.getItem('quizHighScore') || 0;
-            document.getElementById('high-score').innerText = `Điểm cao: ${score}/40`;
+            document.getElementById('high-score').innerText = `Điểm cao: ${localStorage.getItem('quizHighScore') || 0}/40`;
         }
 
-        window.shareResult = function() {
+        window.shareResult = () => {
             if(!window.lastResult) return;
             const textarea = document.createElement("textarea");
-            textarea.value = window.lastResult;
-            document.body.appendChild(textarea);
-            textarea.select();
-            try {
-                document.execCommand('copy');
-                showToast("Đã copy kết quả!");
-            } catch (err) {
-                console.error("Copy failed");
-            }
-            document.body.removeChild(textarea);
+            textarea.value = window.lastResult; document.body.appendChild(textarea);
+            textarea.select(); document.execCommand('copy'); document.body.removeChild(textarea);
+            window.showToast("Đã copy kết quả!");
         };
 
-        // ================= 8. ÔN TẬP (REVIEW) =================
-        window.renderReview = function(keyword = '') {
+        // ================= ÔN TẬP =================
+        window.renderReview = (keyword = '') => {
             const container = document.getElementById('review-container');
             const cleanKeyword = removeDiacritics(keyword);
             const letters = ['A', 'B', 'C', 'D'];
@@ -616,7 +570,6 @@
             
             allQuestions.forEach(q => {
                 const searchString = removeDiacritics(q.qText + " " + q.answers.join(" "));
-                
                 if (cleanKeyword === '' || searchString.includes(cleanKeyword)) {
                     html += `
                     <div class="bg-white p-2.5 rounded shadow-sm border border-gray-200">
@@ -627,7 +580,6 @@
                                 const bgClass = isCorrect ? 'bg-blue-100 border-blue-300' : 'bg-gray-50 border-gray-100 text-gray-500';
                                 const textClass = isCorrect ? 'text-blue-900 font-semibold' : '';
                                 const icon = isCorrect ? '<span class="text-blue-600 ml-auto">✔️</span>' : '';
-                                
                                 return `
                                 <div class="flex items-start p-1.5 border rounded ${bgClass} ${textClass}">
                                     <span class="font-bold mr-2 w-4 shrink-0">${letters[idx]}.</span>
@@ -639,45 +591,26 @@
                     </div>`;
                 }
             });
-
-            if(html === '') {
-                html = `<div class="text-center text-gray-500 mt-10 p-4 bg-white rounded shadow">Không tìm thấy kết quả nào.</div>`;
-            }
-
-            container.innerHTML = html;
+            container.innerHTML = html || `<div class="text-center text-gray-500 mt-10 p-4 bg-white rounded shadow">Không tìm thấy kết quả.</div>`;
         };
 
         function highlightText(text, keyword) {
             if (!keyword.trim()) return text;
-            const escapeHTML = (str) => str.replace(/[&<>'"]/g, tag => ({
-                '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
-            }[tag]));
-            let safeText = escapeHTML(text);
-            const cleanText = removeDiacritics(safeText).toLowerCase();
-            const cleanKey = removeDiacritics(keyword).toLowerCase().trim();
+            let safeText = text.replace(/[&<>'"]/g, t => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[t]));
+            const cleanText = removeDiacritics(safeText).toLowerCase(), cleanKey = removeDiacritics(keyword).toLowerCase().trim();
             if(!cleanKey) return safeText;
-
-            let result = '';
-            let lastIdx = 0;
-            let idx = cleanText.indexOf(cleanKey);
-
+            let result = '', lastIdx = 0, idx = cleanText.indexOf(cleanKey);
             while (idx !== -1) {
-                result += safeText.substring(lastIdx, idx);
-                result += `<mark>${safeText.substring(idx, idx + keyword.length)}</mark>`;
-                lastIdx = idx + keyword.length;
-                idx = cleanText.indexOf(cleanKey, lastIdx);
+                result += safeText.substring(lastIdx, idx) + `<mark>${safeText.substring(idx, idx + keyword.length)}</mark>`;
+                lastIdx = idx + keyword.length; idx = cleanText.indexOf(cleanKey, lastIdx);
             }
-            result += safeText.substring(lastIdx);
-            return result;
+            return result + safeText.substring(lastIdx);
         }
 
         let searchTimeout;
-        window.handleSearch = function() {
+        window.handleSearch = () => {
             clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(() => {
-                const keyword = document.getElementById('search-input').value;
-                renderReview(keyword);
-            }, 250);
+            searchTimeout = setTimeout(() => { window.renderReview(document.getElementById('search-input').value); }, 250);
         };
     </script>
 </body>
