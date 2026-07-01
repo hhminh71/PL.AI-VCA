@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Quiz & Ôn Tập: Đấu Thầu</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Thư viện Mammoth.js để đọc trực tiếp file Word (.docx) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
     <style>
         body { 
@@ -41,12 +40,12 @@
     <header class="bg-blue-700 text-white px-2 pt-2 pb-0 flex-none shadow-md z-50">
         <div class="max-w-3xl mx-auto">
             <div class="flex justify-between items-start">
-                <div>
+                <div class="flex-1 pr-2">
                     <div class="text-[11px] italic text-blue-200 uppercase tracking-tight">Huấn luyện Đào tạo Cảng HKQT Cần Thơ</div>
-                    <h1 class="text-base md:text-lg font-bold mt-0.5 mb-2 leading-tight">Chứng Chỉ Nghiệp Vụ Chuyên Môn Về Đấu Thầu</h1>
+                    <h1 id="course-title" class="text-base md:text-lg font-bold mt-0.5 mb-2 leading-tight">Đang tải dữ liệu Cloud...</h1>
                 </div>
-                <button onclick="openDataModal()" class="bg-yellow-400 hover:bg-yellow-500 text-blue-900 font-bold px-2 py-1.5 rounded shadow-sm text-xs flex items-center gap-1 border border-yellow-300 mt-1 transition-colors">
-                    <span class="text-sm">📂</span> Nạp File Word
+                <button onclick="openPassModal()" class="bg-yellow-400 hover:bg-yellow-500 text-blue-900 font-bold px-3 py-1.5 rounded shadow-sm text-xs flex items-center gap-1 border border-yellow-300 mt-1 transition-colors shrink-0">
+                    <span class="text-sm">⚙️</span> DATA
                 </button>
             </div>
             
@@ -73,7 +72,9 @@
                     <button id="btn-retry-top" class="bg-yellow-500 active:bg-yellow-600 text-white px-3 py-1 rounded shadow-sm text-sm font-bold hidden" onclick="initQuiz()">Làm Lại</button>
                 </div>
             </div>
-            <div id="quiz-container" class="p-2 space-y-3 max-w-3xl mx-auto"></div>
+            <div id="quiz-container" class="p-2 space-y-3 max-w-3xl mx-auto">
+                <div class="text-center p-5 text-gray-500">Đang đồng bộ dữ liệu từ Cloud...</div>
+            </div>
             
             <div id="bottom-actions" class="p-3 flex justify-center space-x-2 max-w-3xl mx-auto mt-2 border-t border-gray-200">
                 <button id="btn-submit-bottom" class="bg-green-600 text-white px-6 py-2 rounded shadow font-bold w-full max-w-[150px]" onclick="submitQuiz()">Nộp Bài</button>
@@ -103,17 +104,38 @@
         Thành công!
     </div>
 
-    <!-- MODAL NHẬP DỮ LIỆU ĐA NĂNG -->
-    <div id="data-modal" class="fixed inset-0 bg-black/60 z-[200] hidden flex-col items-center justify-center p-3">
+    <!-- MODAL NHẬP MẬT KHẨU -->
+    <div id="pass-modal" class="fixed inset-0 bg-black/70 z-[500] hidden items-center justify-center p-4">
+        <div class="bg-white p-6 rounded-xl shadow-2xl w-full max-w-xs text-center">
+            <h3 class="font-bold mb-4 text-lg text-gray-800">Nhập mật khẩu</h3>
+            <input type="password" id="pass-input" class="w-full border border-gray-300 p-2.5 rounded mb-4 focus:outline-none focus:border-blue-500" placeholder="Nhập mật khẩu...">
+            <div class="flex gap-2">
+                <button onclick="closePassModal()" class="w-1/2 bg-gray-200 text-gray-700 py-2 rounded font-bold hover:bg-gray-300 transition-colors">Hủy</button>
+                <button onclick="verifyPass()" class="w-1/2 bg-blue-600 text-white py-2 rounded font-bold hover:bg-blue-700 transition-colors">Xác nhận</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL QUẢN LÝ DATA -->
+    <div id="data-modal" class="fixed inset-0 bg-black/60 z-[200] hidden items-center justify-center p-3">
         <div class="bg-white rounded-lg shadow-xl w-full max-w-md flex flex-col">
             <div class="p-3 border-b flex justify-between items-center bg-blue-50 rounded-t-lg">
-                <h3 class="font-bold text-lg text-blue-800">Cập nhật Ngân Hàng Câu Hỏi</h3>
+                <h3 class="font-bold text-lg text-blue-800">Quản lý DATA (Đám mây)</h3>
                 <button onclick="closeDataModal()" class="text-gray-500 hover:text-red-500 font-bold text-2xl px-2 leading-none">&times;</button>
             </div>
             <div class="p-5 flex flex-col space-y-4">
-                <div class="bg-blue-50 text-blue-800 p-3 rounded text-sm border border-blue-200 leading-relaxed">
-                    <b>Giải pháp tự động nhận diện in đậm:</b><br/>
-                    Hãy chọn trực tiếp file <b>.docx</b> gốc của bạn. Hệ thống sẽ tự phân tích và tìm ra đáp án được in đậm mà không cần bạn phải làm thủ công!
+                
+                <div class="bg-gray-50 border border-gray-200 p-3 rounded-lg text-sm">
+                    <label class="block font-bold text-gray-700 mb-1.5">Đổi tên khóa học:</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="course-title-input" class="flex-1 border border-gray-300 rounded px-2 py-1.5 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" placeholder="Nhập tên khóa học mới...">
+                        <button onclick="saveCourseTitle()" class="bg-blue-600 text-white px-4 py-1.5 rounded font-bold hover:bg-blue-700 transition-colors shadow-sm">Lưu</button>
+                    </div>
+                </div>
+
+                <div class="bg-blue-50 text-blue-800 p-3 rounded-lg text-sm border border-blue-200 leading-relaxed">
+                    <b>Nạp dữ liệu trắc nghiệm:</b><br/>
+                    Dữ liệu sẽ được lưu tự động lên Web. Các máy khác khi mở link này sẽ ngay lập tức được sử dụng.
                 </div>
                 
                 <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:bg-gray-50 transition-colors">
@@ -121,12 +143,12 @@
                     <label for="docx-upload" class="cursor-pointer flex flex-col items-center justify-center">
                         <span class="text-4xl mb-2">📄</span>
                         <span class="font-bold text-blue-600 mb-1">Bấm để chọn file Word (.docx)</span>
-                        <span class="text-xs text-gray-500">Tự động xử lý cấu trúc và chữ in đậm</span>
+                        <span class="text-xs text-gray-500">Tự động đẩy lên Cloud cho mọi người dùng</span>
                     </label>
                 </div>
                 
                 <div id="loading-indicator" class="hidden text-center text-sm font-bold text-blue-600 animate-pulse">
-                    Đang phân tích dữ liệu, vui lòng đợi...
+                    Đang xử lý và đồng bộ Cloud, vui lòng đợi...
                 </div>
             </div>
             <div class="p-3 border-t bg-gray-50 rounded-b-lg flex justify-end">
@@ -135,45 +157,64 @@
         </div>
     </div>
 
-    <!-- KHỐI JAVASCRIPT -->
-    <script>
-        // ================= 1. DỮ LIỆU & PARSER =================
-        // Dữ liệu mẫu (sẽ bị thay thế ngay khi bạn upload file)
+    <!-- KHỐI JAVASCRIPT MODULE (Firebase Cloud Integration) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // ================= 1. TRẠNG THÁI APP =================
         const defaultRawData = [
             {
-                qText: "Bạn chưa tải dữ liệu lên. Hãy bấm nút 'Nạp File Word' ở góc trên bên phải để bắt đầu.",
-                answers: ["Cách 1: Chọn file word", "Cách 2: Không có cách 2"],
+                qText: "Dữ liệu chưa được cập nhật từ Admin. Hãy đăng nhập mục DATA để tải file lên hệ thống Web.",
+                answers: ["...", "...", "...", "..."],
                 correctIdx: 0,
                 explanation: ""
             }
         ];
 
-        // Lấy dữ liệu từ LocalStorage (Lưu dạng Mảng JSON cho tối ưu)
-        let allQuestions = JSON.parse(localStorage.getItem('quizParsedData')) || defaultRawData;
+        let allQuestions = defaultRawData;
+        let quizQuestions = [];
+        let timerInterval;
+        let secondsElapsed = 0;
+        let isSubmitted = false;
+        let isReviewRendered = false;
+        
+        let db, auth, appId;
+        const courseTitleEl = document.getElementById('course-title');
 
-        // --- HÀM XỬ LÝ FILE WORD (MAMMOTH.JS) ---
-        function processWordFile(event) {
-            const file = event.target.files[0];
-            if (!file) return;
+        // ================= 2. FIREBASE SETUP & SYNC =================
+        const setupFirebase = async () => {
+            if (typeof __firebase_config !== 'undefined' && __firebase_config) {
+                const firebaseConfig = JSON.parse(__firebase_config);
+                const app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+                appId = typeof __app_id !== 'undefined' ? __app_id : 'default-quiz-app';
 
-            document.getElementById('loading-indicator').classList.remove('hidden');
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
 
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const arrayBuffer = e.target.result;
-                // Chuyển Docx sang HTML để giữ lại thẻ <strong> (in đậm)
-                mammoth.convertToHtml({arrayBuffer: arrayBuffer})
-                    .then(function(result) {
-                        const html = result.value;
-                        const parsedData = parseHtmlData(html);
-                        
-                        if(parsedData.length > 0) {
-                            allQuestions = parsedData;
-                            localStorage.setItem('quizParsedData', JSON.stringify(allQuestions));
+                onAuthStateChanged(auth, (user) => {
+                    if (!user) return;
+                    
+                    // Lắng nghe dữ liệu realtime từ Cloud
+                    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'quizState', 'main');
+                    onSnapshot(docRef, (docSnap) => {
+                        if (docSnap.exists()) {
+                            const data = docSnap.data();
+                            if (data.questions) {
+                                allQuestions = JSON.parse(data.questions);
+                            }
+                            if (data.title) {
+                                courseTitleEl.innerText = data.title;
+                                document.title = "Quiz: " + data.title;
+                            }
                             
-                            showToast(`Thành công! Nạp ${parsedData.length} câu hỏi.`);
-                            
-                            // Reset trạng thái
+                            // Re-render UI based on new cloud data
                             isReviewRendered = false; 
                             if(!document.getElementById('tab-quiz').classList.contains('hidden')) {
                                 initQuiz();
@@ -181,6 +222,124 @@
                                 renderReview(document.getElementById('search-input').value);
                                 isReviewRendered = true;
                             }
+                        } else {
+                            courseTitleEl.innerText = "Hệ Thống Trắc Nghiệm Tương Tác";
+                            initQuiz();
+                        }
+                    }, (error) => {
+                        console.error("Lỗi đồng bộ Cloud:", error);
+                        initQuiz();
+                    });
+                });
+            } else {
+                // Fallback nếu chạy ở môi trường không có Firebase
+                courseTitleEl.innerText = localStorage.getItem('quizCourseTitle') || "Hệ Thống Trắc Nghiệm Tương Tác";
+                allQuestions = JSON.parse(localStorage.getItem('quizParsedData')) || defaultRawData;
+                initQuiz();
+            }
+        };
+
+        // Hàm Đẩy dữ liệu lên Cloud
+        async function syncToCloud(questionsData, titleStr) {
+            if (db && auth && auth.currentUser) {
+                try {
+                    const indicator = document.getElementById('loading-indicator');
+                    indicator.innerText = "Đang đẩy dữ liệu lên Cloud...";
+                    indicator.classList.remove('hidden');
+                    
+                    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'quizState', 'main');
+                    await setDoc(docRef, {
+                        questions: JSON.stringify(questionsData),
+                        title: titleStr
+                    });
+                    
+                    indicator.classList.add('hidden');
+                } catch (e) {
+                    console.error("Lỗi lưu Cloud:", e);
+                    alert("Có lỗi khi đẩy dữ liệu lên Cloud.");
+                }
+            } else {
+                // Fallback local storage
+                localStorage.setItem('quizParsedData', JSON.stringify(questionsData));
+                localStorage.setItem('quizCourseTitle', titleStr);
+            }
+        }
+
+        setupFirebase();
+
+        // ================= 3. QUẢN LÝ MODAL =================
+        window.openPassModal = function() {
+            const modal = document.getElementById('pass-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            document.getElementById('pass-input').focus();
+        };
+
+        window.closePassModal = function() {
+            const modal = document.getElementById('pass-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            document.getElementById('pass-input').value = '';
+        };
+
+        window.verifyPass = function() {
+            const pass = document.getElementById('pass-input').value;
+            if (pass === "Chaulenba") {
+                closePassModal();
+                document.getElementById('course-title-input').value = courseTitleEl.innerText;
+                const dataModal = document.getElementById('data-modal');
+                dataModal.classList.remove('hidden');
+                dataModal.classList.add('flex');
+            } else {
+                alert("Mật khẩu không đúng!");
+            }
+        };
+
+        window.closeDataModal = function() {
+            const dataModal = document.getElementById('data-modal');
+            dataModal.classList.add('hidden');
+            dataModal.classList.remove('flex');
+        };
+
+        window.saveCourseTitle = async function() {
+            const newTitle = document.getElementById('course-title-input').value.trim();
+            if (newTitle) {
+                courseTitleEl.innerText = newTitle;
+                await syncToCloud(allQuestions, newTitle);
+                showToast("Đã lưu Tên lên Web!");
+            } else {
+                alert("Tên khóa học không được để trống!");
+            }
+        };
+
+        document.getElementById('pass-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') verifyPass();
+        });
+
+        // ================= 4. XỬ LÝ ĐỌC FILE WORD =================
+        window.processWordFile = function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            document.getElementById('loading-indicator').innerText = "Đang phân tích cấu trúc file...";
+            document.getElementById('loading-indicator').classList.remove('hidden');
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const arrayBuffer = e.target.result;
+                mammoth.convertToHtml({arrayBuffer: arrayBuffer})
+                    .then(async function(result) {
+                        const html = result.value;
+                        const parsedData = parseHtmlData(html);
+                        
+                        if(parsedData.length > 0) {
+                            allQuestions = parsedData;
+                            const title = document.getElementById('course-title-input').value.trim() || courseTitleEl.innerText;
+                            
+                            // Đẩy lên Cloud
+                            await syncToCloud(allQuestions, title);
+                            
+                            showToast(`Thành công! Cloud đã nhận ${parsedData.length} câu.`);
                             closeDataModal();
                         } else {
                             alert("Không tìm thấy cấu trúc câu hỏi (Câu X:, A, B, C, D) trong file này!");
@@ -191,22 +350,16 @@
                     })
                     .finally(() => {
                         document.getElementById('loading-indicator').classList.add('hidden');
-                        document.getElementById('docx-upload').value = ''; // Reset input
+                        document.getElementById('docx-upload').value = ''; 
                     });
             };
             reader.readAsArrayBuffer(file);
-        }
+        };
 
-        // --- HÀM PHÂN TÍCH HTML (Tìm chữ In Đậm) ---
         function parseHtmlData(htmlStr) {
             const parsed = [];
-            
-            // Đưa HTML về dạng từng dòng (split theo <p> hoặc <br>)
             let text = htmlStr.replace(/<\/p>|<br\s*\/?>/gi, '\n');
-            // Xóa tất cả thẻ HTML ngoại trừ <strong> và <b> để giữ đánh dấu in đậm
             text = text.replace(/<(?!strong|\/strong|b|\/b)[^>]+>/gi, '');
-
-            // Cắt nội dung thành từng khối "Câu X:"
             const blocks = text.split(/(?=Câu \d+[:\.])/);
 
             blocks.forEach(block => {
@@ -220,32 +373,22 @@
                     line = line.trim();
                     if(!line) return;
 
-                    // 1. Kiểm tra xem dòng này có chứa thẻ in đậm không
                     let hasBoldTag = /<(strong|b)[^>]*>/i.test(line);
-                    
-                    // 2. Lấy nội dung text sạch (bỏ hết html tags) để so khớp
                     let cleanLine = line.replace(/<[^>]+>/g, '').trim();
 
-                    // 3. Regex kiểm tra xem dòng này có phải là Đáp án A, B, C, hay D không
                     const ansMatch = cleanLine.match(/^(A|B|C|D)\s*[:\.]\s*(.*)/i);
                     const explicitAnsMatch = cleanLine.match(/^Đáp án:?\s*([A-D])/i);
 
                     if (ansMatch) {
                         answers.push(ansMatch[2]);
-                        
-                        // Nếu dòng đáp án này có chứa chữ in đậm (trong file Word) => Đích thị là đáp án đúng!
                         if (hasBoldTag && !hasFoundCorrect) {
                             correctIdx = answers.length - 1;
                             hasFoundCorrect = true;
                         }
-                    } 
-                    else if (explicitAnsMatch) {
-                        // Trường hợp file ghi thẳng "Đáp án: A" ở cuối
+                    } else if (explicitAnsMatch) {
                         correctIdx = explicitAnsMatch[1].toUpperCase().charCodeAt(0) - 65;
                         hasFoundCorrect = true;
-                    } 
-                    else if (answers.length === 0) {
-                        // Nếu chưa gặp đáp án nào thì nó vẫn là phần nội dung Câu hỏi
+                    } else if (answers.length === 0) {
                         qText += (qText ? " " : "") + cleanLine;
                     }
                 });
@@ -262,13 +405,7 @@
             return parsed;
         }
 
-        // ================= 2. TRẠNG THÁI & HỆ THỐNG APP =================
-        let quizQuestions = [];
-        let timerInterval;
-        let secondsElapsed = 0;
-        let isSubmitted = false;
-        let isReviewRendered = false;
-
+        // ================= 5. TIỆN ÍCH =================
         function removeDiacritics(str) {
             return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/g, "d").replace(/Đ/g, "D").toLowerCase();
         }
@@ -283,8 +420,19 @@
             return array;
         }
 
-        // ================= 3. LOGIC UI TABS =================
-        function switchTab(tab) {
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            if(msg) toast.innerText = msg;
+            toast.classList.remove('invisible', 'opacity-0');
+            toast.classList.add('toast-show');
+            setTimeout(() => {
+                toast.classList.remove('toast-show');
+                toast.classList.add('invisible', 'opacity-0');
+            }, 3000);
+        }
+
+        // ================= 6. TABS & UI =================
+        window.switchTab = function(tab) {
             const tabQuiz = document.getElementById('tab-quiz');
             const tabReview = document.getElementById('tab-review');
             const btnQuiz = document.getElementById('btn-tab-quiz');
@@ -307,10 +455,10 @@
                     isReviewRendered = true;
                 }
             }
-        }
+        };
 
-        // ================= 4. TAB THI THỬ (QUIZ MODE) =================
-        function initQuiz() {
+        // ================= 7. THI THỬ (QUIZ) =================
+        window.initQuiz = function() {
             clearInterval(timerInterval);
             secondsElapsed = 0;
             updateTimerDisplay();
@@ -323,19 +471,19 @@
             document.getElementById('btn-share').classList.add('hidden');
 
             let pool = [...allQuestions];
-            shuffleArray(pool);
-            let selected = pool.slice(0, 40); // Lấy 40 câu
+            shuffleArray(pool); // Chỉ trộn thứ tự CÂU HỎI
+            let selected = pool.slice(0, 40); 
 
             quizQuestions = selected.map(q => {
+                // Không trộn mảng đáp án, giữ nguyên thứ tự A, B, C, D
                 let ansObj = q.answers.map((text, idx) => ({ text: text, isCorrect: idx === q.correctIdx }));
-                shuffleArray(ansObj);
-                return { qText: q.qText, shuffledAnswers: ansObj };
+                return { qText: q.qText, originalAnswers: ansObj };
             });
 
             renderQuiz();
             startTimer();
             loadHighScore();
-        }
+        };
 
         function renderQuiz() {
             const container = document.getElementById('quiz-container');
@@ -347,7 +495,7 @@
                 <div class="bg-white p-3 rounded shadow-sm border border-gray-100" id="qblock-${index}">
                     <p class="font-bold text-blue-800 mb-2">Câu ${index + 1}: <span class="text-gray-800 font-semibold">${q.qText.replace(/^Câu \d+:\s*/, '')}</span></p>
                     <div class="space-y-1.5 pl-1">
-                        ${q.shuffledAnswers.map((ans, aIdx) => `
+                        ${q.originalAnswers.map((ans, aIdx) => `
                             <label class="flex items-start space-x-2 p-1.5 border border-gray-100 rounded bg-gray-50 cursor-pointer hover:bg-blue-50 transition-colors" id="label-${index}-${aIdx}">
                                 <input type="radio" name="question-${index}" value="${ans.isCorrect}" class="mt-0.5 shrink-0">
                                 <span class="text-sm"><span class="font-bold text-gray-500">${letters[aIdx]}.</span> ${ans.text}</span>
@@ -372,13 +520,24 @@
             document.getElementById('timer').innerText = `${m}:${s}`;
         }
 
-        function submitQuiz() {
+        window.submitQuiz = function() {
             if(isSubmitted) return;
+            
+            const total = quizQuestions.length;
+            let answeredCount = 0;
+            
+            quizQuestions.forEach((q, index) => {
+                const radios = document.getElementsByName(`question-${index}`);
+                for(let r of radios) { if(r.checked) answeredCount++; }
+            });
+            
+            if(answeredCount < total) {
+                if(!confirm(`Bạn mới làm ${answeredCount}/${total} câu. Bạn có chắc chắn muốn nộp bài?`)) return;
+            }
+
             clearInterval(timerInterval);
             isSubmitted = true;
-            
             let score = 0;
-            const total = quizQuestions.length;
 
             quizQuestions.forEach((q, index) => {
                 const radios = document.getElementsByName(`question-${index}`);
@@ -422,15 +581,18 @@
             const timeStr = document.getElementById('timer').innerText;
             document.getElementById('timer').innerHTML = `<span class="text-green-600">${score}/${total}</span>`;
             
-            window.lastResult = `📚 Ôn tập Đấu Thầu Cần Thơ\n✅ Điểm: ${score}/${total}\n⏱️ Thời gian: ${timeStr}\nCùng thử sức nhé!`;
-        }
+            const currentTitle = courseTitleEl.innerText;
+            window.lastResult = `📚 ${currentTitle}\n✅ Điểm: ${score}/${total}\n⏱️ Thời gian: ${timeStr}\nCùng thử sức nhé!`;
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
 
         function loadHighScore() {
             let score = localStorage.getItem('quizHighScore') || 0;
             document.getElementById('high-score').innerText = `Điểm cao: ${score}/40`;
         }
 
-        function shareResult() {
+        window.shareResult = function() {
             if(!window.lastResult) return;
             const textarea = document.createElement("textarea");
             textarea.value = window.lastResult;
@@ -443,21 +605,10 @@
                 console.error("Copy failed");
             }
             document.body.removeChild(textarea);
-        }
+        };
 
-        function showToast(msg) {
-            const toast = document.getElementById('toast');
-            if(msg) toast.innerText = msg;
-            toast.classList.remove('invisible', 'opacity-0');
-            toast.classList.add('toast-show');
-            setTimeout(() => {
-                toast.classList.remove('toast-show');
-                toast.classList.add('invisible', 'opacity-0');
-            }, 3000);
-        }
-
-        // ================= 5. TAB ÔN TẬP (REVIEW MODE) =================
-        function renderReview(keyword = '') {
+        // ================= 8. ÔN TẬP (REVIEW) =================
+        window.renderReview = function(keyword = '') {
             const container = document.getElementById('review-container');
             const cleanKeyword = removeDiacritics(keyword);
             const letters = ['A', 'B', 'C', 'D'];
@@ -494,19 +645,16 @@
             }
 
             container.innerHTML = html;
-        }
+        };
 
         function highlightText(text, keyword) {
             if (!keyword.trim()) return text;
-            
             const escapeHTML = (str) => str.replace(/[&<>'"]/g, tag => ({
                 '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
             }[tag]));
-            
             let safeText = escapeHTML(text);
             const cleanText = removeDiacritics(safeText).toLowerCase();
             const cleanKey = removeDiacritics(keyword).toLowerCase().trim();
-            
             if(!cleanKey) return safeText;
 
             let result = '';
@@ -524,26 +672,13 @@
         }
 
         let searchTimeout;
-        function handleSearch() {
+        window.handleSearch = function() {
             clearTimeout(searchTimeout);
             searchTimeout = setTimeout(() => {
                 const keyword = document.getElementById('search-input').value;
                 renderReview(keyword);
             }, 250);
-        }
-
-        // ================= 6. MODAL DATA LOGIC =================
-        function openDataModal() {
-            document.getElementById('data-modal').classList.remove('hidden');
-            document.getElementById('data-modal').classList.add('flex');
-        }
-
-        function closeDataModal() {
-            document.getElementById('data-modal').classList.add('hidden');
-            document.getElementById('data-modal').classList.remove('flex');
-        }
-
-        initQuiz();
+        };
     </script>
 </body>
 </html>
