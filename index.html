@@ -1,759 +1,333 @@
-```html
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Quiz & Ôn Tập CNTT</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        /* Tối ưu thanh cuộn và các hiệu ứng nhỏ */
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: #f1f1f1; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-        input[type="radio"] { accent-color: #3b82f6; width: 1.1rem; height: 1.1rem; flex-shrink: 0; margin-top: 2px; }
-        mark { background-color: #fde047; color: #000; padding: 0 2px; border-radius: 2px; font-weight: 500; }
-        .tab-btn.active { border-bottom-width: 2px; border-color: #2563eb; color: #2563eb; font-weight: 700; background-color: #eff6ff; }
-        .toast-enter { animation: fade-in-up 0.3s ease-out forwards; }
-        @keyframes fade-in-up {
-            0% { opacity: 0; transform: translate(-50%, 20px); }
-            100% { opacity: 1; transform: translate(-50%, 0); }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VCA Visualizer - Phòng TC-KH</title>
+<style>
+    /* --- CẤU HÌNH GIAO DIỆN VCA (ACV STYLE) --- */
+    body, html { margin: 0; padding: 0; height: 100%; font-family: 'Segoe UI', Arial, sans-serif; background: #f5f7fa; display: flex; flex-direction: column;}
+    
+    /* Header */
+    .vca-header {
+        background: #0056b3; /* Xanh ACV */
+        color: white;
+        padding: 12px 20px;
+        border-bottom: 4px solid #d4af37; /* Vàng Gold */
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        flex-shrink: 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .vca-top { font-size: 11px; text-transform: uppercase; opacity: 0.8; letter-spacing: 0.5px; }
+    .vca-title { font-size: 13px; font-weight: 700; text-transform: uppercase; margin-top: 2px; }
+    .vca-badge { font-size: 12px; background: rgba(255,255,255,0.2); padding: 2px 8px; border-radius: 4px; display: inline-block; margin-top: 5px;}
+
+    /* Nút Tải Sơ Đồ */
+    .btn-download {
+        background: #d4af37; color: #002244; border: none; padding: 8px 15px; border-radius: 5px;
+        font-weight: bold; font-family: 'Segoe UI', sans-serif; font-size: 12px; cursor: pointer;
+        display: flex; align-items: center; gap: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        transition: all 0.2s ease;
+    }
+    .btn-download:hover { background: #e6c555; transform: translateY(-1px); }
+    .btn-download svg { width: 16px; height: 16px; fill: currentColor; }
+
+    /* Main Container */
+    .main-area { flex-grow: 1; position: relative; overflow: hidden; }
+    .markmap { width: 100%; height: 100vh; }
+
+    /* Footer */
+    .vca-footer { 
+        background: #e9ecef; color: #555; text-align: center; 
+        padding: 5px; font-size: 11px; flex-shrink: 0; border-top: 1px solid #ddd;
+    }
+</style>
+<style>.markmap-node-text { font-family: 'Segoe UI'; font-size: 14px; fill: #333; }</style>
 </head>
-<body class="bg-gray-100 text-gray-800 font-sans antialiased text-sm md:text-base leading-tight">
+<body>
 
-    <!-- HEADER -->
-    <header class="bg-white shadow-sm pt-2 pb-1 px-3 sticky top-0 z-40">
-        <div class="max-w-3xl mx-auto">
-            <div class="text-xs italic text-gray-500 mb-0.5">Huấn luyện Đào tạo Cảng HKQT Cần Thơ</div>
-            <div class="flex justify-between items-center mb-1">
-                <h1 class="text-lg md:text-xl font-bold text-gray-900 truncate">TRẮC NGHIỆM TỔNG HỢP</h1>
-                <div class="text-xs font-semibold text-blue-700 bg-blue-100 px-2 py-1 rounded shadow-inner whitespace-nowrap" id="highScoreDisplay">Điểm cao: 0/40</div>
-            </div>
-            <!-- TABS -->
-            <div class="flex border-b border-gray-200 mt-2">
-                <button onclick="switchTab('quiz')" id="tabQuiz" class="tab-btn active flex-1 py-1.5 text-center text-gray-600 font-medium transition-colors">Thi Thử (40)</button>
-                <button onclick="switchTab('review')" id="tabReview" class="tab-btn flex-1 py-1.5 text-center text-gray-600 font-medium transition-colors">Ôn Tập (Full)</button>
-            </div>
+    <div class="vca-header">
+        <div class="vca-header-left">
+            <div class="vca-top">Tổng công ty Cảng hàng không Việt Nam - CTCP</div>
+            <div class="vca-title">Cảng hàng không quốc tế Cần Thơ</div>
+            <div class="vca-badge">Phòng Tài chính - Kế hoạch | Triển khai văn bản</div>
         </div>
-    </header>
-
-    <main class="max-w-3xl mx-auto bg-white min-h-[85vh] shadow-md relative pb-16">
-        
-        <!-- TAB 1: THI THỬ -->
-        <div id="quizContainer" class="block">
-            <!-- Sticky Actions Top -->
-            <div class="sticky top-[86px] md:top-[90px] bg-white z-30 border-b border-gray-200 p-2 flex justify-between items-center shadow-sm">
-                <div class="font-mono text-lg font-bold text-red-600 bg-red-50 px-2 py-0.5 rounded border border-red-100 flex items-center gap-1">
-                    ⏱ <span id="timer">00:00</span>
-                </div>
-                <div class="flex gap-2">
-                    <button id="btnShareTop" onclick="shareScore()" class="hidden bg-green-500 hover:bg-green-600 text-white px-3 py-1.5 rounded font-semibold transition shadow-sm text-sm">Chia Sẻ</button>
-                    <button id="btnSubmitTop" onclick="submitQuiz()" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded font-semibold transition shadow-sm text-sm">Nộp Bài</button>
-                    <button onclick="restartQuiz()" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-3 py-1.5 rounded font-semibold transition shadow-sm text-sm">Làm Lại</button>
-                </div>
-            </div>
-
-            <!-- Quiz Questions -->
-            <div id="quizQuestions" class="p-2 space-y-3">
-                <!-- Nội dung câu hỏi thi sẽ render ở đây -->
-            </div>
-
-            <!-- Sticky Actions Bottom -->
-            <div class="border-t border-gray-200 p-3 bg-gray-50 flex justify-center items-center gap-3">
-                <button id="btnShareBottom" onclick="shareScore()" class="hidden bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded font-bold transition shadow text-base">Chia Sẻ Kết Quả</button>
-                <button id="btnSubmitBottom" onclick="submitQuiz()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded font-bold transition shadow text-base">Nộp Bài</button>
-                <button onclick="restartQuiz()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-6 py-2 rounded font-bold transition shadow text-base">Làm Lại Lần Nữa</button>
-            </div>
-        </div>
-
-        <!-- TAB 2: ÔN TẬP -->
-        <div id="reviewContainer" class="hidden">
-            <!-- Sticky Search -->
-            <div class="sticky top-[86px] md:top-[90px] bg-white z-30 border-b border-gray-200 p-2 shadow-sm">
-                <div class="relative">
-                    <input type="text" id="searchInput" oninput="onSearchInput(event)" placeholder="🔍 Tìm kiếm câu hỏi hoặc đáp án (không dấu)..." 
-                           class="w-full bg-gray-100 border border-gray-300 text-gray-900 rounded-md focus:ring-blue-500 focus:border-blue-500 block p-2 pl-8 text-sm outline-none transition-colors">
-                </div>
-                <div class="text-xs text-gray-500 mt-1 italic" id="searchCount">Đang hiển thị toàn bộ câu hỏi.</div>
-            </div>
-
-            <!-- Review Questions -->
-            <div id="reviewQuestions" class="p-2 space-y-2">
-                <!-- Nội dung ôn tập sẽ render ở đây -->
-            </div>
-        </div>
-    </main>
-
-    <!-- TOAST NOTIFICATION -->
-    <div id="toast" class="fixed bottom-5 left-1/2 -translate-x-1/2 bg-gray-900 text-white px-4 py-2 rounded shadow-lg text-sm font-medium z-50 hidden">
-        Đã copy kết quả!
+        <button class="btn-download" onclick="downloadFullMindmap()">
+            <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+            TẢI SƠ ĐỒ (FULL HD)
+        </button>
     </div>
 
-<script>
-/**
- * DỮ LIỆU RAW TEXT (Trích xuất từ PDF)
- * Lưu ý: Mặc định đáp án A (đáp án đầu tiên) được coi là ĐÚNG vì PDF không đánh dấu.
- * Nếu bạn muốn đổi đáp án đúng, chỉ cần thêm dấu * trước chữ A/B/C/D (Ví dụ: *B. Cấu tạo...)
- */
-const RAW_DATA = `
-Modul 1: Hiểu biết về CNTT cơ bản
-Câu 1: Phần cứng máy tính là gì?
-A. Cấu tạo của phần mềm về mặt logic
-B. Cấu tạo của phần mềm về mặt vật lý
-C. Các bộ phận cụ thể của máy tính về mặt vật lý như màn hình, chuột, bàn phím,...
-D. Cả 3 phương án đều sai
-Câu 2: Lựa chọn nào cho thấy máy tính xách tay có lợi thế hơn so với máy tính để bàn?
-A. Một máy tính xách tay có thể tái sử dụng các thành phần của nó có thể được sử dụng cho máy tính xách tay khác
-B. Sửa máy tính xách tay ít tốn kém hơn
-C. Máy tính xách tay có thể mang đi bất kì đâu
-D. Máy tính xách tay thường có kích thước lớn hơn máy tính để bàn
-Câu 3: Trong máy tính, PC là chữ viết tắt của từ nào?
-A. Performance Computer
-B. Personnal Connector
-C. Personal Computer
-D. Printing Computer
-Câu 4: Một loại máy tính có màn hình cảm ứng, khi sử dụng người dùng có thể dùng bút hoặc công cụ chọn để chạm vào, lựa chọn một đối tượng nào đó hoặc có thể nhập thông tin qua bàn phím ảo tích hợp trong máy là?
-A. Máy chủ
-B. Máy tính để bàn
-C. Máy tính bảng
-D. Máy tính FX500
-Câu 5: Điện thoại thông minh (smartphone) là gì?
-A. Hỗ trợ tất cả các kiểu hệ điều hành
-B. Bền hơn so với điện thoại di động khác
-C. Điện thoại tích hợp một nền tảng hệ điều hành di động với nhiều tính năng hỗ trợ tiên tiến
-D. Điện thoại chỉ có chức năng nghe và gọi
-Câu 6: Thiết bị ngoại vi của máy tính là thiết bị nào?
-A. Máy nghe nhạc Mp3
-B. Máy tính bảng
-C. Máy in
-D. Sách điện tử
-Câu 7: Các thiết bị dùng để nhập dữ liệu vào máy tính là?
-A. Loa máy tính
-B. Máy fax
-C. Bàn phím, máy ghi hình trực tiếp, chuột, máy quét
-D. Máy in
-Câu 8: Những thiết bị nào sau đây được xếp vào nhóm thiết bị ngoại vi?
-A. Mainboard, CPU, CD-ROM Drive, Chuột
-B. HDD, CD-ROM Drive, FDD, bàn phím
-C. Bàn phím, chuột, màn hình, máy in
-D. Màn hình, CPU, RAM, Main
-Câu 9: Các thành phần: RAM, CPU, thiết bị nhập xuất là?
-A. Phần mềm máy tính
-B. Thiết bị lưu trữ
-C. Phần cứng máy tính
-D. Thiết bị mạng và truyền thông
-Câu 10: Thuật ngữ “RAM” là từ viết tắt của cụm từ?
-A. Read Access Memory
-B. Recent Access Memory
-C. Random Access Memory
-D. Read And Modify
-Câu 11: ROM là bộ nhớ gì?
-A. Bộ nhớ tạm thời
-B. Bộ nhớ đọc, ghi
-C. Bộ nhớ chỉ đọc
-D. Bộ nhớ ngoài
-Câu 12: CPU là gì?
-A. Thiết bị lưu trữ của máy tính
-B. Thiết bị nhập liệu của máy tính
-C. Bộ xử lý trung tâm của máy tính
-D. Thiết bị hiển thị của máy tính
-Câu 13: MB (Megabyte) là đơn vị đo gì?
-A. Đo tốc độ mạng
-B. Đo tốc độ của nguồn máy tính
-C. Đo dung lượng của thiết bị lưu trữ như đĩa cứng
-D. Độ phân giải màn hình
-Câu 14: ROM là viết tắt của từ gì?
-A. Random Only Memory
-B. Read One Memory
-C. Read Only Memory
-D. Random One Memory
-Câu 15: Phát biểu nào là đúng khi nói đến CPU?
-A. CPU được tạo bởi bộ nhớ RAM và ROM
-B. CPU lưu trữ các phần mềm người sử dụng
-C. CPU là viết tắt của Processing Unit, là đơn vị xử lý trung tâm được tích hợp trong một chip được gọi là một vi xử lý, để xử lý dữ liệu và dịch các lệnh của chương trình
-D. CPU thường được tích hợp với một chip gọi là vi xử lý
-Câu 16: Đơn vị tính nhỏ nhất của máy tính là gì?
-A. Byte
-B. Megabyte
-C. Bit
-D. Terabyte
-Câu 17: Bit là gì?
-A. Là đơn vị nhỏ nhất của thông tin được sử dụng trong máy tính
-B. Là một phần tử nhỏ mang một trong 2 giá trị 0 và 1
-C. Tất cả các đáp án đều đúng
-D. Là một đơn vị đo thông tin
-Câu 18: 1 byte bằng?
-A. 2 bit
-B. 10 bit
-C. 8 bit
-D. 16 bit
-Câu 19: 1 KB bằng?
-A. 1000 bit
-B. 1024 bit
-C. 1024 byte
-D. 1000 byte
-Câu 20: CPU làm những công việc chủ yếu nào?
-A. Lưu trữ dữ liệu
-B. Nhập dữ liệu
-C. Xử lý dữ liệu
-D. Xuất dữ liệu
-Câu 21: Kể tên các loại bộ nhớ trong?
-A. Bộ nhớ truy cập ngẫu nhiên (RAM)
-B. Bộ nhớ chỉ đọc (ROM)
-C. Bộ nhớ truy cập ngẫu nhiên (RAM) và bộ nhớ chỉ đọc (ROM)
-D. Đĩa cứng (Hard disk)
-Câu 22: Các thiết bị nào có thể thiếu trong một bộ máy tính?
-A. Bộ nguồn
-B. Bộ nhớ RAM
-C. đĩa mềm
-D. Màn hình
-Câu 23: Cấu trúc chung của máy tính gồm có những khối chức năng nào?
-A. Bộ xử lý trung tâm, bộ nhớ
-B. Bộ nhớ, thiết bị nhập/xuất, màn hình
-C. Bộ xử lý trung tâm, bộ nhớ, thiết bị nhập/xuất
-D. Bộ xử lý trung tâm, bộ nhớ, thiết bị nhập
-Câu 24: Các thành phần cơ bản của 1 máy tính?
-A. CPU, các thiết bị lưu trữ, bộ nhớ
-B. CPU, bộ nhớ, các thiết bị nhập dữ liệu
-C. CPU, các thiết bị lưu trữ, bộ nhớ, các thiết bị nhập và các thiết bị xuất dữ liệu
-D. Bộ nhớ, các thiết bị nhập, thiết bị xuất dữ liệu và con người
-Câu 25: Phát biểu nào là đúng khi nói đến bộ nhớ RAM và ROM??
-A. Bộ nhớ ROM thường được dùng bởi các chương trình ứng dụng để lưu trữ tạm thời. Bộ nhớ RAM được dùng để lưu các file dữ liệu
-B. Bộ nhớ RAM không bị xoá khi máy tính đã tắt. Bộ nhớ ROM bị xoá khi máy tính tắt
-C. Bộ nhớ RAM là bộ nhớ đọc và ghi, trong khi ROM là bộ nhớ chỉ đọc
-D. RAM và ROM là hai bộ nhớ truy cập ngẫu nhiên
-Câu 26: Khi đọc các thông số cấu hình của một máy tính thông thường: 2GHZ-320GB-4.00GB, con số 4.00GB chỉ điều gì?
-A. Chỉ tốc độ của bộ vi xử lý
-B. Chỉ dung lượng của đĩa cứng
-C. Chỉ dung lượng bộ nhớ truy cập ngẫu nhiên RAM
-D. Chỉ dung lượng của bộ nhớ chỉ đọc ROM
-Câu 27: Đâu là thiết bị lưu trữ dữ liệu?
-A. Máy in
-B. Webcam
-C. USB
-D. Cần điểu khiển
-Câu 28: Thành phần nào của máy tính có thể ngăn máy tính khởi động, nếu nó bị hư hỏng hoặc kết nối không đúng cách?
-A. Chuột
-B. Bàn phím
-C. đĩa cứng
-D. Máy in
-Câu 29: Nhóm nào sau đây bao gồm các thiết bị được xếp vào cùng loại?
-A. Đĩa cứng trong, máy in, các loại đĩa quang (CD, DVD), thẻ nhớ, ô nhớ di động
-B. Đĩa cứng trong, đĩa cứng ngoài, USB, thẻ nhớ, máy scan, nhớ di động
-C. Đĩa cứng trong, đĩa cứng ngoài, các loại đĩa quang (CD, DVD), thẻ nhớ, ô nhớ di động
-D. Máy in, máy scan, màn hình, loa
-Câu 30: Máy Scanner được kết nối với máy tính thông qua cổng nào sau đây?
-A. RJ 45
-B. Jack 3.5
-C. USB
-D. RJ 11
-Câu 31: Bàn phím máy tính là thiết bị nào trong các thiết bị sau?
-A. Thiết bị xuất thông tin
-B. Thiết bị nhập thông tin
-C. Thiết bị lưu trữ thông tin
-D. Thiết bị thoát thông tin
-Câu 32: Hãy chỉ ra đâu là thiết bị nhập?
-A. Máy in
-B. Máy quét
-C. Loa
-D. Màn hình
-Câu 33: Thiết bị nào thực hiện thao tác nhập dữ liệu trong số các thiết bị sau: Màn hình, máy in, máy vẽ, bàn phím, ô đĩa cứng, ô đĩa mềm, chuột, loa, máy quét?
-A. Máy in, màn hình, máy quét, chuột
-B. Bàn phím, chuột, máy quét
-C. Máy vẽ, ô đĩa cứng, ô đĩa mềm, bàn phím
-D. Máy quét, Loa, chuột, màn hình
-Câu 34: Máy điện tử dùng để thu và lưu giữ hình ảnh một cách tự động thay vì phải dùng phim ảnh là máy gì?
-A. Máy ảnh thường
-B. Máy ảnh kỹ thuật số
-C. Webcam
-D. Máy quét ảnh
-Câu 35: Máy in và máy quét, thiết bị nào là thiết bị nhập thông tin vào máy tính?
-A. Máy in
-B. Máy quét
-C. Cả hai
-D. Không cái nào
-Câu 36: Thiết bị nào không thể thiếu trong một máy tính?
-A. đĩa mềm
-B. CPU
-C. đĩa CD
-D. Máy in
-Câu 37: Các thiết bị: chuột, bàn phím, máy quét, thuộc khối chức năng nào?
-A. Thiết bị xuất
-B. Thiết bị nhập
-C. Khối xử lý
-D. Các thiết bị lưu trữ
-Câu 38: Hãy chọn nhóm có thiết bị không cùng nhóm với những thiết bị còn lại?
-A. Bàn phím, chuột, máy quét, máy in, máy chiếu
-B. Bàn phím, chuột, máy scan, máy quét
-C. Máy scan, máy tính bảng, ò đĩa mềm (FDD)
-D. Màn hình, máy in, máy chủ, điện thoại thông minh
-Câu 39: Thiết bị nào thực hiện thao tác xuất ra dữ liệu trong số các thiết bị sau: Màn hình, máy in, bàn phím, máy chiếu, ô đĩa mềm, chuột, loa, máy quét?
-A. Bàn phím, chuột, máy quét, máy in
-B. Màn hình, Máy in, máy chiếu, loa
-C. Máy in, màn hình, máy quét, chuột
-D. Màn hình, ô đĩa cứng, ô đĩa mềm, bàn phím
-Câu 40: Thiết bị xuất để đưa ra kết quả đã xử lý cho người sử dụng. Các thiết bị xuất thông dụng hiện nay là?
-A. Màn hình, ò cứng
-B. Màn hình, màn hình cảm ứng, máy in, loa, tai nghe
-C. Máy in, ò mềm
-D. Màn hình, ò mềm
-Câu 41: Các thiết bị: màn hình, loa, máy in, thuộc khối chức năng nào?
-A. Thiết bị nhập
-B. Thiết bị xuất
-C. Khối xử lý
-D. Các thiết bị lưu trữ
-Câu 42: Hãy chọn nhóm có thiết bị không cùng nhóm với những thiết bị còn lại?
-A. Màn hình, máy in, bàn phím
-B. Màn hình, máy in, loa
-C. Máy in, bàn phím, chuột
-D. Máy in, máy scan, usb
-Câu 43: Phần mềm công cộng là gì?
-A. Là phần mềm có tính phí và bạn có thể chia sẻ cho những người khác mà không mất phí
-B. Là phần mềm không có bản quyền, bất cứ ai cũng có thể sử dụng miễn phí mà không bị hạn chế
-C. Là phần mềm dùng thử bị hạn chế về thời gian sử dụng và các tính năng sử dụng
-D. Là phần mềm có bản quyền và được thay đổi bởi bất cứ ai
-Câu 44: Đâu là một ví dụ về phần mềm hệ thống?
-A. Đĩa mềm
-B. Hệ điều hành
-C. Đĩa CD
-D. Bàn phím
-Câu 45: Phát biểu nào sau đây là đúng?
-A. Phần mềm là tập hợp của các thiết bị nhập như máy scan, bàn phím, chuột,...
-B. Phần mềm là một tập hợp những câu lệnh được viết bằng một hoặc nhiều ngôn ngữ lập trình, và các dữ liệu hay tài liệu liên quan nhằm tự động thực hiện một số nhiệm vụ hay chức năng
-C. Phần mềm là tập hợp của các thiết bị xuất như màn hình, máy in, máy chiếu,...
-D. Phần mềm là tập hợp của các thiết bị lưu trữ như ô cứng, đĩa mềm, USB,...
-Câu 46: Chương trình điều kiển thiết bị trong các đĩa CD kèm theo khi gắn thêm thiết bị ngoại vi cho máy tính thường gọi là gì?
-A. IOS
-B. Driver
-C. RAM
-D. ROM
-Câu 47: Chức năng chính của hệ điều hành (Operating System) là gì?
-A. Thực hiện các lệnh theo yêu cầu của người sử dụng
-B. Tất cả các đáp án đều đúng
-C. Quản lý, phân phối và thu hồi bộ nhớ
-D. Điều khiển các thiết bị ngoại vi như ô đĩa, máy in, bàn phím, màn hình
-Câu 48: Hãy chỉ ra tên của một số hệ điều hành?
-A. Linux, Turbo
-B. Linux, Windows, Mac OS
-C. Windows, Max
-D. Linux, Window
-Câu 49: Hệ thống nào là tập hợp các chương trình phần mềm chạy trên máy tính, dùng để điều hành, quản lý các thiết bị phần cứng và tài nguyên phần mềm trên máy tính?
-A. Phần mềm ứng dụng
-B. Hệ điều hành
-C. Phần cứng
-D. Các loại trình dịch trung gian
-Câu 50: Phần mềm nào dưới đây được cài đặt đầu tiên trong máy tính?
-A. Ms Office
-B. MS Windows
-C. FireFox
-D. Norton Antivirus
-Câu 51: Hãy kể tên một số hệ điều hành?
-A. Linux, Turbo
-B. Linux, Windows, Mac OS
-C. Windows, Max
-D. Mac OS, Window
-Câu 52: Phát biểu nào sau đây là đúng?
-A. Phần mềm ứng dụng không cần hệ điều hành để chạy
-B. Phần mềm ứng dụng cần hệ điều hành để chạy
-C. Hệ điều hành cần phần mềm ứng dụng để chạy
-D. Máy tính không cần hệ điều hành để chạy
-Câu 53: Hệ điều hành là?
-A. Trình duyệt web
-B. Phần mềm quản lý và phân phối tài nguyên máy tính phục vụ cho các ứng dụng
-C. Phần mềm tìm kiếm thông tin
-D. Phần mềm văn phòng
-Câu 54: Hệ điều hành nào sau đây không sử dụng cho máy tính?
-A. LINUX
-B. Android
-C. Windows 7
-D. WindowsXP
-Câu 55: Phần mềm Windows, Linux có đặc điểm gì chung?
-A. Tất cả đều là phần mềm ứng dụng
-B. Tất cả đều là phần mềm hệ điều hành
-C. Tất cả đều là dịch vụ dải tần rộng
-D. Tất cả đều là thiết bị phần cứng
-Câu 56: Trong các phần mềm sau, phần mềm nào là phần mềm ứng dụng?
-A. Windows 7
-B. Microsoft Word
-C. Linux
-D. Unix
-Câu 57: Hãy chọn phương án đúng để điền vào dấu 3 chấm: "... là một cấu trúc bao gồm tập hợp các thao tác và các kết quả tương quan sử dụng trong việc phát triển để sản xuất ra một sản phẩm phần mềm"
-A. Quy trình hoạt động của máy tính
-B. Quy trình phát triển phần mềm
-C. Quy trình sản xuất máy tính
-D. Quy trình lắp ráp máy tính
-Câu 58: Phát biểu nào chưa đúng?
-A. Phần mềm thương mại - Commercia Software: có đăng ký bản quyền, không cho phép sao chép dưới bất kỳ hình thức nào
-B. Phần mềm mã nguồn mở - Open Source Software: có đăng ký bản quyền, không cho phép sao chép dưới bất kỳ hình thức nào
-C. Phần mềm chia sẻ - Shareware: có bản quyền, dùng thử trước khi mua. Nếu muốn tiếp tục sử dụng chương trình thì được khuyến khích trả tiền cho tác giả
-D. Phần mềm miễn phí - Freeware: cho phép người khác tự do sử dụng hoàn toàn hoặc theo một số yêu cầu bắt buộc. Ví dụ kèm tên tác giả
-Câu 59: Phát biểu nào sau đây là sai?
-A. Phần mềm mã nguồn mở cho phép người dùng được sửa mã nguồn
-B. Phần mềm mã nguồn mở là phần mềm phải mua bản quyền để sử dụng
-C. Phần mềm mã nguồn mở là phần mềm miễn phí
-D. Phần mềm mã nguồn mở cho phép người dùng được chia sẻ cho người khác
-Câu 60: Phần mềm nào sau đây không phải là phần mềm mã nguồn mở?
-A. Ubuntu
-B. Microsoft Office
-C. Open Office
-D. Mozilla Firefox
-Câu 61: Phát biểu nào sau đây là đúng?
-A. Phần mềm mã nguồn mở gây hại cho người sử dụng
-B. Phần mềm mã nguồn mở không cho phép phân phối lại
-C. Phần mềm mã nguồn mở không có bản quyền
-D. Phần mềm mã nguồn mở không có bảo hành
-Câu 62: Thiết bị nào quyết định khả năng làm việc của máy tính?
-A. Chuột
-B. Bàn phím
-C. Máy in
-D. CPU
-Câu 63: Tốc độ của máy tính phụ thuộc vào các yếu tố nào sau đây?
-A. Tốc độ của bộ vi xử lý. Tốc độ, dung lượng và không gian trống của ô cứng
-B. Dung lượng bộ nhớ truy cập ngẫu nhiên RAM
-C. Hệ điều hành và quá trình tiến hành gom các tệp tin đã bị phân mảnh theo định kỳ
-D. Tất cả các đáp án đều đúng
-Câu 64: Tuỳ chọn nào cho phép cải thiện hiệu năng của máy tính?
-A. Thêm card mạng không dây
-B. Thêm các thiết bị không dây
-C. Tăng số cổng kết nối
-D. Nâng cấp RAM, CPU của máy tính
-Câu 65: Hành động nào nên thực hiện để tăng hiệu năng của máy tính?
-A. Thường xuyên khôi phục các tệp tin từ thùng rác
-B. Luôn giữ các chương trình của nhà sản xuất trên máy tính
-C. Chạy nhiều chương trình quét virus để tăng độ bảo vệ
-D. Loại bỏ các chương trình không bao giờ dùng và đóng bớt các ứng dụng cùng chạy tại một thời điểm
-`;
+    <div class="main-area">
+        <div class="markmap">
+            <script type="text/template">
+# DANH SÁCH VĂN BẢN PHÁP LUẬT THÁNG 06/2026 LIÊN QUAN ACV (Số: 16/PCKTNB)
 
-/** * LOGIC PARSE DỮ LIỆU BẰNG REGEX 
- * Cách này đảm bảo không phụ thuộc JSON, tránh lỗi cắt xén string khi quá dài.
- */
-function parseRawData(raw) {
-    const questions = [];
-    // Tách riêng từng block dựa trên cụm từ "Câu [số]:"
-    const blocks = raw.split(/(?=Câu \d+:)/);
-    
-    blocks.forEach(block => {
-        if (!block.trim()) return;
-        
-        // Tách dòng
-        const lines = block.split('\n').map(l => l.trim()).filter(l => l);
-        let qText = "";
-        let options = [];
-        let correctIndex = 0; // Mặc định đáp án 0 (A)
-        
-        lines.forEach(line => {
-            // Nhận diện dòng đáp án A. B. C. D. (Cũng bắt trường hợp có đánh dấu *A.)
-            const optMatch = line.match(/^(\*?[A-D])\.\s*(.*)$/i);
-            if (optMatch) {
-                let optLetter = optMatch[1].toUpperCase();
-                let isCorrect = optLetter.startsWith('*');
-                if (isCorrect) correctIndex = options.length;
-                options.push(optMatch[2]);
-            } else {
-                if (options.length === 0) {
-                    qText += (qText ? " " : "") + line;
-                } else {
-                    options[options.length - 1] += " " + line; // Gộp nối dòng dài
-                }
-            }
-        });
-        
-        if (qText && options.length > 0) {
-            questions.push({
-                question: qText.replace(/^Câu \d+:\s*/, ''), // Bỏ chữ Câu X:
-                options: options,
-                correctIndex: correctIndex
-            });
-        }
-    });
-    return questions;
-}
+## 0. THÔNG TIN HÀNH CHÍNH
+### Cơ quan ban hành
+- Ban Pháp chế và Kiểm toán nội bộ (ACV)
+- Người ký: Phó Trưởng ban Nguyễn Ngọc Anh
+- Ngày ký: 16/07/2026
+### Nơi nhận
+- Cảng HKQT Cần Thơ (Số đến: 1005, Ngày đến: 16/07/2026)
+- Các cơ quan, đơn vị thuộc TCT
+### Yêu cầu triển khai
+- Cập nhật, nghiên cứu, triển khai kịp thời, đảm bảo tuân thủ pháp luật
+- Nơi lưu trữ: Sharepoint Ban PCKTNB (truy cập bằng tài khoản Microsoft 365)
 
-// Bảng map bỏ dấu cực kỳ an toàn, bảo toàn length của chuỗi để highlight index không bị lệch
-const charMap = {
-    'á':'a','à':'a','ả':'a','ã':'a','ạ':'a','ă':'a','ắ':'a','ằ':'a','ẳ':'a','ẵ':'a','ặ':'a','â':'a','ấ':'a','ầ':'a','ẩ':'a','ẫ':'a','ậ':'a',
-    'đ':'d',
-    'é':'e','è':'e','ẻ':'e','ẽ':'e','ẹ':'e','ê':'e','ế':'e','ề':'e','ể':'e','ễ':'e','ệ':'e',
-    'í':'i','ì':'i','ỉ':'i','ĩ':'i','ị':'i',
-    'ó':'o','ò':'o','ỏ':'o','õ':'o','ọ':'o','ô':'o','ố':'o','ồ':'o','ổ':'o','ỗ':'o','ộ':'o','ơ':'o','ớ':'o','ờ':'o','ở':'o','ỡ':'o','ợ':'o',
-    'ú':'u','ù':'u','ủ':'u','ũ':'u','ụ':'u','ư':'u','ứ':'u','ừ':'u','ử':'u','ữ':'u','ự':'u',
-    'ý':'y','ỳ':'y','ỷ':'y','ỹ':'y','ỵ':'y'
-};
+## 1. LĨNH VỰC ĐẦU TƯ XÂY DỰNG & QUẢN LÝ DỰ ÁN
+### Nghị định 193/2026/NĐ-CP (Quyết toán vốn đầu tư dự án)
+#### Thời điểm
+- Ban hành: 01/06/2026
+- Áp dụng: 01/07/2026
+#### Quy định Quyết toán
+- Bao gồm toàn bộ chi phí hợp pháp, nằm trong giới hạn tổng mức đầu tư được duyệt/điều chỉnh
+- Áp dụng cho dự án thành phần, tiểu dự án, công trình, hạng mục độc lập
+#### Thẩm quyền phê duyệt & Thẩm tra
+- Phê duyệt: Người có thẩm quyền quyết định đầu tư
+- Thẩm tra: Sở Tài chính hoặc đơn vị có chức năng thuộc thẩm quyền quản lý
+#### Chi phí kiểm toán & Thời gian
+- Chi phí: Thuộc nội dung chi phí khác, tỷ lệ định mức tính theo giá trị dự án
+- Thời gian lập, thẩm tra, phê duyệt: Từ 4 - 9 tháng (tùy quy mô)
 
-function removeAccentsPreserveLength(str) {
-    return str.split('').map(c => {
-        const lower = c.toLowerCase();
-        if (charMap[lower]) return (c === c.toUpperCase()) ? charMap[lower].toUpperCase() : charMap[lower];
-        return c;
-    }).join('');
-}
+### Nghị định 206/2026/NĐ-CP (Quản lý chi phí đầu tư XD)
+#### Thời điểm
+- Ban hành: 15/06/2026
+- Có hiệu lực: 01/07/2026
+#### Cấu thành Tổng mức đầu tư
+- Gồm: Bồi thường/hỗ trợ/tái định cư, xây dựng, thiết bị, QLDA, tư vấn, chi phí khác, dự phòng
+#### Quản lý & Định mức
+- Thẩm định tổng mức đầu tư là một phần của Báo cáo NCKT
+- Giá XD gồm: Giá công tác, nhóm công tác, bộ phận, suất chi phí, suất vốn ĐTXD
+- Quy định rõ trách nhiệm Người Quyết định đầu tư, CĐT, Nhà thầu tư vấn, Nhà thầu thi công
 
-function escapeHTML(str) {
-    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-}
+### Nghị định 207/2026/NĐ-CP (Quản lý chất lượng và bảo trì)
+#### Thời điểm
+- Ban hành: 15/06/2026
+- Có hiệu lực: 01/07/2026
+#### Nội dung chính
+- Quản lý chất lượng, nghiệm thu công trình quy mô lớn, kỹ thuật phức tạp
+- Yêu cầu an toàn công trường, thi công, phá dỡ
+- Bàn giao, bảo hành, bảo trì
+- Quy định việc Dừng khai thác/sử dụng công trình để đảm bảo an toàn
 
-function highlightText(text, keyword) {
-    if (!keyword.trim()) return escapeHTML(text);
-    
-    const safeText = escapeHTML(text);
-    const normText = removeAccentsPreserveLength(safeText).toLowerCase();
-    const normKey = removeAccentsPreserveLength(keyword).toLowerCase();
-    
-    let result = '';
-    let lastIdx = 0;
-    let idx = normText.indexOf(normKey);
-    
-    while (idx !== -1) {
-        result += safeText.substring(lastIdx, idx);
-        result += `<mark>` + safeText.substring(idx, idx + normKey.length) + `</mark>`;
-        lastIdx = idx + normKey.length;
-        idx = normText.indexOf(normKey, lastIdx);
-    }
-    result += safeText.substring(lastIdx);
-    return result;
-}
+### Nghị định 212/2026/NĐ-CP (Điều kiện năng lực & HTTT Xây dựng)
+#### Thời điểm
+- Ban hành: 17/06/2026
+- Có hiệu lực: 01/07/2026
+#### Nội dung chính
+- CSDL Quốc gia về HĐXD tập trung tại Bộ Xây dựng (https://csdlhdxd.gov.vn)
+- Chứng chỉ hành nghề: Hiệu lực 10 năm, quản lý qua mã số
+- Các Bộ, UBND tỉnh/xã có trách nhiệm nhập, cập nhật dữ liệu
 
-function shuffleArray(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-    }
-}
+### Nghị định 217/2026/NĐ-CP (Quản lý Xây dựng)
+#### Thời điểm
+- Ban hành: 19/06/2026
+- Có hiệu lực: 01/07/2026
+#### Trình tự Đầu tư
+- Chuẩn bị dự án: Lập, thẩm định, phê duyệt NCKT, quy hoạch
+- Thực hiện dự án: Thi công, giám sát, nghiệm thu
+- Kết thúc XD: Quyết toán, bảo hành
+#### Giấy phép & Quản lý
+- GPXD: Đảm bảo kết cấu, PCCC, môi trường (Thẩm quyền: UBND Xã, BQL KCN, Sở XD)
+- Quản lý công trình đặc thù: Bí mật NN, khẩn cấp, cấp bách
 
-// Global States
-const ALL_QUESTIONS = parseRawData(RAW_DATA);
-let quizQuestions = [];
-let userAnswers = [];
-let timerInterval = null;
-let secondsElapsed = 0;
-let isQuizSubmitted = false;
-let isReviewRendered = false; // Cờ hiệu Fix Bug Tab Trắng
-let currentScore = 0;
-let highScore = parseInt(localStorage.getItem('quizHighScore') || '0');
+### Nghị định 220/2026/NĐ-CP (Bảo hiểm bắt buộc XD)
+#### Thời điểm
+- Ban hành: 22/06/2026
+- Áp dụng: 01/07/2026
+#### Số tiền & Mức phí
+- Bắt buộc với công trình lớn, nguy cơ môi trường, kỹ thuật phức tạp
+- Số tiền BH không thấp hơn tổng giá trị HĐ (kể cả điều chỉnh)
+- DN bảo hiểm được chỉnh phí tối đa 25% theo rủi ro (Cấm giảm phí tại vùng thiên tai/DN lỗ thuần 3 năm)
+- CĐT được giao thầu mua nhưng phải đảm bảo đủ BH toàn công trình
 
-// Khởi tạo
-document.addEventListener("DOMContentLoaded", () => {
-    document.getElementById('highScoreDisplay').innerText = `Điểm cao: ${highScore}/40`;
-    initQuiz();
-});
+### Các Thông tư BXD (Hướng dẫn thi hành)
+#### TT 32/2026/TT-BXD (Quản lý chất lượng)
+- Kế hoạch thí nghiệm phải được CĐT chấp thuận
+- Quan trắc thi công: Trình CĐT phê duyệt (có thể thuê độc lập)
+- Hết hạn sử dụng: Phải lập báo cáo, công bố trên trang TTĐT cơ quan thẩm quyền
+#### TT 33/2026/TT-BXD (Đánh giá an toàn)
+- Lần đầu: Trong 10 năm từ khi nghiệm thu
+- Lần tiếp theo: Không quá 5 năm/lần
+- Cấp độ 1 (Trực quan), Cấp độ 2 (Sơ bộ & Chi tiết)
+#### TT 34/2026/TT-BXD (Cấp công trình)
+- Phân cấp theo mức độ quan trọng, công suất, kết cấu
+- Dùng cho thẩm định NCKT, GPXD, BIM, thi tuyển kiến trúc
+#### TT 36/2026/TT-BXD (Chi phí đầu tư XD)
+- Hướng dẫn chi tiết bồi thường, XD, thiết bị, dự phòng
+- Chỉ số giá XD công bố theo Quý/Năm
+#### TT 37/2026/TT-BXD & TT 38/2026/TT-BXD (Định mức)
+- PP xác định định mức dự toán, giá nhân công, ca máy (TT37)
+- Ban hành định mức khảo sát, lắp đặt máy móc, thí nghiệm, sửa chữa (TT38)
+#### TT 40/2026/TT-BXD (Chi phí bảo trì)
+- Chi phí dự phòng: Không quá 5% tổng chi phí thực hiện và chi phí khác
+- Chủ sở hữu tính chi phí quản lý theo tỷ lệ %
+#### TT 41/2026/TT-BXD & TT 42/2026/TT-BXD (Vật liệu & An toàn)
+- VLXD rủi ro cao/trung bình: Bắt buộc công bố hợp quy, niêm yết online
+- TT42: Bãi bỏ "GCN hợp quy" cho cần trục, vận thăng, sàn treo nâng người; Bổ sung QCVN 18:2021/BXD
 
-// Chuyển Tab
-function switchTab(tab) {
-    document.getElementById('tabQuiz').classList.toggle('active', tab === 'quiz');
-    document.getElementById('tabReview').classList.toggle('active', tab === 'review');
-    document.getElementById('quizContainer').style.display = tab === 'quiz' ? 'block' : 'none';
-    document.getElementById('reviewContainer').style.display = tab === 'review' ? 'block' : 'none';
-    
-    // YÊU CẦU QUAN TRỌNG: Render Tab Ôn tập lần đầu
-    if (tab === 'review') {
-        const reviewContainer = document.getElementById('reviewQuestions');
-        if (reviewContainer.children.length === 0 || !isReviewRendered) {
-            renderReviewList("");
-            isReviewRendered = true;
-        }
-    }
-}
+## 2. LĨNH VỰC TÀI CHÍNH, KẾ TOÁN & THUẾ
+### Nghị định 202/2026/NĐ-CP (Lệ phí trước bạ)
+#### Thời điểm & Quy định
+- Áp dụng từ: 01/03/2027
+- Ô tô điện chạy pin: Miễn phí trước bạ lần đầu (0%) đến hết 31/12/2030
 
-// LOGIC TAB 1: THI THỬ
-function initQuiz() {
-    clearInterval(timerInterval);
-    secondsElapsed = 0;
-    isQuizSubmitted = false;
-    userAnswers = new Array(40).fill(null);
-    updateTimerDisplay();
-    
-    // Pick 40 random
-    const pool = [...ALL_QUESTIONS];
-    shuffleArray(pool);
-    quizQuestions = pool.slice(0, 40).map(q => {
-        // Xáo trộn Option
-        const opts = q.options.map((opt, i) => ({ text: opt, isCorrect: i === q.correctIndex }));
-        shuffleArray(opts);
-        return { question: q.question, options: opts };
-    });
+### Nghị định 245/2026/NĐ-CP (Gia hạn Thuế & Tiền thuê đất 2026)
+#### Thời điểm
+- Áp dụng: 27/06/2026 (Nhóm ngành Xây dựng, Vận tải kho bãi...)
+#### Thời hạn gia hạn cụ thể
+- Thuế GTGT & TNCN (Tối đa 5 tháng): Kỳ T5 (đến 20/11), T6-T9 (đến 21/12), Quý II (đến 02/11), Quý III (đến 30/12)
+- Thuế TNDN: Quý II gia hạn 3 tháng (đến 02/11), Quý III gia hạn 2 tháng (đến 30/12)
+- Tiền thuê đất: Gia hạn 50% số tiền phát sinh 2026 trong 5 tháng (đến 02/11)
+- Hồ sơ: Nộp văn bản đề nghị chậm nhất 02/11/2026. KHÔNG tính tiền chậm nộp.
 
-    renderQuiz();
-    
-    // Bắt đầu đếm giờ
-    timerInterval = setInterval(() => {
-        secondsElapsed++;
-        updateTimerDisplay();
-    }, 1000);
+### Nghị định 252/2026/NĐ-CP & NĐ 253/2026/NĐ-CP (Quản lý Thuế & TNCN)
+#### Khai bổ sung & Phân bổ
+- Khai khi phát hiện sai sót, nộp phần tăng thêm + tiền chậm nộp (Điều 12, NĐ 252)
+- Khai tập trung tại nơi quản lý và phân bổ cho địa phương (DN khác tỉnh)
+#### Thuế TNCN (NĐ 253)
+- Thu nhập tính thuế trừ giảm trừ gia cảnh, BHXH, từ thiện
+- Khấu trừ: Tổ chức chi trả khấu trừ trước khi trả; Cá nhân ủy quyền quyết toán thay
 
-    // Reset UI
-    document.getElementById('btnShareTop').classList.add('hidden');
-    document.getElementById('btnShareBottom').classList.add('hidden');
-    document.getElementById('btnSubmitTop').classList.remove('hidden');
-    document.getElementById('btnSubmitBottom').classList.remove('hidden');
-}
+### Nghị định 254/2026/NĐ-CP & TT 91/2026/TT-BTC (Hóa đơn Điện tử)
+#### Loại & Ký hiệu Hóa đơn
+- Định dạng: Ngôn ngữ XML. Ký hiệu gồm 6 ký tự (Ví dụ: Số 1 là HĐ GTGT)
+- DN điện lực, viễn thông, NH, y tế: Có thể dùng HĐĐT KHÔNG có mã cơ quan thuế
+#### Xử lý sai sót & Khuyến khích
+- Sai không ảnh hưởng số tiền/thuế suất: Chỉ thông báo (KHÔNG cần lập lại HĐ)
+- Chương trình "hóa đơn may mắn" (Kinh phí tối đa 150 tỷ/năm)
+- Khen thưởng người tố giác không lập HĐ
 
-function updateTimerDisplay() {
-    const m = Math.floor(secondsElapsed / 60).toString().padStart(2, '0');
-    const s = (secondsElapsed % 60).toString().padStart(2, '0');
-    document.getElementById('timer').innerText = `${m}:${s}`;
-}
+### Thông tư 84 & 86/2026/TT-BTC (Hoàn thuế & Thuế Hàng hóa XNK)
+- TT84: Hoàn thuế GTGT cho người nước ngoài xuất cảnh qua HT do Cục Hải quan vận hành
+- TT86: Hướng dẫn khai, nộp thuế, gia hạn, khoanh/xóa nợ thuế hàng XNK
 
-function renderQuiz() {
-    const container = document.getElementById('quizQuestions');
-    container.innerHTML = quizQuestions.map((q, qIndex) => `
-        <div class="bg-white border border-gray-200 rounded p-3 shadow-sm mb-2" id="qBox_${qIndex}">
-            <div class="font-bold text-blue-900 mb-2">Câu ${qIndex + 1}: ${escapeHTML(q.question)}</div>
-            <div class="space-y-1.5 pl-1 md:pl-2">
-                ${q.options.map((opt, oIndex) => `
-                    <label class="flex items-start p-1.5 border border-transparent rounded hover:bg-gray-50 cursor-pointer transition-colors" id="label_${qIndex}_${oIndex}">
-                        <input type="radio" name="q_${qIndex}" value="${oIndex}" onchange="selectAnswer(${qIndex}, ${oIndex})">
-                        <span class="ml-2 text-gray-700">${escapeHTML(opt.text)}</span>
-                    </label>
-                `).join('')}
-            </div>
+## 3. LĨNH VỰC HÀNG KHÔNG & TÀU BAY
+### Nghị định 221/2026/NĐ-CP (Nhà chức trách & An toàn HK)
+#### Tổ chức
+- Cục HKVN (thuộc Bộ XD) là Nhà chức trách hàng không VN
+#### Quản lý Tài chính (Phí)
+- Dịch vụ bảo đảm hoạt động bay: 165.000 đồng/lượt
+- Kinh doanh Cảng HK: 335.000 đồng/lượt
+- Nhà chức trách giữ lại 45% để chi hoạt động
+#### Điều tra sự cố
+- HĐ điều tra nhằm phòng ngừa, KHÔNG quy kết trách nhiệm pháp lý
+
+### Nghị định 223/2026/NĐ-CP (Tàu bay & Khai thác)
+#### Khai thác & An toàn
+- Tàu bay phải gắn quốc kỳ VN và dấu hiệu quốc tịch
+- Đủ điều kiện bay: Tuân thủ bảo dưỡng theo chương trình phê chuẩn
+- Được đình chỉ/yêu cầu hạ cánh nếu uy hiếp an toàn
+#### Môi trường
+- Trách nhiệm giảm phát thải khí nhà kính, tiếng ồn, quản lý chất thải
+
+### Thông tư BXD (Quản lý Cảng HK & Bãi cất hạ cánh)
+#### TT 47/2026/TT-BXD (Hoạt động bay)
+- Trách nhiệm Người khai thác CHK: Tìm kiếm cứu nạn, khẩn nguy
+- Đo đạc mốc khống chế tọa độ sơ cấp (PACS) và thứ cấp (SACS)
+- Thỏa thuận chuyển đổi nguồn điện dự phòng, xử lý sự cố
+#### TT 48/2026/TT-BXD (Vận tải hàng không)
+- Phối hợp xử lý hành khách khuyết tật, chậm/hủy chuyến, từ chối nhập cảnh
+- Báo cáo định kỳ: Số chuyến bay đúng giờ/chậm/hủy (Mẫu CHK-1), số liệu thông qua cảng (Mẫu CHK-2)
+- Đầu tư CNTT xử lý dữ liệu để điều phối Slot
+#### TT 52/2026/TT-BXD (Cảng HK & Bãi cất hạ cánh)
+- Ban hành quy chế an toàn (Chèn bánh, chóp an toàn, khoảng cách phương tiện)
+- Có thể điều chỉnh thời gian khai thác khi sự cố, thời tiết, quân sự
+- Giám sát viên an toàn: Đạt chuẩn trình độ, kinh nghiệm, ngoại ngữ
+
+## 4. LĨNH VỰC KHÁC (CÔNG NGHỆ, DOANH NGHIỆP, THƯƠNG MẠI)
+### Nghị định 200/2026/NĐ-CP (Trái phiếu Doanh nghiệp)
+#### Điều kiện chào bán & Trách nhiệm
+- Trái phiếu chuyển đổi/kèm chứng quyền: Phải là CTCP, đáp ứng tỷ lệ NĐT nước ngoài
+- Bắt buộc sử dụng vốn đúng mục đích, công bố thông tin trước/sau chào bán và định kỳ
+- Phải mua lại trước hạn nếu vi phạm
+
+### Nghị định 243/2026/NĐ-CP (Mua bán điện trực tiếp)
+- Cơ chế MBĐT giữa: Đơn vị phát điện NLTT - Khách hàng lớn - Đơn vị bán lẻ (tại khu/cụm)
+- Sản lượng dư: Giá bán không vượt giá tối đa của khung giá phát điện
+
+### Thông tư 32/2026/TT-BCT & 68/2026/TT-BTC
+- TT32: Hỗ trợ 100% kinh phí xúc tiến TM trên MT điện tử (Hội chợ online, livestream, hạ tầng số)
+- TT68: Áp dụng mã vạch (QR), chip trong quản lý dự trữ quốc gia (bảo mật, mã hóa, chữ ký số)
+
+### Nghị định 216/2026/NĐ-CP (Lý lịch tư pháp)
+- CSDL do Bộ Công an quản lý
+- Cấp phiếu: Trực tuyến, Bưu chính, Trực tiếp (Dữ liệu chia sẻ có giá trị pháp lý)
+            </script>
         </div>
-    `).join('');
-}
+    </div>
 
-function selectAnswer(qIndex, oIndex) {
-    if(isQuizSubmitted) return;
-    userAnswers[qIndex] = oIndex;
-}
+    <div class="vca-footer">
+        Hệ thống hỗ trợ triển khai văn bản nội bộ - VCA
+    </div>
 
-function submitQuiz() {
-    if (isQuizSubmitted) return;
-    
-    const unanswered = userAnswers.filter(a => a === null).length;
-    if (unanswered > 0) {
-        if (!confirm(`Bạn còn ${unanswered} câu chưa làm. Bạn có chắc chắn muốn nộp bài?`)) return;
-    }
+    <script src="https://cdn.jsdelivr.net/npm/markmap-autoloader@0.15.4"></script>
+    <script>
+        // Thuật toán chụp toàn bộ Mindmap độ phân giải cao
+        function downloadFullMindmap() {
+            const svg = document.querySelector('.markmap svg');
+            if (!svg) return alert("Sơ đồ chưa tải xong, vui lòng đợi giây lát!");
 
-    isQuizSubmitted = true;
-    clearInterval(timerInterval);
-    currentScore = 0;
+            const g = svg.querySelector('g');
+            if (!g) return;
 
-    quizQuestions.forEach((q, qIndex) => {
-        const selectedOpt = userAnswers[qIndex];
-        const correctOpt = q.options.findIndex(o => o.isCorrect);
-        
-        if (selectedOpt === correctOpt) currentScore++;
+            // 1. Lấy kích thước thật của sơ đồ (không bị ảnh hưởng bởi Zoom/Pan)
+            const bbox = g.getBBox();
+            const padding = 60; // Viền an toàn
 
-        // Render kết quả (Lock input, tô màu)
-        const labels = document.querySelectorAll(`[id^="label_${qIndex}_"]`);
-        labels.forEach((label, oIndex) => {
-            const input = label.querySelector('input');
-            input.disabled = true;
-            const span = label.querySelector('span');
+            // 2. Clone SVG để tạo file ảnh ngầm
+            const clone = svg.cloneNode(true);
+            const cloneG = clone.querySelector('g');
+            
+            // Xóa transform để sơ đồ tự canh giữa khung hình mới
+            cloneG.setAttribute('transform', '');
 
-            if (oIndex === correctOpt) {
-                label.classList.add('bg-green-100', 'border-green-400', 'font-semibold');
-                span.classList.add('text-green-800');
-                span.innerHTML = `✔️ ` + span.innerHTML;
-            } else if (oIndex === selectedOpt && selectedOpt !== correctOpt) {
-                label.classList.add('bg-red-50', 'border-red-300');
-                span.classList.add('text-red-700', 'line-through');
-                span.innerHTML = `✖️ ` + span.innerHTML;
-            }
-        });
-    });
+            const width = bbox.width + padding * 2;
+            const height = bbox.height + padding * 2;
+            
+            clone.setAttribute('viewBox', `${bbox.x - padding} ${bbox.y - padding} ${width} ${height}`);
+            
+            // Scale x3 để đạt chất lượng Full HD / 4K
+            const scale = 3; 
+            clone.setAttribute('width', width * scale);
+            clone.setAttribute('height', height * scale);
 
-    // Update điểm
-    if (currentScore > highScore) {
-        highScore = currentScore;
-        localStorage.setItem('quizHighScore', highScore);
-        document.getElementById('highScoreDisplay').innerText = `Điểm cao: ${highScore}/40`;
-    }
+            // 3. Thêm nền xanh nhạt VCA
+            const bg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            bg.setAttribute('x', bbox.x - padding);
+            bg.setAttribute('y', bbox.y - padding);
+            bg.setAttribute('width', width);
+            bg.setAttribute('height', height);
+            bg.setAttribute('fill', '#f5f7fa');
+            clone.insertBefore(bg, clone.firstChild);
 
-    // Cuộn lên đầu và đổi nút
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    document.getElementById('timer').innerText = `Điểm: ${currentScore}/40`;
-    document.getElementById('btnSubmitTop').classList.add('hidden');
-    document.getElementById('btnSubmitBottom').classList.add('hidden');
-    document.getElementById('btnShareTop').classList.remove('hidden');
-    document.getElementById('btnShareBottom').classList.remove('hidden');
-}
+            // Thêm style định dạng chữ
+            const style = document.createElementNS('http://www.w3.org/2000/svg', 'style');
+            style.textContent = ".markmap-node-text { font-family: 'Segoe UI', Arial, sans-serif; font-size: 14px; fill: #333; } path { fill: none; }";
+            clone.insertBefore(style, clone.firstChild);
 
-function restartQuiz() {
-    if (!isQuizSubmitted && !confirm("Bài thi đang làm dở, bạn có chắc muốn tạo đề mới?")) return;
-    initQuiz();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-function shareScore() {
-    const m = Math.floor(secondsElapsed / 60).toString().padStart(2, '0');
-    const s = (secondsElapsed % 60).toString().padStart(2, '0');
-    const text = `🏆 Huấn luyện CNTT - Cảng HKQT Cần Thơ\nĐiểm của tôi: ${currentScore}/40\nThời gian: ${m}:${s}\nThử sức ngay!`;
-    
-    // Copy to clipboard
-    const textarea = document.createElement('textarea');
-    textarea.value = text;
-    document.body.appendChild(textarea);
-    textarea.select();
-    document.execCommand('copy');
-    document.body.removeChild(textarea);
-
-    // Toast
-    const toast = document.getElementById('toast');
-    toast.classList.remove('hidden');
-    toast.classList.add('toast-enter');
-    setTimeout(() => {
-        toast.classList.add('hidden');
-        toast.classList.remove('toast-enter');
-    }, 2500);
-}
-
-
-// LOGIC TAB 2: ÔN TẬP
-let searchTimeout;
-function onSearchInput(e) {
-    clearTimeout(searchTimeout);
-    searchTimeout = setTimeout(() => {
-        renderReviewList(e.target.value);
-    }, 250); // Debounce chống lag
-}
-
-function renderReviewList(keyword) {
-    const container = document.getElementById('reviewQuestions');
-    const countLabel = document.getElementById('searchCount');
-    
-    const normKey = removeAccentsPreserveLength(keyword).toLowerCase().trim();
-    
-    let html = '';
-    let count = 0;
-
-    ALL_QUESTIONS.forEach((q, index) => {
-        const normQ = removeAccentsPreserveLength(q.question).toLowerCase();
-        const normOpts = q.options.map(opt => removeAccentsPreserveLength(opt).toLowerCase());
-        
-        let isMatch = false;
-        if (!normKey || normQ.includes(normKey) || normOpts.some(o => o.includes(normKey))) {
-            isMatch = true;
+            // 4. Render ra Canvas và tải xuống
+            const svgData = new XMLSerializer().serializeToString(clone);
+            const img = new Image();
+            img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
+            
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                canvas.width = width * scale;
+                canvas.height = height * scale;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0);
+                
+                const a = document.createElement('a');
+                a.download = 'VCA_Mindmap_ChiTiet.png';
+                a.href = canvas.toDataURL('image/png');
+                a.click();
+            };
         }
-
-        if (isMatch) {
-            count++;
-            html += `
-                <div class="bg-white border border-gray-200 rounded p-2.5 shadow-sm">
-                    <div class="font-bold text-gray-800 mb-1.5">Câu ${index + 1}: ${highlightText(q.question, normKey)}</div>
-                    <div class="space-y-1 pl-1">
-                        ${q.options.map((opt, oIndex) => {
-                            const isCorrect = (oIndex === q.correctIndex);
-                            const cssClass = isCorrect ? 'bg-blue-50 border-blue-200 text-blue-800 font-semibold' : 'text-gray-500';
-                            const icon = isCorrect ? '✔️ ' : '';
-                            return `
-                            <div class="p-1.5 border rounded ${cssClass} text-sm">
-                                ${icon}${highlightText(opt, normKey)}
-                            </div>`;
-                        }).join('')}
-                    </div>
-                </div>
-            `;
-        }
-    });
-
-    container.innerHTML = html || `<div class="text-center text-gray-500 py-10">Không tìm thấy kết quả phù hợp.</div>`;
-    countLabel.innerText = normKey ? `Tìm thấy ${count} câu hỏi.` : `Đang hiển thị toàn bộ ${ALL_QUESTIONS.length} câu hỏi.`;
-}
-</script>
+    </script>
 </body>
 </html>
-
-```
+```eof
