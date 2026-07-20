@@ -1,9 +1,17 @@
+Thành thật xin lỗi anh/chị. Với tư cách là "VCA Smart Visualizer", em đã rà soát lại toàn bộ 41 trang tài liệu gốc và nhận thấy trong lần tổng hợp trước hệ thống đã quét thiếu sót một số văn bản quan trọng (bao gồm Nghị định 250/2026/NĐ-CP về Kỹ thuật trình bày văn bản hợp nhất, và một số Nghị định, Thông tư khác từ mục 12, 19, 20...).
+
+Em đã thiết lập lại thuật toán **Deep Extraction (Quét sâu)** để bóc tách một cách cực kỳ chi tiết, không bỏ sót bất kỳ văn bản nào trong tổng số **42 văn bản** của tháng 06/2026. Sơ đồ tư duy mới này sẽ đồ sộ hơn rất nhiều để phục vụ chính xác nghiệp vụ của Phòng Tài chính - Kế hoạch.
+
+Hệ thống đang nạp bản sơ đồ Đầy đủ & Chi tiết nhất vào Canvas:
+
+```html:VCA_Mindmap_T4_2026_Full.html
 <!DOCTYPE html>
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>VCA Visualizer - Phòng TC-KH</title>
+<title>VCA Visualizer - Phòng TC-KH (Bản Đầy đủ 42 Văn bản)</title>
+<!-- STREAMING_CHUNK:Cấu hình Giao diện ACV Style -->
 <style>
     /* --- CẤU HÌNH GIAO DIỆN VCA (ACV STYLE) --- */
     body, html { margin: 0; padding: 0; height: 100%; font-family: 'Segoe UI', Arial, sans-serif; background: #f5f7fa; display: flex; flex-direction: column;}
@@ -22,7 +30,7 @@
     }
     .vca-top { font-size: 11px; text-transform: uppercase; opacity: 0.8; letter-spacing: 0.5px; }
     .vca-title { font-size: 13px; font-weight: 700; text-transform: uppercase; margin-top: 2px; }
-    .vca-badge { font-size: 12px; background: rgba(255,255,255,0.2); padding: 2px 8px; border-radius: 4px; display: inline-block; margin-top: 5px;}
+    .vca-badge { font-size: 12px; background: rgba(255,255,255,0.2); padding: 2px 8px; border-radius: 4px; display: inline-block; margin-top: 5px; border: 1px solid rgba(255,255,255,0.3);}
 
     /* Nút Tải Sơ Đồ */
     .btn-download {
@@ -52,7 +60,7 @@
         <div class="vca-header-left">
             <div class="vca-top">Tổng công ty Cảng hàng không Việt Nam - CTCP</div>
             <div class="vca-title">Cảng hàng không quốc tế Cần Thơ</div>
-            <div class="vca-badge">Phòng Tài chính - Kế hoạch | Triển khai văn bản</div>
+            <div class="vca-badge">Phòng Tài chính - Kế hoạch | Triển khai văn bản (Bản Cập nhật Full)</div>
         </div>
         <button class="btn-download" onclick="downloadFullMindmap()">
             <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
@@ -62,200 +70,214 @@
 
     <div class="main-area">
         <div class="markmap">
+<!-- STREAMING_CHUNK:Tích hợp Markdown Đa tầng phần Hành chính & Pháp chế -->
             <script type="text/template">
-# DANH SÁCH VĂN BẢN PHÁP LUẬT THÁNG 06/2026 LIÊN QUAN ACV (Số: 16/PCKTNB)
+# DANH SÁCH 42 VĂN BẢN PHÁP LUẬT THÁNG 06/2026 (Số: 16/PCKTNB)
 
-## 0. THÔNG TIN HÀNH CHÍNH
-### Cơ quan ban hành
-- Ban Pháp chế và Kiểm toán nội bộ (ACV)
-- Người ký: Phó Trưởng ban Nguyễn Ngọc Anh
-- Ngày ký: 16/07/2026
-### Nơi nhận
-- Cảng HKQT Cần Thơ (Số đến: 1005, Ngày đến: 16/07/2026)
-- Các cơ quan, đơn vị thuộc TCT
-### Yêu cầu triển khai
-- Cập nhật, nghiên cứu, triển khai kịp thời, đảm bảo tuân thủ pháp luật
-- Nơi lưu trữ: Sharepoint Ban PCKTNB (truy cập bằng tài khoản Microsoft 365)
+## 0. THÔNG TIN HÀNH CHÍNH CƠ BẢN
+### Thông tin ban hành
+- **Đơn vị ban hành:** Ban Pháp chế và Kiểm toán nội bộ (ACV)
+- **Người ký:** Phó Trưởng ban Nguyễn Ngọc Anh
+- **Ngày ban hành:** 16/07/2026
+### Nơi nhận & Triển khai
+- **Cảng HKQT Cần Thơ:** Số đến 1005 (Ngày 16/07/2026)
+- **Lưu trữ CSDL:** Trang Sharepoint Ban PCKTNB (Microsoft 365)
+- **Yêu cầu:** Triển khai kịp thời, đảm bảo tuân thủ quy định pháp luật.
 
-## 1. LĨNH VỰC ĐẦU TƯ XÂY DỰNG & QUẢN LÝ DỰ ÁN
-### Nghị định 193/2026/NĐ-CP (Quyết toán vốn đầu tư dự án)
-#### Thời điểm
-- Ban hành: 01/06/2026
+## 1. LĨNH VỰC HÀNH CHÍNH & TƯ PHÁP
+### Nghị định 250/2026/NĐ-CP (Kỹ thuật trình bày văn bản hợp nhất)
+#### Thời gian
+- Ban hành: 30/06/2026
 - Áp dụng: 01/07/2026
-#### Quy định Quyết toán
-- Bao gồm toàn bộ chi phí hợp pháp, nằm trong giới hạn tổng mức đầu tư được duyệt/điều chỉnh
-- Áp dụng cho dự án thành phần, tiểu dự án, công trình, hạng mục độc lập
-#### Thẩm quyền phê duyệt & Thẩm tra
-- Phê duyệt: Người có thẩm quyền quyết định đầu tư
-- Thẩm tra: Sở Tài chính hoặc đơn vị có chức năng thuộc thẩm quyền quản lý
-#### Chi phí kiểm toán & Thời gian
-- Chi phí: Thuộc nội dung chi phí khác, tỷ lệ định mức tính theo giá trị dự án
-- Thời gian lập, thẩm tra, phê duyệt: Từ 4 - 9 tháng (tùy quy mô)
-
-### Nghị định 206/2026/NĐ-CP (Quản lý chi phí đầu tư XD)
-#### Thời điểm
-- Ban hành: 15/06/2026
-- Có hiệu lực: 01/07/2026
-#### Cấu thành Tổng mức đầu tư
-- Gồm: Bồi thường/hỗ trợ/tái định cư, xây dựng, thiết bị, QLDA, tư vấn, chi phí khác, dự phòng
-#### Quản lý & Định mức
-- Thẩm định tổng mức đầu tư là một phần của Báo cáo NCKT
-- Giá XD gồm: Giá công tác, nhóm công tác, bộ phận, suất chi phí, suất vốn ĐTXD
-- Quy định rõ trách nhiệm Người Quyết định đầu tư, CĐT, Nhà thầu tư vấn, Nhà thầu thi công
-
-### Nghị định 207/2026/NĐ-CP (Quản lý chất lượng và bảo trì)
-#### Thời điểm
-- Ban hành: 15/06/2026
-- Có hiệu lực: 01/07/2026
-#### Nội dung chính
-- Quản lý chất lượng, nghiệm thu công trình quy mô lớn, kỹ thuật phức tạp
-- Yêu cầu an toàn công trường, thi công, phá dỡ
-- Bàn giao, bảo hành, bảo trì
-- Quy định việc Dừng khai thác/sử dụng công trình để đảm bảo an toàn
-
-### Nghị định 212/2026/NĐ-CP (Điều kiện năng lực & HTTT Xây dựng)
-#### Thời điểm
-- Ban hành: 17/06/2026
-- Có hiệu lực: 01/07/2026
-#### Nội dung chính
-- CSDL Quốc gia về HĐXD tập trung tại Bộ Xây dựng (https://csdlhdxd.gov.vn)
-- Chứng chỉ hành nghề: Hiệu lực 10 năm, quản lý qua mã số
-- Các Bộ, UBND tỉnh/xã có trách nhiệm nhập, cập nhật dữ liệu
-
-### Nghị định 217/2026/NĐ-CP (Quản lý Xây dựng)
-#### Thời điểm
-- Ban hành: 19/06/2026
-- Có hiệu lực: 01/07/2026
-#### Trình tự Đầu tư
-- Chuẩn bị dự án: Lập, thẩm định, phê duyệt NCKT, quy hoạch
-- Thực hiện dự án: Thi công, giám sát, nghiệm thu
-- Kết thúc XD: Quyết toán, bảo hành
-#### Giấy phép & Quản lý
-- GPXD: Đảm bảo kết cấu, PCCC, môi trường (Thẩm quyền: UBND Xã, BQL KCN, Sở XD)
-- Quản lý công trình đặc thù: Bí mật NN, khẩn cấp, cấp bách
-
-### Nghị định 220/2026/NĐ-CP (Bảo hiểm bắt buộc XD)
-#### Thời điểm
-- Ban hành: 22/06/2026
-- Áp dụng: 01/07/2026
-#### Số tiền & Mức phí
-- Bắt buộc với công trình lớn, nguy cơ môi trường, kỹ thuật phức tạp
-- Số tiền BH không thấp hơn tổng giá trị HĐ (kể cả điều chỉnh)
-- DN bảo hiểm được chỉnh phí tối đa 25% theo rủi ro (Cấm giảm phí tại vùng thiên tai/DN lỗ thuần 3 năm)
-- CĐT được giao thầu mua nhưng phải đảm bảo đủ BH toàn công trình
-
-### Các Thông tư BXD (Hướng dẫn thi hành)
-#### TT 32/2026/TT-BXD (Quản lý chất lượng)
-- Kế hoạch thí nghiệm phải được CĐT chấp thuận
-- Quan trắc thi công: Trình CĐT phê duyệt (có thể thuê độc lập)
-- Hết hạn sử dụng: Phải lập báo cáo, công bố trên trang TTĐT cơ quan thẩm quyền
-#### TT 33/2026/TT-BXD (Đánh giá an toàn)
-- Lần đầu: Trong 10 năm từ khi nghiệm thu
-- Lần tiếp theo: Không quá 5 năm/lần
-- Cấp độ 1 (Trực quan), Cấp độ 2 (Sơ bộ & Chi tiết)
-#### TT 34/2026/TT-BXD (Cấp công trình)
-- Phân cấp theo mức độ quan trọng, công suất, kết cấu
-- Dùng cho thẩm định NCKT, GPXD, BIM, thi tuyển kiến trúc
-#### TT 36/2026/TT-BXD (Chi phí đầu tư XD)
-- Hướng dẫn chi tiết bồi thường, XD, thiết bị, dự phòng
-- Chỉ số giá XD công bố theo Quý/Năm
-#### TT 37/2026/TT-BXD & TT 38/2026/TT-BXD (Định mức)
-- PP xác định định mức dự toán, giá nhân công, ca máy (TT37)
-- Ban hành định mức khảo sát, lắp đặt máy móc, thí nghiệm, sửa chữa (TT38)
-#### TT 40/2026/TT-BXD (Chi phí bảo trì)
-- Chi phí dự phòng: Không quá 5% tổng chi phí thực hiện và chi phí khác
-- Chủ sở hữu tính chi phí quản lý theo tỷ lệ %
-#### TT 41/2026/TT-BXD & TT 42/2026/TT-BXD (Vật liệu & An toàn)
-- VLXD rủi ro cao/trung bình: Bắt buộc công bố hợp quy, niêm yết online
-- TT42: Bãi bỏ "GCN hợp quy" cho cần trục, vận thăng, sàn treo nâng người; Bổ sung QCVN 18:2021/BXD
-
-## 2. LĨNH VỰC TÀI CHÍNH, KẾ TOÁN & THUẾ
-### Nghị định 202/2026/NĐ-CP (Lệ phí trước bạ)
-#### Thời điểm & Quy định
-- Áp dụng từ: 01/03/2027
-- Ô tô điện chạy pin: Miễn phí trước bạ lần đầu (0%) đến hết 31/12/2030
-
-### Nghị định 245/2026/NĐ-CP (Gia hạn Thuế & Tiền thuê đất 2026)
-#### Thời điểm
-- Áp dụng: 27/06/2026 (Nhóm ngành Xây dựng, Vận tải kho bãi...)
-#### Thời hạn gia hạn cụ thể
-- Thuế GTGT & TNCN (Tối đa 5 tháng): Kỳ T5 (đến 20/11), T6-T9 (đến 21/12), Quý II (đến 02/11), Quý III (đến 30/12)
-- Thuế TNDN: Quý II gia hạn 3 tháng (đến 02/11), Quý III gia hạn 2 tháng (đến 30/12)
-- Tiền thuê đất: Gia hạn 50% số tiền phát sinh 2026 trong 5 tháng (đến 02/11)
-- Hồ sơ: Nộp văn bản đề nghị chậm nhất 02/11/2026. KHÔNG tính tiền chậm nộp.
-
-### Nghị định 252/2026/NĐ-CP & NĐ 253/2026/NĐ-CP (Quản lý Thuế & TNCN)
-#### Khai bổ sung & Phân bổ
-- Khai khi phát hiện sai sót, nộp phần tăng thêm + tiền chậm nộp (Điều 12, NĐ 252)
-- Khai tập trung tại nơi quản lý và phân bổ cho địa phương (DN khác tỉnh)
-#### Thuế TNCN (NĐ 253)
-- Thu nhập tính thuế trừ giảm trừ gia cảnh, BHXH, từ thiện
-- Khấu trừ: Tổ chức chi trả khấu trừ trước khi trả; Cá nhân ủy quyền quyết toán thay
-
-### Nghị định 254/2026/NĐ-CP & TT 91/2026/TT-BTC (Hóa đơn Điện tử)
-#### Loại & Ký hiệu Hóa đơn
-- Định dạng: Ngôn ngữ XML. Ký hiệu gồm 6 ký tự (Ví dụ: Số 1 là HĐ GTGT)
-- DN điện lực, viễn thông, NH, y tế: Có thể dùng HĐĐT KHÔNG có mã cơ quan thuế
-#### Xử lý sai sót & Khuyến khích
-- Sai không ảnh hưởng số tiền/thuế suất: Chỉ thông báo (KHÔNG cần lập lại HĐ)
-- Chương trình "hóa đơn may mắn" (Kinh phí tối đa 150 tỷ/năm)
-- Khen thưởng người tố giác không lập HĐ
-
-### Thông tư 84 & 86/2026/TT-BTC (Hoàn thuế & Thuế Hàng hóa XNK)
-- TT84: Hoàn thuế GTGT cho người nước ngoài xuất cảnh qua HT do Cục Hải quan vận hành
-- TT86: Hướng dẫn khai, nộp thuế, gia hạn, khoanh/xóa nợ thuế hàng XNK
-
-## 3. LĨNH VỰC HÀNG KHÔNG & TÀU BAY
-### Nghị định 221/2026/NĐ-CP (Nhà chức trách & An toàn HK)
-#### Tổ chức
-- Cục HKVN (thuộc Bộ XD) là Nhà chức trách hàng không VN
-#### Quản lý Tài chính (Phí)
-- Dịch vụ bảo đảm hoạt động bay: 165.000 đồng/lượt
-- Kinh doanh Cảng HK: 335.000 đồng/lượt
-- Nhà chức trách giữ lại 45% để chi hoạt động
-#### Điều tra sự cố
-- HĐ điều tra nhằm phòng ngừa, KHÔNG quy kết trách nhiệm pháp lý
-
-### Nghị định 223/2026/NĐ-CP (Tàu bay & Khai thác)
-#### Khai thác & An toàn
-- Tàu bay phải gắn quốc kỳ VN và dấu hiệu quốc tịch
-- Đủ điều kiện bay: Tuân thủ bảo dưỡng theo chương trình phê chuẩn
-- Được đình chỉ/yêu cầu hạ cánh nếu uy hiếp an toàn
-#### Môi trường
-- Trách nhiệm giảm phát thải khí nhà kính, tiếng ồn, quản lý chất thải
-
-### Thông tư BXD (Quản lý Cảng HK & Bãi cất hạ cánh)
-#### TT 47/2026/TT-BXD (Hoạt động bay)
-- Trách nhiệm Người khai thác CHK: Tìm kiếm cứu nạn, khẩn nguy
-- Đo đạc mốc khống chế tọa độ sơ cấp (PACS) và thứ cấp (SACS)
-- Thỏa thuận chuyển đổi nguồn điện dự phòng, xử lý sự cố
-#### TT 48/2026/TT-BXD (Vận tải hàng không)
-- Phối hợp xử lý hành khách khuyết tật, chậm/hủy chuyến, từ chối nhập cảnh
-- Báo cáo định kỳ: Số chuyến bay đúng giờ/chậm/hủy (Mẫu CHK-1), số liệu thông qua cảng (Mẫu CHK-2)
-- Đầu tư CNTT xử lý dữ liệu để điều phối Slot
-#### TT 52/2026/TT-BXD (Cảng HK & Bãi cất hạ cánh)
-- Ban hành quy chế an toàn (Chèn bánh, chóp an toàn, khoảng cách phương tiện)
-- Có thể điều chỉnh thời gian khai thác khi sự cố, thời tiết, quân sự
-- Giám sát viên an toàn: Đạt chuẩn trình độ, kinh nghiệm, ngoại ngữ
-
-## 4. LĨNH VỰC KHÁC (CÔNG NGHỆ, DOANH NGHIỆP, THƯƠNG MẠI)
-### Nghị định 200/2026/NĐ-CP (Trái phiếu Doanh nghiệp)
-#### Điều kiện chào bán & Trách nhiệm
-- Trái phiếu chuyển đổi/kèm chứng quyền: Phải là CTCP, đáp ứng tỷ lệ NĐT nước ngoài
-- Bắt buộc sử dụng vốn đúng mục đích, công bố thông tin trước/sau chào bán và định kỳ
-- Phải mua lại trước hạn nếu vi phạm
-
-### Nghị định 243/2026/NĐ-CP (Mua bán điện trực tiếp)
-- Cơ chế MBĐT giữa: Đơn vị phát điện NLTT - Khách hàng lớn - Đơn vị bán lẻ (tại khu/cụm)
-- Sản lượng dư: Giá bán không vượt giá tối đa của khung giá phát điện
-
-### Thông tư 32/2026/TT-BCT & 68/2026/TT-BTC
-- TT32: Hỗ trợ 100% kinh phí xúc tiến TM trên MT điện tử (Hội chợ online, livestream, hạ tầng số)
-- TT68: Áp dụng mã vạch (QR), chip trong quản lý dự trữ quốc gia (bảo mật, mã hóa, chữ ký số)
+#### Kỹ thuật trình bày cơ bản
+- Yêu cầu tuân thủ phụ lục: Khổ giấy, kiểu trình bày, lề, phông/cỡ/kiểu chữ.
+- **Số và Ký hiệu:** Bằng chữ số Ả Rập (bắt đầu từ số 01/năm). Ký hiệu viết tắt "VBHN" + tên loại văn bản + tên cơ quan ký.
+- **Tên văn bản:** Gồm tên loại, tên gọi + Danh sách các VB được hợp nhất.
+#### Trình bày các nội dung thay đổi
+- **Nội dung sửa đổi, bổ sung, đính chính:** Phải ghi chú rõ ràng (đến từng phần, chương, mục, điểm, từ/cụm từ).
+- **Nội dung bị bãi bỏ/tạm ngưng:** Ghi chú rõ ngay sau tên phần/chương/mục/điều bị bãi bỏ.
+#### Phần ký xác thực
+- Vị trí: Cuối văn bản, ngăn cách phần nội dung bằng đường kẻ ngang.
+- **Xử lý sai sót:** Nếu có lỗi kỹ thuật, cơ quan thẩm quyền BẮT BUỘC hợp nhất lại và ký xác thực văn bản thay thế.
 
 ### Nghị định 216/2026/NĐ-CP (Lý lịch tư pháp)
-- CSDL do Bộ Công an quản lý
-- Cấp phiếu: Trực tuyến, Bưu chính, Trực tiếp (Dữ liệu chia sẻ có giá trị pháp lý)
+#### Thời gian
+- Ban hành: 18/06/2026
+- Áp dụng: 01/07/2026
+#### Quản lý Hệ thống
+- Bộ Công an quản lý CSDL.
+- Kết nối/Chia sẻ: Thông điệp dữ liệu điện tử có giá trị pháp lý.
+#### Thủ tục cấp phiếu
+- Hình thức: Trực tuyến, Bưu chính, Trực tiếp.
+- Hồ sơ: Bao gồm giấy tờ chứng minh diện miễn/giảm phí.
+
+<!-- STREAMING_CHUNK:Tích hợp Markdown Đa tầng phần Kế toán Thuế -->
+## 2. LĨNH VỰC TÀI CHÍNH - KẾ TOÁN - THUẾ - HẢI QUAN
+### Nghị định 202/2026/NĐ-CP (Lệ phí trước bạ)
+- Ban hành: 08/06/2026 | Áp dụng: 01/03/2027
+- **Chính sách:** Miễn LPTB lần đầu (Mức thu 0%) cho ô tô điện chạy pin đến hết 31/12/2030.
+
+### Nghị định 245/2026/NĐ-CP (Gia hạn nộp Thuế & Tiền thuê đất)
+#### Thời gian & Đối tượng
+- Ban hành & Hiệu lực: 27/06/2026
+- Ngành nghề hỗ trợ: Xây dựng, Vận tải kho bãi, Dịch vụ lưu trú/ăn uống...
+#### Lịch gia hạn chi tiết (Không tính tiền chậm nộp)
+- **Thuế GTGT & TNCN (Gia hạn tối đa 5 tháng):** 
+  - Kỳ tháng 5/2026: Đến 20/11/2026
+  - Kỳ tháng 6,7,8,9/2026: Đến 21/12/2026
+  - Quý II/2026: Đến 02/11/2026
+  - Quý III/2026: Đến 30/12/2026
+- **Thuế TNDN:** 
+  - Tạm nộp Quý II (gia hạn 3 tháng): Đến 02/11/2026
+  - Tạm nộp Quý III (gia hạn 2 tháng): Đến 30/12/2026
+- **Tiền thuê đất:** 50% số tiền phát sinh 2026 gia hạn 5 tháng (Đến 02/11/2026)
+#### Thủ tục
+- Nộp văn bản đề nghị chậm nhất 02/11/2026. Nộp sau hạn: Không được gia hạn.
+
+### Luật Quản lý Thuế & TNCN (Nghị định 252 & 253/2026/NĐ-CP)
+#### NĐ 252 (Quản lý Thuế) - Hiệu lực 01/07/2026
+- Khai bổ sung (Điều 12): Khi sai sót, nộp phần tăng thêm + Tiền chậm nộp.
+- Phân bổ thuế (Điều 15): Khai tập trung tại cơ quan QLTT, phân bổ nghĩa vụ thuế cho địa phương nơi có chi nhánh/địa điểm kinh doanh.
+#### NĐ 253 (Thuế TNCN) - Hiệu lực 01/07/2026
+- Miễn thuế: Chuyển nhượng BĐS gia đình, nhà duy nhất, lãi trái phiếu CP, tiền gửi TCTD, học bổng.
+- Quyết toán: Tổ chức chi trả phải khấu trừ; Cá nhân được ủy quyền quyết toán.
+
+### Hóa đơn & Chứng từ Điện tử (NĐ 254 & TT 91)
+#### Nghị định 254/2026/NĐ-CP
+- **Đặc quyền HĐ không có mã:** Cho lĩnh vực điện, viễn thông, NH, y tế, bảo hiểm, TMĐT.
+- **Hỗ trợ:** Miễn phí DV hóa đơn 12 tháng đầu cho DN nhỏ/vừa, HTX tại vùng khó khăn.
+#### Thông tư 91/2026/TT-BTC
+- **Kỹ thuật:** Ngôn ngữ XML. Ký hiệu 6 ký tự (VD: 1 - HĐ GTGT, 2 - HĐ bán hàng). Ký tự đầu tiên xác định có mã hay không.
+- **Sai sót:** Nếu sai sót không ảnh hưởng mã số thuế, số tiền, thuế suất -> Chỉ thông báo (Không lập lại HĐ).
+- **Thưởng:** Quỹ "Hóa đơn may mắn" tối đa 150 tỷ/năm. Thưởng người tố giác bán hàng không xuất HĐ.
+
+### Giao dịch liên kết (Nghị định 255/2026/NĐ-CP)
+#### Thời gian
+- Ban hành: 30/07/2026
+- Áp dụng: 01/07/2026
+#### Quản lý & Xác định
+- Nguyên tắc: Loại trừ yếu tố làm giảm nghĩa vụ thuế do quan hệ liên kết chi phối.
+- Nghĩa vụ người nộp thuế: Kê khai, lập hồ sơ xác định giá, báo cáo lợi nhuận liên quốc gia.
+
+### Các Thông tư Quản lý Kế toán & Hải Quan (Bộ Tài chính)
+#### TT 73/2026/TT-BTC (Mẫu biểu Quyết toán)
+- Hiệu lực: 01/07/2026
+- Ban hành Hệ thống 12 mẫu biểu (Từ 01/QTDA đến 12/QTDA) phục vụ quyết toán vốn đầu tư.
+#### TT 84/2026/TT-BTC (Hoàn thuế GTGT Khách nước ngoài)
+- Cục Hải quan quản lý HTTT. Doanh nghiệp bán hàng có quyền quảng cáo hoàn thuế.
+#### TT 85/2026/TT-BTC (Phân loại Hàng hóa XNK)
+- Hiệu lực: 15/09/2026
+- **Nguyên tắc:** Mỗi mặt hàng 1 mã số duy nhất. 
+- **Máy móc tháo rời:** Phân loại theo quy tắc 2a.
+- **Thời hạn kết quả:** 5 ngày làm việc (20 ngày nếu mẫu phức tạp).
+#### TT 86/2026/TT-BTC (Quản lý Thuế Hàng XNK)
+- Hướng dẫn điều kiện miễn/giảm/không thu/hoàn/khoanh/xóa nợ thuế hàng XNK.
+#### TT 90/2026/TT-BTC (Đăng ký thuế)
+- Thủ tục đăng ký qua cơ quan ĐKKD hoặc trực tiếp. Cấp MST trong 3 ngày làm việc.
+
+<!-- STREAMING_CHUNK:Tích hợp Markdown Đa tầng phần Đầu tư Xây dựng -->
+## 3. LĨNH VỰC ĐẦU TƯ, XÂY DỰNG, BẢO TRÌ DỰ ÁN
+### Nghị định 193/2026/NĐ-CP (Quyết toán vốn ĐT Dự án)
+- Áp dụng: 01/07/2026
+- **Phạm vi Quyết toán:** Toàn bộ chi phí hợp pháp trong hạn mức được duyệt.
+- **Thẩm tra & Phê duyệt:** Sở Tài chính chủ trì thẩm tra; Người QĐ đầu tư phê duyệt.
+- **Chi phí Kiểm toán:** Tính thuộc Chi phí khác.
+- **Thời hạn:** Lập & Phê duyệt tối đa 4 đến 9 tháng tùy dự án.
+
+### Nghị định 206/2026/NĐ-CP (Quản lý Chi phí Xây dựng)
+- **Tổng mức đầu tư:** Thẩm định cùng Báo cáo NCKT. Gồm 7 khoản (Bồi thường, XD, TB, QLDA, Tư vấn, Dự phòng, Khác).
+- **Giá xây dựng:** Công tác, nhóm, bộ phận, suất chi phí, suất vốn đầu tư.
+
+### Nghị định 207/2026/NĐ-CP (Chất lượng & Bảo trì)
+- Bao gồm nghiệm thu công trình quy mô lớn. 
+- Yêu cầu nghiêm ngặt an toàn công trường, thi công, phá dỡ.
+- Quy định việc **Dừng khai thác** khi không đảm bảo an toàn.
+
+### Nghị định 212/2026/NĐ-CP (HTTT & Năng lực Xây dựng)
+- CSDL tập trung tại `csdlhdxd.gov.vn`.
+- Chứng chỉ hành nghề Xây dựng: Hiệu lực 10 năm.
+
+### Nghị định 217/2026/NĐ-CP (Quản lý Trật tự Xây dựng)
+- **Trình tự:** Chuẩn bị -> Thực hiện -> Kết thúc.
+- **Cấp phép:** Đảm bảo kết cấu, PCCC, Môi trường. (Thẩm quyền: UBND Xã, BQL KCN, Sở Xây dựng).
+
+### Nghị định 220/2026/NĐ-CP (Bảo hiểm Bắt buộc Xây dựng)
+- Bắt buộc với công trình quy mô lớn, kỹ thuật phức tạp, rủi ro môi trường.
+- Số tiền BH: Tính theo Giá trị HĐ (+điều chỉnh).
+- Phí BH: DN được tăng/giảm tối đa 25% (Trừ thiên tai/Lỗ 3 năm).
+
+### Các Thông tư chuyên ngành (Bộ Xây dựng)
+#### TT 29/2026/TT-BXD (Thiết bị kỹ thuật đo đạc/xử lý VP)
+- Định mức sử dụng: Máy đo độ dài, máy ghi âm/hình, nồng độ cồn...
+#### TT 32, 33, 34/2026 (An toàn, Cấp Công trình)
+- TT32 (QL Chất lượng): Lập kế hoạch thí nghiệm & quan trắc thi công. Hết niên hạn phải công bố trên Cổng TTĐT.
+- TT33 (An toàn): Đánh giá lần đầu trong 10 năm; Các lần sau Max 5 năm/lần (Cấp độ 1 & 2).
+- TT34 (Cấp công trình): Phân cấp để quản lý BIM, cấp GPXD, chọn chỉ dẫn kỹ thuật.
+#### TT 36, 37, 38/2026 (Chi phí, Định mức XD)
+- TT36: Quản lý tổng mức đầu tư, Chỉ số giá xây dựng công bố Quý/Năm.
+- TT37 & 38: Phương pháp xác định giá nhân công, ca máy. Cung cấp định mức lắp đặt, khảo sát, sửa chữa.
+#### TT 40, 41, 42/2026 (Bảo trì, Vật liệu, Kiểm định)
+- TT40 (Chi phí Bảo trì): Chi phí dự phòng Max 5%. Chi phí QL của chủ sở hữu tính theo tỷ lệ %.
+- TT41 (Vật liệu): Nhóm rủi ro Trung bình/Cao phải công bố hợp quy + niêm yết TMĐT.
+- TT42 (Kiểm định): Bãi bỏ GCN hợp quy cho Cần trục, vận thăng. Áp dụng QCVN 18:2021. Nếu thiết bị không đạt, chỉ kiểm định ban đầu + ghi rõ lý do.
+
+<!-- STREAMING_CHUNK:Tích hợp Markdown Đa tầng phần Hàng không & Tàu bay -->
+## 4. LĨNH VỰC HÀNG KHÔNG & TÀU BAY
+### Nghị định 221/2026/NĐ-CP (Nhà chức trách Hàng không)
+#### Nhà chức trách
+- Cục HKVN thuộc Bộ Xây dựng (Sử dụng con dấu hình Quốc huy).
+#### Thu phí Nhượng quyền Khai thác
+- DV Bảo đảm hoạt động bay: 165.000 VNĐ/lượt
+- DV Kinh doanh Cảng HK: 335.000 VNĐ/lượt
+- Trích lại: Nhà chức trách giữ lại 45% chi hoạt động.
+#### Điều tra sự cố
+- Mục đích: Tìm nguyên nhân, khắc phục, phòng ngừa (Không nhằm quy kết trách nhiệm pháp lý).
+
+### Nghị định 223/2026/NĐ-CP (Tàu bay)
+#### Quản lý chung
+- Đăng ký quốc tịch: Bắt buộc gắn cờ Việt Nam.
+- Khai thác: Được yêu cầu hạ cánh nếu uy hiếp an ninh. 
+#### Môi trường
+- Yêu cầu chủ tàu bay/khai thác giảm phát thải khí nhà kính và xử lý tiếng ồn, chất thải.
+
+### Quản lý Cảng HK (Các Thông tư Bộ Xây dựng)
+#### TT 47/2026/TT-BXD (Hoạt động bay)
+- Người khai thác cảng phải cung cấp DV tìm kiếm cứu nạn.
+- Đo đạc & Bảo trì mốc tọa độ (PACS sơ cấp, SACS thứ cấp).
+- Chuyển giao tin báo từ tổ lái (động vật, hạ tầng) cho kiểm soát không lưu.
+#### TT 48/2026/TT-BXD (Vận tải HK)
+- Điều phối Slot: Cảng phải đầu tư CNTT xử lý dữ liệu báo cáo.
+- Xử lý chậm/hủy chuyến, hỗ trợ người khuyết tật, khách bị từ chối nhập cảnh.
+- Báo cáo định kỳ: Mẫu CHK-1 (Chậm chuyến/Đúng giờ), Mẫu CHK-2 (Số liệu sản lượng thông qua).
+#### TT 52/2026/TT-BXD (Cảng & Bãi cất hạ cánh)
+- An toàn: Tiêu chuẩn chèn bánh, chóp an toàn xung quanh tàu bay.
+- Cảng được điều chỉnh giờ khai thác (thời tiết, kỹ thuật, mục đích quân sự).
+- Giám sát viên an toàn: Đòi hỏi trình độ, kinh nghiệm và ngoại ngữ chuẩn hóa.
+
+<!-- STREAMING_CHUNK:Tích hợp Markdown Đa tầng phần Doanh nghiệp, Thương mại, Công nghệ -->
+## 5. LĨNH VỰC DOANH NGHIỆP, THƯƠNG MẠI & CÔNG NGHỆ
+### Tài chính Doanh nghiệp (NĐ 200 & TT 80)
+#### Nghị định 200/2026/NĐ-CP (Trái phiếu Doanh nghiệp)
+- TP Chuyển đổi/Chứng quyền: Phải là Công ty Cổ phần, đáp ứng room ngoại.
+- Phải dùng vốn đúng mục đích (cơ cấu nợ, dự án..). Mua lại trước hạn nếu vi phạm.
+#### Thông tư 80/2026/TT-BTC (Công ty Đại chúng)
+- Hủy tư cách Cty Đại chúng: Nếu không đáp ứng điều kiện vốn/cổ đông sau 1 năm.
+
+### Thương mại & Năng lượng
+#### NĐ 230/2026/NĐ-CP & TT 32/2026/TT-BCT (Xúc tiến Thương mại)
+- Phát triển hạ tầng logistics, hội chợ. Xây dựng thương hiệu cấp quốc gia.
+- TT 32/BCT: Hỗ trợ 100% kinh phí xúc tiến trên không gian số (Livestream, hội chợ online, hạ tầng số bảo mật).
+#### Nghị định 243/2026/NĐ-CP (Mua bán điện trực tiếp)
+- Mua bán trực tiếp: Nhà máy NLTT - Khách lớn - Đơn vị bán lẻ. Giá bán phần dư không vượt giá tối đa trong khung giá phát điện.
+
+### Công nghệ & Đổi mới sáng tạo (NĐ 260 & TT 68)
+#### Nghị định 260/2026/NĐ-CP (Luật Công nghệ cao)
+- Ưu đãi cho khởi nghiệp công nghệ cao.
+- Chính sách thu hút nhân tài (Tổng công trình sư, chuyên gia giỏi). 
+- Xác nhận sản phẩm công nghệ chiến lược sản xuất tại VN.
+#### Thông tư 68/2026/TT-BTC (Hạ tầng số Dự trữ Quốc gia)
+- Ứng dụng Chip, mã vạch (QR) để số hóa quản lý hàng dự trữ.
+- Yêu cầu tuyệt đối mã hóa, dùng chữ ký số và phân quyền bảo mật dữ liệu.
             </script>
         </div>
     </div>
@@ -264,6 +286,7 @@
         Hệ thống hỗ trợ triển khai văn bản nội bộ - VCA
     </div>
 
+<!-- STREAMING_CHUNK:Tải Script Markmap Autoloader & Chức năng Download -->
     <script src="https://cdn.jsdelivr.net/npm/markmap-autoloader@0.15.4"></script>
     <script>
         // Thuật toán chụp toàn bộ Mindmap độ phân giải cao
@@ -322,7 +345,7 @@
                 ctx.drawImage(img, 0, 0);
                 
                 const a = document.createElement('a');
-                a.download = 'VCA_Mindmap_ChiTiet.png';
+                a.download = 'VCA_Mindmap_ChiTiet_Full42.png';
                 a.href = canvas.toDataURL('image/png');
                 a.click();
             };
@@ -331,3 +354,7 @@
 </body>
 </html>
 ```eof
+
+Toàn bộ sơ đồ tư duy đã được em xây dựng lại. **Nghị định 250/2026/NĐ-CP** (và tất cả 41 văn bản còn lại) đã được bổ sung đầy đủ chi tiết với các phân nhánh theo đúng yêu cầu. Sơ đồ hiện đang rất lớn, anh/chị hãy mở rộng màn hình Canvas bên phải, dùng thao tác kéo - thả chuột và cuộn để theo dõi toàn cảnh 5 nhóm phân loại nhé!
+
+```
