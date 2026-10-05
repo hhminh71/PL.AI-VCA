@@ -1,290 +1,305 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cổng Thông Tin Văn Bản Pháp Luật - ACV</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Chosen Palette: Corporate Blue and Slate -->
-    <!-- Application Structure Plan: A dashboard-style single-page application. The core is a filterable, searchable list of legal documents presented as interactive cards. The main navigation will be based on legal domains (Xây dựng, Tài chính, PCCC, etc.) derived from the source report, rather than the original chronological grouping. This task-oriented structure helps users from different departments quickly find relevant information. A timeline chart at the top provides a high-level overview of when regulations become effective. Users can filter the document list by clicking on category tags. Clicking on a document card reveals its detailed summary in a modal window. A search bar allows for keyword-based filtering. This structure transforms a static list into an exploratory tool, prioritizing user efficiency. -->
-    <!-- Visualization & Content Choices: 
-        1. Report Info: Number of documents and their effective dates. Goal: Show the volume/timing of new regulations. Viz: Bar Chart (Chart.js/Canvas) showing count per month. Interaction: Hover for details. Justification: Provides a quick visual summary of upcoming changes.
-        2. Report Info: List of all legal documents. Goal: Organize and present detailed information clearly. Viz: Interactive Cards (HTML/CSS/Tailwind). Interaction: Click card to open a modal with details. List is filterable by category tags and searchable. Justification: Progressive disclosure via modals prevents information overload. Domain-based filtering is highly usable for the target audience.
-    -->
-    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
-    <style>
-        body { font-family: 'Inter', sans-serif; }
-        .chart-container { position: relative; width: 100%; max-width: 800px; margin-left: auto; margin-right: auto; height: 300px; max-height: 40vh; }
-        .modal-bg { transition: opacity 0.3s ease; }
-        .modal-box { transition: transform 0.3s ease, opacity 0.3s ease; }
-        .document-card { transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; }
-        .document-card:hover { transform: translateY(-4px); box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1); }
-        .filter-btn-active { background-color: #2563eb; color: white; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VCA Visualizer - Phòng TC-KH</title>
+<style>
+    /* --- CẤU HÌNH GIAO DIỆN VCA (ACV STYLE) --- */
+    body, html { margin: 0; padding: 0; height: 100%; font-family: 'Segoe UI', Arial, sans-serif; background: #f5f7fa; display: flex; flex-direction: column;}
+    
+    /* Header */
+    .vca-header {
+        background: #0056b3; /* Xanh ACV */
+        color: white;
+        padding: 12px 20px;
+        border-bottom: 4px solid #d4af37; /* Vàng Gold */
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        flex-shrink: 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .vca-top { font-size: 11px; text-transform: uppercase; opacity: 0.8; letter-spacing: 0.5px; }
+    .vca-title { font-size: 13px; font-weight: 700; text-transform: uppercase; margin-top: 2px; }
+    .vca-badge { font-size: 12px; background: rgba(255,255,255,0.2); padding: 2px 8px; border-radius: 4px; display: inline-block; margin-top: 5px;}
+
+    /* Nút Tải Sơ Đồ */
+    .btn-download {
+        background: #d4af37; color: #002244; border: none; padding: 8px 15px; border-radius: 5px;
+        font-weight: bold; font-family: 'Segoe UI', sans-serif; font-size: 12px; cursor: pointer;
+        display: flex; align-items: center; gap: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        transition: all 0.2s ease;
+    }
+    .btn-download:hover { background: #e6c555; transform: translateY(-1px); }
+    .btn-download svg { width: 16px; height: 16px; fill: currentColor; }
+
+    /* Main Container */
+    .main-area { flex-grow: 1; position: relative; overflow: hidden; }
+    .markmap { width: 100%; height: 100vh; }
+
+    /* Footer */
+    .vca-footer { 
+        background: #e9ecef; color: #555; text-align: center; 
+        padding: 5px; font-size: 11px; flex-shrink: 0; border-top: 1px solid #ddd;
+    }
+</style>
+<style>.markmap-node-text { font-family: 'Segoe UI'; font-size: 14px; fill: #333; }</style>
 </head>
-<body class="bg-slate-50 text-slate-800">
+<body>
 
-    <div class="container mx-auto p-4 md:p-8">
-        
-        <header class="text-center mb-8">
-            <h1 class="text-3xl md:text-4xl font-bold text-slate-900">Cổng Thông Tin Văn Bản Pháp Luật</h1>
-            <p class="mt-2 text-lg text-slate-600">Cập nhật các quy định pháp luật mới liên quan đến hoạt động của ACV (T5-T6/2025)</p>
-        </header>
-
-        <main>
-            <section id="overview" class="mb-10">
-                <h2 class="text-2xl font-semibold mb-4 text-slate-700 text-center">Tổng Quan Lộ Trình Hiệu Lực</h2>
-                <p class="text-center text-slate-500 mb-6 max-w-3xl mx-auto">Biểu đồ dưới đây thể hiện số lượng văn bản quy phạm pháp luật có hiệu lực theo từng tháng, giúp các đơn vị có cái nhìn tổng thể và chuẩn bị kế hoạch tuân thủ kịp thời.</p>
-                <div class="bg-white p-4 rounded-xl shadow-md">
-                    <div class="chart-container">
-                        <canvas id="effectiveDateChart"></canvas>
-                    </div>
-                </div>
-            </section>
-
-            <section id="documents-section">
-                <h2 class="text-2xl font-semibold mb-4 text-slate-700 text-center">Tra Cứu Văn Bản Chi Tiết</h2>
-                <p class="text-center text-slate-500 mb-6 max-w-3xl mx-auto">Sử dụng thanh tìm kiếm hoặc lọc theo lĩnh vực để nhanh chóng tìm thấy văn bản bạn quan tâm. Nhấp vào từng văn bản để xem nội dung chi tiết.</p>
-
-                <div class="flex flex-col md:flex-row gap-4 mb-6">
-                    <div class="relative flex-grow">
-                        <input type="text" id="searchInput" placeholder="Tìm theo số hiệu, tiêu đề..." class="w-full p-3 pl-10 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
-                        <svg class="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                    </div>
-                </div>
-
-                <div id="filters" class="flex flex-wrap justify-center gap-2 mb-8">
-                </div>
-
-                <div id="documents-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                </div>
-                 <p id="no-results" class="text-center text-slate-500 text-lg py-10 hidden">Không tìm thấy văn bản nào phù hợp.</p>
-            </section>
-        </main>
-
+    <div class="vca-header">
+        <div class="vca-header-left">
+            <div class="vca-top">Tổng công ty Cảng hàng không Việt Nam - CTCP</div>
+            <div class="vca-title">Cảng hàng không quốc tế Cần Thơ</div>
+            <div class="vca-badge">Phòng Tài chính - Kế hoạch | Triển khai văn bản</div>
+        </div>
+        <button class="btn-download" onclick="downloadFullMindmap()">
+            <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+            TẢI SƠ ĐỒ (FULL HD)
+        </button>
     </div>
 
-    <div id="modal" class="fixed inset-0 bg-black bg-opacity-60 modal-bg flex items-center justify-center p-4 z-50 hidden" role="dialog" aria-modal="true">
-        <div id="modal-box" class="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col transform scale-95 opacity-0 modal-box">
-            <div class="flex items-center justify-between p-5 border-b border-slate-200">
-                <h3 id="modal-title" class="text-xl font-semibold text-slate-800"></h3>
-                <button id="close-modal" class="text-slate-400 hover:text-slate-700 transition" aria-label="Đóng">
-                    <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                </button>
-            </div>
-            <div id="modal-content" class="p-6 overflow-y-auto">
-            </div>
-            <div class="p-4 bg-slate-50 border-t border-slate-200 text-sm text-slate-500">
-                <p>Nội dung chỉ mang tính chất tham khảo, vui lòng xem văn bản gốc để có thông tin đầy đủ và chính xác nhất.</p>
-            </div>
+    <div class="main-area">
+        <div class="markmap">
+            <script type="text/template">
+# NGHỊ ĐỊNH 287/2025/NĐ-CP
+## THÔNG TIN CHUNG
+### Ngày ban hành: 05/11/2025
+### Hiệu lực thi hành: 01/01/2026 (Thay thế NĐ 44/2018/NĐ-CP)
+## CHƯƠNG I: QUY ĐỊNH CHUNG
+### Điều 1. Phạm vi điều chỉnh
+#### Quản lý, sử dụng, khai thác TS KCHT HK do Nhà nước đầu tư, quản lý
+#### KHÔNG điều chỉnh đối với:
+- Tài sản do đơn vị lực lượng vũ trang nhân dân quản lý.
+- Trụ sở làm việc, cơ sở hoạt động sự nghiệp tại CHK, sân bay.
+- Công trình/đất gắn với công trình dịch vụ HK, phi HK (kỹ thuật, sửa chữa, suất ăn, xăng dầu...).
+- Tài sản do đối tượng khác quản lý; tài sản đã bán, chuyển nhượng, cổ phần hóa.
+### Điều 2. Đối tượng áp dụng
+#### Cơ quan QLNN về HKDD (Chính phủ)
+#### Cơ quan tham mưu, thực thi pháp luật chuyên ngành (Cơ quan QLHK)
+#### Doanh nghiệp được giao quản lý tài sản (Doanh nghiệp quản lý tài sản):
+- Doanh nghiệp bảo đảm hoạt động bay (100% vốn NN thuộc Bộ Xây dựng).
+- Doanh nghiệp kinh doanh, khai thác cảng (Thực tiếp khai thác hạ tầng sân bay).
+### Điều 3. Danh mục tài sản KCHT HK
+#### Công trình bảo đảm hoạt động bay
+#### Công trình thuộc kết cấu hạ tầng sân bay
+- Đường cất hạ cánh, đường lăn, sân đỗ, khu phụ trợ.
+- Công trình khẩn nguy, PCCC.
+- Hàng rào vành đai, đường nội cảng, hạ tầng BVMT trong sân bay.
+- Bãi tập kết thiết bị, tra nạp nhiên liệu mặt đất.
+#### Công trình khẩn nguy ngoài sân bay
+#### Hàng rào CHK, đường nội cảng ngoài sân bay, hạ tầng kỹ thuật (điện, nước, viễn thông...)
+#### Công trình hạ tầng BVMT ngoài sân bay
+#### Nhà ga hành khách, nhà khách ngoại giao, logistics, nhà ga hàng hóa
+#### Trách nhiệm đối với TS liên quan QP-AN:
+- Quốc phòng: Theo quy định bảo vệ công trình quốc phòng & khu quân sự.
+- An ninh: Theo quy định bảo vệ công trình quan trọng về ANQG.
+### Điều 4. Nguyên tắc quản lý, sử dụng, khai thác
+#### Phải thống kê, kế toán, tính hao mòn, khấu hao, bảo trì.
+#### Căn cứ giao tài sản: Quy hoạch, kế hoạch đầu tư, chức năng nhiệm vụ.
+#### Lấy ý kiến khi giao/khai thác/xử lý:
+- Bộ Quốc phòng (TS liên quan QP hoặc lưỡng dụng).
+- Bộ Công an (TS liên quan ANQG).
+- Bộ Xây dựng, CQQLHK, DNQLTS tự xác định nếu không liên quan QP-AN.
+#### Xử lý đất đai:
+- Tuân thủ Luật Đất đai, Luật HKDD. Thu hồi đất thực hiện theo Luật Đất đai (không theo NĐ này).
+## CHƯƠNG II: GIAO QUẢN LÝ TÀI SẢN
+### Điều 5. Đối tượng & Hình thức
+#### Tính thành phần vốn NN tại DN:
+- Giao cho DN bảo đảm hoạt động bay (TS đảm bảo HĐ bay).
+- Giao cho DN kinh doanh, khai thác cảng (TS khẩn nguy ngoài SB, hàng rào ngoài SB, BVMT ngoài SB, nhà ga...).
+#### Không tính thành phần vốn NN tại DN:
+- Giao cho DN kinh doanh, khai thác cảng (Hạ tầng sân bay: đường băng, đường lăn, sân đỗ...).
+- Lưu ý: Sau khi giao không tính vốn, DN có thể lập phương án đầu tư bổ sung vốn NN bằng giá trị tài sản này.
+#### TS là kết quả dự án vốn NN:
+- Có xác định thụ hưởng là DNQLTS: Tự động bàn giao sau hoàn thành, không lập lại thủ tục.
+- Đối tượng thụ hưởng là CQNN/Đảng/Đoàn thể: Điều chuyển về Bộ Xây dựng -> Giao DNQLTS.
+### Điều 6. Thẩm quyền, trình tự, thủ tục giao
+#### Thẩm quyền quyết định: Bộ trưởng Bộ Xây dựng
+#### Quy trình & Thời hạn:
+- B1: CQQLHK lập 01 bộ hồ sơ trình Bộ Xây dựng.
+- B2: Trông 15 NGÀY, Bộ trưởng Bộ Xây dựng ra Quyết định giao tài sản (hoặc phản hồi từ chối).
+#### Xác định giá trị (để tính vốn NN):
+- TS hoàn thành trong 03 năm: Giá trị còn lại trên sổ kế toán.
+- Các trường hợp khác (>3 năm): CQQLHK thuê thẩm định giá (dùng kinh phí chi thường xuyên của CQQLHK).
+#### Tổ chức thực hiện: Lập biên bản bàn giao (Mẫu 01).
+### Điều 7. Chuyển hình thức giao (Từ Không tính vốn -> Tính vốn NN)
+#### Thẩm quyền: Bộ trưởng Bộ Xây dựng
+#### Trình tự:
+- DN kinh doanh, khai thác cảng lập hồ sơ -> Gửi CQQLHK.
+- Xác định giá trị: TS hoàn thành <=03 năm lấy giá trị sổ sách; Khác: Thuê thẩm định giá (chi phí do DN trả).
+- Trong 30 NGÀY từ khi đủ hồ sơ: CQQLHK báo cáo Bộ Xây dựng, lấy ý kiến các cơ quan, trình Bộ trưởng QĐ.
+### Điều 8. Giao tài sản điều chuyển về Bộ Xây dựng
+#### Thẩm quyền: Bộ trưởng Bộ Xây dựng
+#### Thời hạn: 15 NGÀY (Từ khi nhận đủ hồ sơ, Bộ trưởng ra QĐ giao tài sản).
+## CHƯƠNG III: QUẢN LÝ, SỬ DỤNG, KHAI THÁC (Áp dụng TS giao Không tính vốn NN)
+### Mục 1: Hồ sơ & Kế toán
+#### Điều 9. Hồ sơ:
+- Quản lý hiện trạng, báo cáo kê khai, lưu trữ dữ liệu CSDL.
+#### Điều 10. Kế toán:
+- TS có kết cấu độc lập/hệ thống là 1 đối tượng ghi sổ.
+- Nguyên giá: Lấy giá trị mua sắm/quyết toán. Nếu chưa quyết toán -> dùng nguyên giá tạm tính (ưu tiên: Thẩm tra QT > Đề nghị QT > Hợp đồng A-B > Dự toán > Tổng mức đầu tư).
+- TS không có thông tin: Thuê Thẩm định giá.
+- Điều chỉnh nguyên giá khi: Đánh giá lại, nâng cấp mở rộng, tháo dỡ/lắp đặt bộ phận, hư hỏng do thiên tai.
+### Mục 2: Bảo trì & Vận hành khi nâng cấp
+#### Điều 11. Bảo trì:
+- Kinh phí: Do Ngân sách Nhà nước (NSNN) đảm bảo.
+- Quy trình: DN lập dự toán -> CQQLHK/Bộ XD tổng hợp -> Bộ XD giao dự toán.
+- TRƯỜNG HỢP KHẨN CẤP: DN được ứng kinh phí từ nguồn thu khai thác tài sản, lập hồ sơ giao bổ sung dự toán NSNN để hoàn trả khoản ứng.
+- Vật tư thu hồi từ bảo trì -> Xử lý theo quy định thanh lý tài sản.
+#### Điều 12. Quản lý trong thời gian nâng cấp (Dự án NSNN):
+- Bàn giao mặt bằng (Mẫu 02) cho Chủ đầu tư.
+- Chủ đầu tư chịu trách nhiệm bảo quản, bảo trì; không cấp kinh phí bảo trì cho DN khai thác cảng giai đoạn này.
+### Mục 3: Khai thác tài sản
+#### Điều 13-14. Phương thức khai thác:
+- DN kinh doanh khai thác cảng TRỰC TIẾP tổ chức khai thác, cung cấp dịch vụ chuyên ngành.
+- HĐQT của DN ban hành Quy chế cung cấp dịch vụ.
+#### Điều 15. Quản lý tiền thu từ khai thác:
+- Bản chất: Là nguồn thu của Ngân sách Trung ương (sau khi trừ chi phí).
+- Thời hạn nộp (Hàng quý): Chậm nhất ngày thứ 15 của tháng đầu tiên trong quý sau.
+- Thời hạn nộp (Hàng năm): Chậm nhất 90 ngày kể từ ngày kết thúc năm tài chính.
+- Chi phí được trừ: Phí thẩm định giá, chi phí trực tiếp, chi phí gián tiếp (phân bổ). Giao Bộ Xây dựng quy định định mức phân bổ trong 06 THÁNG từ khi NĐ có hiệu lực.
+- Ưu tiên: Tiền nộp NSNN được ưu tiên bố trí vốn ĐTC/Dự toán để đầu tư/phát triển lại KCHT HK.
+### Mục 4: Xử lý tài sản
+#### Điều 16. Các hình thức xử lý (5 hình thức chính)
+- Thu hồi / Điều chuyển / Chuyển giao về địa phương / Thanh lý / Bị mất, hủy hoại.
+#### Điều 17. Thu hồi:
+- Lý do: Thay đổi quy hoạch, không còn nhu cầu sử dụng.
+- Thẩm quyền: Bộ trưởng Bộ Xây dựng.
+- Xử lý sau thu hồi: Điều chuyển (Nếu trên đất QP -> Điều chuyển cho Bộ QP) hoặc Chuyển giao về địa phương.
+- Thời gian: CQQLHK báo cáo Bộ XD trong 30 NGÀY kể từ khi nhận đủ hồ sơ.
+#### Điều 18. Điều chuyển:
+- Thẩm quyền:
+  + Bộ trưởng Bộ XD (Điều chuyển nội bộ hoặc sang Bộ/Ngành/Tỉnh khác).
+  + Chủ tịch UBND Tỉnh / Bộ trưởng khác (Điều chuyển từ địa phương/Bộ khác sang Bộ XD).
+- Thời hạn thẩm định: 30 NGÀY (CQQLHK báo cáo).
+- Thời hạn Quyết định: 15 NGÀY (Từ khi các Bộ/Tỉnh nhận đủ hồ sơ).
+- Thời hạn Bàn giao: 30 NGÀY kể từ ngày có QĐ. Nếu chậm, bên chậm chịu chi phí bảo quản và bồi thường rủi ro. KHÔNG hạch toán chi phí chậm vào chi phí hợp lý tính thuế TNDN.
+#### Điều 19. Chuyển giao về địa phương:
+- Thẩm quyền: Bộ trưởng Bộ Xây dựng.
+- Thời hạn CQQLHK báo cáo: 30 NGÀY.
+- Thời hạn Bộ trưởng ra QĐ: 15 NGÀY.
+- Thời hạn UBND tỉnh QĐ tiếp nhận: 15 NGÀY (kể từ khi có QĐ của Bộ XD).
+- Thời hạn Bàn giao: 15 NGÀY (kể từ khi có QĐ của UBND tỉnh).
+- Phương thức xử lý tài sản trên đất của địa phương: Giao tài sản có hoàn trả giá trị cho NN HOẶC Phá dỡ/hủy bỏ trước khi giao đất.
+#### Điều 20. Thanh lý (Phá dỡ, Hủy bỏ):
+- Thẩm quyền: Bộ trưởng Bộ Xây dựng.
+- Thời hạn Quyết định: 15 NGÀY.
+- Xử lý vật tư thu hồi: Giao lại DN bảo trì (giảm trừ dự toán NSNN) / Điều chuyển / Bán (Theo NĐ 151/2017 & 114/2024) / Hủy bỏ.
+- Nếu điều chuyển vật tư thu hồi: Bộ XD quyết định trong 15 NGÀY, bàn giao trong 30 NGÀY.
+#### Điều 21. Bị mất, bị hủy hoại (Thiên tai, Hỏa hoạn...):
+- Thẩm quyền QĐ: Bộ trưởng Bộ Xây dựng.
+- Thời hạn lập hồ sơ: 30 NGÀY từ khi phát hiện.
+- Thời hạn Quyết định: 15 NGÀY.
+- Khắc phục hậu quả: Kế toán giảm tài sản trong 30 NGÀY. Ngân sách NN đảm bảo kinh phí khôi phục. Tiền bảo hiểm/bồi thường (nếu có) phải nộp vào NSNN.
+#### Điều 22. Tiền thu từ xử lý tài sản:
+- Nộp TOÀN BỘ vào NSNN (sau khi trừ chi phí).
+- Chi phí được trừ: Kiểm kê, tháo dỡ, thẩm định giá, bảo vệ chờ xử lý...
+- Thời hạn lập hồ sơ thanh toán chi phí: 30 NGÀY từ khi hoàn thành xử lý.
+### Mục 5: Phương thức đối tác công tư (PPP)
+#### Điều 23. Quản lý TS tham gia PPP
+- Thẩm quyền sử dụng TS hiện có để PPP: Bộ trưởng Bộ Xây dựng (TS thuộc Bộ), UBND Cấp tỉnh (TS đã chuyển giao địa phương).
+- Thời hạn xem xét QĐ: 15 NGÀY.
+- Phối hợp: CQQLHK, DN kinh doanh khai thác cảng theo dõi, kiểm tra suốt vòng đời PPP cho đến khi nhà đầu tư chuyển giao lại cho NN.
+## CHƯƠNG IV: BÁO CÁO & CƠ SỞ DỮ LIỆU
+### Điều 24. Chế độ Báo cáo
+#### Báo cáo kê khai:
+- Thời hạn: 30 NGÀY kể từ ngày đưa vào sử dụng, tiếp nhận, hoặc có thay đổi thông tin.
+#### Báo cáo hàng năm (Chốt số liệu hết năm tài chính):
+- DN nộp cho Bộ Xây dựng: TRƯỚC 28/02 hàng năm.
+- Bộ Xây dựng tổng hợp nộp Bộ Tài chính: TRƯỚC 15/03 hàng năm.
+### Điều 25. Cơ sở dữ liệu (CSDL)
+#### Trách nhiệm: Bộ Xây dựng, Bộ Tài chính phối hợp.
+#### Tính chất: Là một bộ phận của CSDL Quốc gia về tài sản công.
+## CHƯƠNG V: TỔ CHỨC THỰC HIỆN
+### Điều 26. Trách nhiệm thi hành
+#### Bộ Xây dựng:
+- Ban hành định mức kỹ thuật bảo trì, chi phí trực tiếp/gián tiếp trong vòng 06 THÁNG.
+- Phê duyệt kế hoạch bảo trì.
+#### Bộ Tài chính:
+- Hướng dẫn kế toán, hao mòn, tích hợp CSDL.
+### Điều 27. Xử lý chuyển tiếp
+#### Đối với TS theo Quyết định 2007/QĐ-TTg:
+- Tiếp tục thực hiện quản lý, khai thác theo QĐ 2007 ĐẾN HẾT NĂM 2026 (Không phải làm lại thủ tục).
+- Hết hạn, Bộ XD ra QĐ giao lại theo NĐ này.
+#### TS chưa xác định giá trị:
+- Phải hoàn thành định giá trong vòng 06 THÁNG kể từ ngày NĐ có hiệu lực (01/01/2026).
+## PHỤ LỤC BIỂU MẪU
+### Mẫu 01: Biên bản bàn giao, tiếp nhận TS KCHT HK.
+### Mẫu 02: Biên bản tạm bàn giao TS KCHT HK (Cho thi công/dự án).
+            </script>
         </div>
     </div>
 
+    <div class="vca-footer">
+        Hệ thống hỗ trợ triển khai văn bản nội bộ - VCA
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/markmap-autoloader@0.15.4"></script>
     <script>
-        const documentsData = [
-            { id: 1, category: 'Xây dựng', number: 'Thông tư 05/2025/TT-BXD', title: 'Ban hành định mức kinh tế - kỹ thuật trong bảo trì kết cấu hạ tầng hàng không thuộc khu bay tại các Cảng hàng không sân bay.', issuedDate: '12/05/2025', effectiveDate: '12/05/2025', details: '<ul><li class="mb-2">- Quy định định mức KT-KT trong bảo trì kết cấu hạ tầng hàng không thuộc khu bay sử dụng vốn NSNN.</li><li class="mb-2">- Định mức KT-KT đối với bảo trì công trình xây dựng.</li><li>- Định mức KT-KT đối với bảo dưỡng thiết bị.</li></ul>' },
-            { id: 2, category: 'Tài chính', number: 'Thông tư 27/2025/TT-BTC', title: 'Quy định về quyết toán vốn đầu tư dự án hoàn thành sử dụng vốn nhà nước ngoài vốn đầu tư công.', issuedDate: '22/05/2025', effectiveDate: '22/05/2025', details: '<ul><li>Quy định quyết toán vốn đầu tư đối với các dự án sử dụng vốn nhà nước ngoài vốn đầu tư công sau khi hoàn thành hoặc dừng thực hiện vĩnh viễn.</li></ul>' },
-            { id: 3, category: 'Chứng khoán', number: 'Thông tư 19/2025/TT-BTC', title: 'Quy định việc đăng ký công ty đại chúng, hủy tư cách công ty đại chúng, báo cáo về vốn điều lệ đã góp được kiểm toán.', issuedDate: '05/05/2025', effectiveDate: '05/05/2025', details: '<ul><li class="mb-2">- <strong>Đăng ký công ty đại chúng:</strong> Trình tự, thủ tục, hồ sơ.</li><li>- <strong>Hủy tư cách công ty đại chúng:</strong> Các trường hợp và trình tự, thủ tục.</li></ul>' },
-            { id: 4, category: 'Xây dựng', number: 'Nghị định 101/2025/NĐ-CP', title: 'Sửa đổi, bổ sung một số điều của NĐ 32/2016/NĐ-CP và NĐ 42/2016/NĐ-CP.', issuedDate: '09/05/2025', effectiveDate: '23/06/2025', details: '<ul><li class="mb-2">- Sửa đổi hình thức nộp hồ sơ chấp thuận độ cao công trình, thời hạn giải quyết.</li><li class="mb-2">- Bổ sung trách nhiệm của Bộ Xây dựng.</li><li>- Sửa đổi quy định về mở, đóng sân bay chuyên dùng.</li></ul>' },
-            { id: 5, category: 'Xây dựng', number: 'Thông tư 08/2025/TT-BXD', title: 'Sửa đổi, bổ sung một số định mức xây dựng ban hành tại TT 12/2021/TT-BXD.', issuedDate: '30/05/2025', effectiveDate: '15/07/2025', details: '<ul><li>Sửa đổi, bổ sung các định mức: dự toán xây dựng, sử dụng vật liệu, chi phí quản lý dự án.</li></ul>' },
-            { id: 6, category: 'PCCC & CNCH', number: 'Nghị định 105/2025/NĐ-CP', title: 'Quy định chi tiết Luật Phòng cháy, chữa cháy và cứu nạn, cứu hộ.', issuedDate: '15/05/2025', effectiveDate: '01/07/2025', details: '<ul><li class="mb-2">- Danh mục cơ sở, công trình thuộc diện quản lý, thẩm định PCCC.</li><li class="mb-2">- Quy định về nội quy, hồ sơ quản lý PCCC&CNCH.</li><li class="mb-2">- Yêu cầu kết nối thiết bị báo cháy (trước 01/07/2027).</li><li>- Quy định bảo hiểm cháy, nổ bắt buộc.</li></ul>' },
-            { id: 7, category: 'PCCC & CNCH', number: 'Nghị định 106/2025/NĐ-CP', title: 'Quy định xử phạt vi phạm hành chính trong lĩnh vực PCCC và CNCH.', issuedDate: '15/05/2025', effectiveDate: '01/07/2025', details: '<ul><li class="mb-2">- Hình thức xử phạt: Cảnh cáo, phạt tiền (tối đa 100 triệu cho tổ chức),...</li><li>- Thời hiệu xử phạt: 1 năm.</li></ul>' },
-            { id: 8, category: 'Lưu trữ', number: 'Thông tư 07/2025/TT-BXD', title: 'Quy định thời hạn lưu trữ hồ sơ, tài liệu thuộc phạm vi quản lý của Bộ Xây dựng.', issuedDate: '15/05/2025', effectiveDate: '01/07/2025', details: '<ul><li>Quy định thời hạn lưu trữ cho các lĩnh vực: quy hoạch, kiến trúc, đầu tư xây dựng, hạ tầng kỹ thuật, hàng không,...</li></ul>' },
-            { id: 9, category: 'Lưu trữ', number: 'TT 06/2025/TT-BNV & TT 05/2025/TT-BNV', title: 'Quy định chi tiết Luật Lưu trữ 2024 và nghiệp vụ lưu trữ tài liệu số.', issuedDate: '14-15/05/2025', effectiveDate: '01/07/2025', details: '<ul><li class="mb-2">- Quản lý, hủy, sử dụng tài liệu lưu trữ.</li><li>- Quy trình số hóa, bảo quản, sử dụng và hủy tài liệu lưu trữ số.</li></ul>' },
-            { id: 10, category: 'Tài chính', number: 'Nghị định 70/2025/NĐ-CP', title: 'Sửa đổi Nghị định 123/2020/NĐ-CP quy định về hóa đơn, chứng từ.', issuedDate: '20/03/2025', effectiveDate: '01/06/2025', details: '<ul><li class="mb-2">- Sửa đổi quy định về hóa đơn điện tử từ máy tính tiền.</li><li>- Bổ sung trách nhiệm của tổ chức cung cấp dịch vụ hóa đơn điện tử.</li></ul>' },
-            { id: 11, category: 'Lao động & Thi đua', number: 'Thông tư 003/2025/TT-BNV', title: 'Hướng dẫn thực hiện quản lý lao động, tiền lương, thù lao, tiền thưởng trong doanh nghiệp Nhà nước.', issuedDate: '28/04/2025', effectiveDate: '15/06/2025', details: '<ul><li>Nguyên tắc quản lý, xác định tiền lương, thù lao, tiền thưởng dựa trên lợi nhuận, năng suất lao động.</li></ul>' },
-            { id: 12, category: 'Chứng khoán', number: 'Thông tư 14/2025/TT-BTC', title: 'Sửa đổi TT 119/2020/TT-BTC và TT 58/2021/TT-BTC về giao dịch chứng khoán.', issuedDate: '04/04/2025', effectiveDate: '01/06/2025', details: '<ul><li class="mb-2">- Làm rõ tài liệu trong hồ sơ chuyển quyền sở hữu chứng khoán.</li><li class="mb-2">- Làm rõ thông tin khách hàng khi mở tài khoản lưu ký.</li><li>- Thay thế mẫu hợp đồng chứng khoán phái sinh.</li></ul>' },
-            { id: 13, category: 'Môi trường', number: 'Thông tư 01/2025/TT-BNNMT', title: 'Ban hành 03 Quy chuẩn Quốc gia về chất lượng môi trường xung quanh.', issuedDate: '15/05/2025', effectiveDate: '14/11/2025', details: '<ul><li class="mb-2">- QCVN 26:2025/BNNMT - Quy chuẩn kỹ thuật Quốc gia về tiếng ồn.</li><li class="mb-2">- QCVN 27:2025/BNNMT - Quy chuẩn kỹ thuật Quốc gia về độ rung.</li><li>- QCVN 28:2025/BNNMT - Quy chuẩn kỹ thuật Quốc gia về chất lượng trầm tích.</li></ul>' },
-            { id: 14, category: 'PCCC & CNCH', number: 'Thông tư 37/2025/TT-BCA', title: 'Quy định về nhiệm vụ công tác PCCC, CNCH của lực lượng Công an nhân dân.', issuedDate: '15/05/2025', effectiveDate: '01/07/2025', details: '<ul><li class="mb-2">- Quy trình thẩm định thiết kế về phòng cháy, chữa cháy.</li><li class="mb-2">- Quy trình kiểm tra công tác nghiệm thu về phòng cháy, chữa cháy.</li><li>- Quy trình kiểm tra về phòng cháy chữa cháy.</li></ul>' },
-            { id: 15, category: 'Lao động & Thi đua', number: 'Thông tư 28/2025/TT-BTC', title: 'Hướng dẫn mức chi tổ chức thực hiện công tác thi đua, khen thưởng.', issuedDate: '26/05/2025', effectiveDate: '15/07/2025', details: '<ul><li>Quy định chi tiết về mức chi cho công tác thi đua, khen thưởng, chi in ấn, làm hiện vật, chi tuyên truyền, phổ biến...</li></ul>' },
-            { id: 16, category: 'Tài chính', number: 'Thông tư 31/2025/TT-BTC', title: 'Sửa đổi Thông tư 23/2021/TT-BTC hướng dẫn việc in, phát hành, quản lý và sử dụng tem điện tử.', issuedDate: '31/05/2025', effectiveDate: '01/06/2025', details: '<ul><li class="mb-2">- Sửa đổi, bổ sung quy định về mẫu tem, dán tem điện tử.</li><li class="mb-2">- Sửa đổi quản lý, mua tem điện tử thuốc lá, rượu nhập khẩu và sản xuất trong nước.</li><li>- Lược bỏ một số giấy tờ khi mua tem tại cơ quan thuế.</li></ul>' },
-            { id: 17, category: 'Tài chính', number: 'Thông tư 32/2025/TT-BTC', title: 'Hướng dẫn thực hiện Luật Quản lý thuế, Nghị định 123/2020/NĐ-CP, Nghị định 70/2025/NĐ-CP.', issuedDate: '31/05/2025', effectiveDate: '01/06/2025', details: '<ul><li>Hướng dẫn việc chuyển đổi áp dụng hóa đơn điện tử có mã và không có mã của cơ quan thuế đối với các trường hợp, bao gồm cả các doanh nghiệp có rủi ro cao về thuế.</li></ul>' },
-        ];
+        // Thuật toán chụp toàn bộ Mindmap độ phân giải cao
+        function downloadFullMindmap() {
+            const svg = document.querySelector('.markmap svg');
+            if (!svg) return alert("Sơ đồ chưa tải xong, vui lòng đợi giây lát!");
 
-        document.addEventListener('DOMContentLoaded', () => {
-            const documentsList = document.getElementById('documents-list');
-            const filtersContainer = document.getElementById('filters');
-            const searchInput = document.getElementById('searchInput');
-            const noResults = document.getElementById('no-results');
+            const g = svg.querySelector('g');
+            if (!g) return;
 
-            const modal = document.getElementById('modal');
-            const modalBox = document.getElementById('modal-box');
-            const closeModalBtn = document.getElementById('close-modal');
-            const modalTitle = document.getElementById('modal-title');
-            const modalContent = document.getElementById('modal-content');
+            // 1. Lấy kích thước thật của sơ đồ (không bị ảnh hưởng bởi Zoom/Pan)
+            const bbox = g.getBBox();
+            const padding = 60; // Viền an toàn
 
-            let currentFilter = 'Tất cả';
+            // 2. Clone SVG để tạo file ảnh ngầm
+            const clone = svg.cloneNode(true);
+            const cloneG = clone.querySelector('g');
+            
+            // Xóa transform để sơ đồ tự canh giữa khung hình mới
+            cloneG.setAttribute('transform', '');
 
-            function renderDocuments(docs) {
-                documentsList.innerHTML = '';
-                if (docs.length === 0) {
-                    noResults.classList.remove('hidden');
-                } else {
-                    noResults.classList.add('hidden');
-                }
-                docs.forEach(doc => {
-                    const card = document.createElement('div');
-                    card.className = 'document-card bg-white rounded-xl shadow-md p-5 flex flex-col cursor-pointer';
-                    card.dataset.id = doc.id;
-                    card.innerHTML = `
-                        <div class="flex-grow">
-                            <span class="inline-block bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded-full mb-3">${doc.category}</span>
-                            <h3 class="text-base font-semibold text-slate-800 mb-2">${doc.number}</h3>
-                            <p class="text-slate-600 text-sm">${doc.title}</p>
-                        </div>
-                        <div class="mt-4 pt-4 border-t border-slate-100 text-xs text-slate-500 flex justify-between">
-                            <span>Hiệu lực: <strong>${doc.effectiveDate}</strong></span>
-                            <span>Ban hành: <strong>${doc.issuedDate}</strong></span>
-                        </div>
-                    `;
-                    card.addEventListener('click', () => openModal(doc));
-                    documentsList.appendChild(card);
-                });
-            }
+            const width = bbox.width + padding * 2;
+            const height = bbox.height + padding * 2;
+            
+            clone.setAttribute('viewBox', `${bbox.x - padding} ${bbox.y - padding} ${width} ${height}`);
+            
+            // Scale x3 để đạt chất lượng Full HD / 4K
+            const scale = 3; 
+            clone.setAttribute('width', width * scale);
+            clone.setAttribute('height', height * scale);
 
-            function setupFilters() {
-                const categories = ['Tất cả', ...new Set(documentsData.map(d => d.category))];
-                filtersContainer.innerHTML = '';
-                categories.forEach(category => {
-                    const button = document.createElement('button');
-                    button.textContent = category;
-                    button.className = 'filter-btn px-4 py-2 text-sm font-medium border border-slate-300 rounded-full transition hover:bg-slate-100';
-                    if (category === currentFilter) {
-                        button.classList.add('filter-btn-active', 'border-blue-600');
-                    }
-                    button.addEventListener('click', () => {
-                        currentFilter = category;
-                        filterAndRender();
-                        updateActiveFilterButton();
-                    });
-                    filtersContainer.appendChild(button);
-                });
-            }
+            // 3. Thêm nền xanh nhạt VCA
+            const bg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            bg.setAttribute('x', bbox.x - padding);
+            bg.setAttribute('y', bbox.y - padding);
+            bg.setAttribute('width', width);
+            bg.setAttribute('height', height);
+            bg.setAttribute('fill', '#f5f7fa');
+            clone.insertBefore(bg, clone.firstChild);
 
-            function updateActiveFilterButton() {
-                document.querySelectorAll('.filter-btn').forEach(btn => {
-                    if (btn.textContent === currentFilter) {
-                        btn.classList.add('filter-btn-active', 'border-blue-600');
-                        btn.classList.remove('bg-slate-100');
-                    } else {
-                        btn.classList.remove('filter-btn-active', 'border-blue-600');
-                    }
-                });
-            }
+            // Thêm style định dạng chữ
+            const style = document.createElementNS('http://www.w3.org/2000/svg', 'style');
+            style.textContent = ".markmap-node-text { font-family: 'Segoe UI', Arial, sans-serif; font-size: 14px; fill: #333; } path { fill: none; }";
+            clone.insertBefore(style, clone.firstChild);
 
-            function filterAndRender() {
-                const searchTerm = searchInput.value.toLowerCase();
-                let filteredDocs = documentsData;
-
-                if (currentFilter !== 'Tất cả') {
-                    filteredDocs = filteredDocs.filter(d => d.category === currentFilter);
-                }
-
-                if (searchTerm) {
-                    filteredDocs = filteredDocs.filter(d =>
-                        d.title.toLowerCase().includes(searchTerm) ||
-                        d.number.toLowerCase().includes(searchTerm)
-                    );
-                }
+            // 4. Render ra Canvas và tải xuống
+            const svgData = new XMLSerializer().serializeToString(clone);
+            const img = new Image();
+            img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
+            
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                canvas.width = width * scale;
+                canvas.height = height * scale;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0);
                 
-                renderDocuments(filteredDocs);
-            }
-
-            function openModal(doc) {
-                modalTitle.textContent = doc.number;
-                modalContent.innerHTML = `<h4 class="font-semibold text-lg mb-2">${doc.title}</h4><div class="prose prose-sm max-w-none text-slate-600">${doc.details}</div>`;
-                modal.classList.remove('hidden');
-                setTimeout(() => {
-                    modalBox.classList.remove('scale-95', 'opacity-0');
-                }, 10);
-            }
-
-            function closeModal() {
-                 modalBox.classList.add('scale-95', 'opacity-0');
-                 setTimeout(() => {
-                    modal.classList.add('hidden');
-                 }, 300);
-            }
-
-            function setupChart() {
-                const effectiveDates = documentsData.map(d => {
-                    const parts = d.effectiveDate.split('/');
-                    return new Date(parts[2], parts[1] - 1, parts[0]);
-                });
-
-                const monthCounts = effectiveDates.reduce((acc, date) => {
-                    const month = date.toLocaleString('vi-VN', { month: 'long', year: 'numeric' });
-                    acc[month] = (acc[month] || 0) + 1;
-                    return acc;
-                }, {});
-
-                const sortedMonths = Object.keys(monthCounts).sort((a, b) => {
-                    const [monthA, yearA] = a.replace('Tháng ', '').split(' năm ');
-                    const [monthB, yearB] = b.replace('Tháng ', '').split(' năm ');
-                    return new Date(yearA, monthA - 1) - new Date(yearB, monthB - 1);
-                });
-                
-                const chartLabels = sortedMonths;
-                const chartData = sortedMonths.map(month => monthCounts[month]);
-
-                const ctx = document.getElementById('effectiveDateChart').getContext('2d');
-                new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: chartLabels,
-                        datasets: [{
-                            label: 'Số lượng văn bản',
-                            data: chartData,
-                            backgroundColor: 'rgba(59, 130, 246, 0.7)',
-                            borderColor: 'rgba(37, 99, 235, 1)',
-                            borderWidth: 1,
-                            borderRadius: 4,
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                ticks: {
-                                    stepSize: 1
-                                }
-                            }
-                        },
-                        plugins: {
-                            legend: {
-                                display: false
-                            },
-                            tooltip: {
-                                callbacks: {
-                                    title: (context) => `Hiệu lực ${context[0].label}`
-                                }
-                            }
-                        }
-                    }
-                });
-            }
-
-            searchInput.addEventListener('keyup', filterAndRender);
-            closeModalBtn.addEventListener('click', closeModal);
-            modal.addEventListener('click', (e) => {
-                if (e.target === modal) closeModal();
-            });
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
-                    closeModal();
-                }
-            });
-
-            renderDocuments(documentsData);
-            setupFilters();
-            setupChart();
-        });
+                const a = document.createElement('a');
+                a.download = 'VCA_Mindmap_ChiTiet.png';
+                a.href = canvas.toDataURL('image/png');
+                a.click();
+            };
+        }
     </script>
 </body>
 </html>
+```eof
