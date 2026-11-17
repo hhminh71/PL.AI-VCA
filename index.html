@@ -2,87 +2,86 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Quiz: Khẩn Nguy Sân Bay</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz App - Cảng HKQT Cần Thơ</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.15; background-color: #f9fafb; color: #111827; }
-        .ultra-compact { padding-top: 2px; padding-bottom: 2px; }
-        .sticky-bar { box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
-        mark { background-color: #fde047; color: #000; padding: 0 2px; border-radius: 2px; font-weight: bold; }
-        input[type="radio"] { accent-color: #2563eb; transform: scale(0.9); }
+        .active-tab {
+            background-color: #dc2626 !important; /* Đỏ */
+            font-weight: bold;
+            box-shadow: 0 0 15px 3px rgba(255, 255, 255, 0.95); /* Hào quang trắng */
+            color: white;
+            z-index: 10;
+            transform: scale(1.01);
+        }
+        .highlight { background-color: yellow; color: black; }
+        /* Ép nén siêu tối đa chiều dọc */
+        .compact-q { padding: 4px 2px; margin-bottom: 2px; border-bottom: 1px solid #e5e7eb; }
+        .compact-opt { padding: 1px 2px; margin: 0; line-height: 1.1; display: flex; align-items: flex-start; gap: 4px; cursor: pointer; }
+        .compact-opt input { margin-top: 2px; flex-shrink: 0; cursor: pointer; }
+        .q-title { font-weight: bold; margin-bottom: 2px; line-height: 1.1; }
     </style>
 </head>
-<body class="antialiased">
+<body class="bg-gray-50 text-gray-900 font-sans antialiased text-sm">
 
-    <!-- Header Full-width -->
-    <header class="bg-blue-900 text-white py-1">
-        <div class="max-w-5xl mx-auto px-2">
-            <div class="text-[10px] uppercase font-medium tracking-wide">Tổng công ty Cảng hàng không Việt Nam - CTCP</div>
-            <div class="text-lg font-bold uppercase leading-[1.1] mt-0.5">Cảng hàng không quốc tế Cần Thơ</div>
-            <div class="text-xs italic mt-0.5 text-blue-100">HUẤN LUYỆN ĐÀO TẠO</div>
-        </div>
-    </header>
+<!-- Header (Full-width) -->
+<div class="bg-blue-900 text-white py-1 px-2 shadow-md relative z-40">
+    <div class="max-w-5xl mx-auto flex flex-col justify-center">
+        <div class="text-[0.65rem] md:text-xs uppercase text-left tracking-tight">TỔNG CÔNG TY CẢNG HÀNG KHÔNG VIỆT NAM - CTCP</div>
+        <div class="text-xs md:text-[0.85rem] font-bold uppercase tracking-[0.06em] md:tracking-[0.14em] text-left leading-tight">CẢNG HÀNG KHÔNG QUỐC TẾ CẦN THƠ</div>
+        <div class="text-[0.7rem] md:text-sm text-left leading-tight mt-[1px]">Huấn luyện Đào tạo Cảng HKQT Cần Thơ</div>
+    </div>
+</div>
 
-    <!-- Main Container -->
-    <main class="max-w-5xl mx-auto px-2 mt-2 bg-white min-h-screen shadow-sm pb-10">
-        
-        <h1 class="text-base font-bold text-center text-blue-900 uppercase mb-2">Huấn Luyện Ban Đầu Công Tác Khẩn Nguy Sân Bay</h1>
-        
-        <!-- Tabs -->
-        <div class="flex border-b border-gray-300 mb-1 sticky top-0 bg-white z-20">
-            <button id="tab-test" onclick="switchTab('test')" class="flex-1 py-1.5 font-bold text-sm text-blue-700 border-b-2 border-blue-700 transition-colors">Thi Thử (40)</button>
-            <button id="tab-review" onclick="switchTab('review')" class="flex-1 py-1.5 font-bold text-sm text-gray-500 border-b-2 border-transparent hover:text-gray-700 transition-colors">Ôn Tập (Full)</button>
-        </div>
-
-        <!-- TAB 1: THI THỬ -->
-        <section id="test-section">
-            <!-- Top Controls -->
-            <div class="sticky top-[35px] bg-white/95 backdrop-blur z-10 py-1.5 flex justify-between items-center border-b border-gray-100 sticky-bar mb-2">
-                <div class="flex flex-col">
-                    <span class="font-bold text-red-600 text-base" id="timer">00:00</span>
-                    <span class="text-[11px] font-semibold text-gray-500" id="best-score">Điểm cao: 0/40</span>
-                </div>
-                <div class="flex gap-1.5">
-                    <button onclick="submitTest()" class="bg-blue-600 text-white px-3 py-1 rounded text-sm font-bold shadow hover:bg-blue-700">Nộp Bài</button>
-                    <button onclick="resetTest()" class="bg-gray-200 text-gray-800 px-3 py-1 rounded text-sm font-bold shadow hover:bg-gray-300">Làm Lại</button>
-                </div>
-            </div>
-
-            <!-- Quiz Questions Container -->
-            <div id="test-questions"></div>
-
-            <!-- Bottom Controls -->
-            <div class="py-2 mt-2 flex justify-between items-center border-t border-gray-200">
-                <span class="font-bold text-red-600 text-base" id="timer-bottom">00:00</span>
-                <div class="flex gap-1.5">
-                    <button onclick="submitTest()" class="bg-blue-600 text-white px-4 py-1.5 rounded text-sm font-bold shadow hover:bg-blue-700">Nộp Bài</button>
-                    <button onclick="resetTest()" class="bg-gray-200 text-gray-800 px-4 py-1.5 rounded text-sm font-bold shadow hover:bg-gray-300">Làm Lại</button>
-                </div>
-            </div>
-        </section>
-
-        <!-- TAB 2: ÔN TẬP -->
-        <section id="review-section" class="hidden">
-            <!-- Search Bar -->
-            <div class="sticky top-[35px] bg-white/95 backdrop-blur z-10 py-1.5 border-b border-gray-100 sticky-bar mb-2">
-                <input type="text" id="search-input" placeholder="Tìm kiếm theo từ khóa (không dấu)..." class="w-full border border-gray-300 rounded px-2 py-1.5 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 bg-gray-50">
-            </div>
-
-            <!-- Review Questions Container -->
-            <div id="review-questions"></div>
-        </section>
-
-    </main>
-
-    <!-- Toast Notification -->
-    <div id="toast" class="fixed bottom-4 left-1/2 -translate-x-1/2 bg-gray-800 text-white px-4 py-2 rounded-full text-sm font-medium shadow-lg transform translate-y-20 opacity-0 transition-all duration-300 z-50 whitespace-nowrap pointer-events-none">
-        Đã copy kết quả!
+<!-- Container Desktop giới hạn độ rộng -->
+<div class="max-w-5xl mx-auto px-1 relative">
+    
+    <!-- Tiêu đề chính -->
+    <h1 class="text-[15px] md:text-lg font-bold text-center my-1 text-blue-900 uppercase">Khẩn Nguy Sân Bay - Mức Độ Trung Cấp</h1>
+    
+    <!-- Hệ thống Tab (Sticky) -->
+    <div class="flex gap-1 bg-gray-300 p-1 rounded sticky top-0 z-30 shadow-sm border-b border-gray-400">
+        <button id="tab-test" class="flex-1 py-1 text-center bg-gray-200 rounded transition-all active-tab text-xs md:text-sm" onclick="switchTab('test')">Thi Thử (40)</button>
+        <button id="tab-review" class="flex-1 py-1 text-center bg-gray-200 rounded transition-all text-xs md:text-sm" onclick="switchTab('review')">Ôn Tập (Full)</button>
     </div>
 
-    <!-- MAIN JAVASCRIPT -->
-    <script>
-        const rawData = `Câu 1: Một tàu bay bị gãy càng, nằm bất động trên đường cất hạ cánh nhưng không còn nguy cơ cháy và toàn bộ người trên tàu đã được sơ tán. Tài liệu tác nghiệp nào phải được ưu tiên kích hoạt để giải phóng đường cất hạ cánh?
+    <!-- TAB 1: THI THỬ -->
+    <div id="content-test" class="mt-1">
+        <!-- Khu vực Timer và Nút bấm (Sticky) -->
+        <div class="sticky top-[34px] bg-white z-20 border-b pb-1 mb-1 shadow-sm flex justify-between items-center px-1">
+            <div class="font-bold text-red-600 text-lg md:text-xl tracking-widest drop-shadow-sm" id="timer">40:00</div>
+            <div class="flex gap-1">
+                <button id="btn-submit" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-[2px] rounded font-bold text-xs md:text-sm shadow" onclick="submitTest()">Nộp Bài</button>
+                <button id="btn-retry" class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-[2px] rounded font-bold text-xs md:text-sm shadow hidden" onclick="startTest()">Làm Lại</button>
+            </div>
+        </div>
+        
+        <div id="test-score" class="hidden text-center font-bold text-base md:text-lg bg-blue-100 text-blue-800 rounded py-1 mb-1"></div>
+        <div id="test-container" class="flex flex-col gap-0 pb-10"></div>
+        
+        <!-- Nút Nộp bài / Làm lại (Dưới cùng) -->
+        <div class="flex gap-1 justify-center my-2 pb-4">
+            <button id="btn-submit-bottom" class="bg-blue-600 text-white px-8 py-2 rounded font-bold shadow-md" onclick="submitTest()">Nộp Bài</button>
+            <button id="btn-retry-bottom" class="bg-yellow-500 text-white px-8 py-2 rounded font-bold shadow-md hidden" onclick="startTest()">Làm Lại</button>
+        </div>
+    </div>
+
+    <!-- TAB 2: ÔN TẬP -->
+    <div id="content-review" class="mt-1 hidden pb-10">
+        <!-- Thanh Tìm kiếm (Sticky) -->
+        <div class="sticky top-[34px] bg-gray-100 z-20 p-1 border-b shadow-sm mb-1">
+            <input type="text" id="search-box" class="w-full border border-gray-400 p-[4px] rounded text-sm leading-none focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" placeholder="🔍 Tìm kiếm câu hỏi hoặc đáp án..." onkeyup="handleSearch()">
+        </div>
+        <div id="review-container" class="flex flex-col gap-0"></div>
+    </div>
+    
+</div>
+
+<script>
+// ==========================================
+// 1. DỮ LIỆU RAW TEXT (Template String)
+// ==========================================
+const rawText = `Câu 1: Một tàu bay bị gãy càng, nằm bất động trên đường cất hạ cánh nhưng không còn nguy cơ cháy và toàn bộ người trên tàu đã được sơ tán. Tài liệu tác nghiệp nào phải được ưu tiên kích hoạt để giải phóng đường cất hạ cánh?
 ĐÁP ÁN ĐÚNG: Phương án di dời tàu bay mất khả năng di chuyển
 Câu 2: Khi xây dựng phương án xử lý hành vi can thiệp bất hợp pháp tại cảng, tài liệu nào đóng vai trò căn cứ trực tiếp nhất?
 ĐÁP ÁN ĐÚNG: Kế hoạch khẩn nguy can thiệp bất hợp pháp của A08
@@ -164,7 +163,7 @@ Câu 40: Sau khi hành khách đã rời tàu bay, đơn vị phục vụ mặt 
 ĐÁP ÁN ĐÚNG: Sơ tán khách và hàng hóa; hướng dẫn tại khu tiếp nhận; cung cấp danh sách, tài liệu và chứng cứ phục vụ điều tra
 Câu 41: Khi lực lượng cứu nạn cần xác định vị trí cưa cắt khẩn cấp trên thân tàu bay, đơn vị nào phải cung cấp sơ đồ kỹ thuật và chỉ dẫn?
 ĐÁP ÁN ĐÚNG: Đơn vị sửa chữa, bảo dưỡng tàu bay
-Câu 42: Hàng nguy hiểm đã được đưa khỏi hiện trường nhưng cần tập kết, giám sát vận chuyển và cách làm ly. Đơn vị phù hợp nhất là gì?
+Câu 42: Hàng nguy hiểm đã được đưa khỏi hiện trường nhưng cần tập kết, giám sát vận chuyển và cách ly. Đơn vị phù hợp nhất là gì?
 ĐÁP ÁN ĐÚNG: Đơn vị Kho hàng
 Câu 43: Đơn vị nào Duy trì trật tự, kiểm soát việc ghi hình và ngăn rò rỉ thông tin?
 ĐÁP ÁN ĐÚNG: Lực lượng kiểm soát An ninh hàng không
@@ -209,269 +208,267 @@ Câu 62: Đại diện lãnh đạo Công an cửa khẩu là Phó chỉ huy tr�
 Câu 63: Để ứng phó các tình huống khẩn nguy tàu bay bị sự cố/tai nạn, công tác tổ chức ứng phó khẩn nguy tại các cảng hàng không, sân bay được tổ chức như thế nào?
 ĐÁP ÁN ĐÚNG: Thành lập Trung tâm khẩn nguy để chỉ đạo chỉ huy ứng phó`;
 
-        // 1. Data Parsing & Initialization
-        let questions = [];
-        const blocks = rawData.split(/\n?(?=Câu \d+:)/);
+// ==========================================
+// 2. PARSE LOGIC (Regex, Tự động tạo đáp án nhiễu)
+// ==========================================
+let questions = [];
+let allCorrectAnswers = [];
+
+function parseData() {
+    const blocks = rawText.split(/Câu \d+:/).filter(b => b.trim() !== '');
+    
+    blocks.forEach((block, index) => {
+        const parts = block.split('ĐÁP ÁN ĐÚNG:');
+        if (parts.length < 2) return;
         
-        blocks.forEach((block, idx) => {
-            if (!block.trim()) return;
-            let parts = block.split('ĐÁP ÁN ĐÚNG:');
-            if (parts.length >= 2) {
-                let qText = parts[0].trim().replace(/^Câu \d+:\s*/, '');
-                let aText = parts[1].trim();
-                questions.push({ id: idx, q: qText, a: aText });
+        let qText = parts[0].trim();
+        let correctAns = parts[1].trim();
+        let options = [];
+        
+        // Trích xuất các option A, B, C, D nếu nằm trong ngoặc của câu hỏi (VD: Câu 12)
+        const optMatch = qText.match(/\(([a-e]\.\s.*)\)/i);
+        if (optMatch) {
+            const optStr = optMatch[1];
+            const splitOpts = optStr.split(/,\s*[a-e]\.\s/i);
+            splitOpts[0] = splitOpts[0].replace(/^[a-e]\.\s/i, '');
+            options = splitOpts.map(o => o.trim());
+            qText = qText.replace(optMatch[0], '').trim(); 
+        }
+        
+        // Nếu là dạng câu hỏi Đúng/Sai (Câu 35, 38, 57, 62)
+        if ((correctAns.toLowerCase().startsWith('đúng') || correctAns.toLowerCase().startsWith('sai')) 
+             && (correctAns.length < 35)) {
+             options = ["Đúng", "Sai"];
+             correctAns = correctAns.split('(')[0].trim();
+        }
+        
+        allCorrectAnswers.push(correctAns);
+        
+        questions.push({
+            id: index + 1,
+            question: qText,
+            correct: correctAns,
+            originalOptions: options
+        });
+    });
+    
+    // Tự động thêm distractors cho các câu không có 4 options sẵn
+    questions.forEach(q => {
+        if (q.originalOptions.length === 0) {
+            let opts = [q.correct];
+            let attempts = 0;
+            while(opts.length < 4 && attempts < 100) {
+                let randomAns = allCorrectAnswers[Math.floor(Math.random() * allCorrectAnswers.length)];
+                if (!opts.includes(randomAns) && randomAns !== "Đúng" && randomAns !== "Sai") {
+                    opts.push(randomAns);
+                }
+                attempts++;
+            }
+            q.options = opts.sort(() => Math.random() - 0.5);
+        } else if (q.originalOptions.length === 2) {
+             q.options = q.originalOptions;
+        } else {
+            let hasCorrect = q.originalOptions.some(o => o.toLowerCase().includes(q.correct.toLowerCase()));
+            if (!hasCorrect) q.originalOptions[0] = q.correct;
+            q.options = q.originalOptions; 
+        }
+    });
+}
+parseData();
+
+// ==========================================
+// 3. UI STATE & APP LOGIC
+// ==========================================
+const letters = ['A', 'B', 'C', 'D', 'E'];
+let isReviewRendered = false;
+let testQuestions = [];
+let timerInterval;
+let timeLeft = 40 * 60;
+let isSubmitted = false;
+
+function switchTab(tab) {
+    document.getElementById('tab-test').classList.remove('active-tab');
+    document.getElementById('tab-review').classList.remove('active-tab');
+    document.getElementById('content-test').classList.add('hidden');
+    document.getElementById('content-review').classList.add('hidden');
+    
+    document.getElementById('tab-' + tab).classList.add('active-tab');
+    document.getElementById('content-' + tab).classList.remove('hidden');
+    
+    if (tab === 'review' && !isReviewRendered) {
+        renderReview();
+    }
+}
+
+function startTest() {
+    clearInterval(timerInterval);
+    timeLeft = 40 * 60;
+    isSubmitted = false;
+    
+    document.getElementById('test-score').classList.add('hidden');
+    document.getElementById('btn-submit').classList.remove('hidden');
+    document.getElementById('btn-submit-bottom').classList.remove('hidden');
+    document.getElementById('btn-retry').classList.add('hidden');
+    document.getElementById('btn-retry-bottom').classList.add('hidden');
+    
+    updateTimerDisplay();
+    
+    // Bốc ngẫu nhiên 40 câu
+    let shuffled = [...questions].sort(() => Math.random() - 0.5);
+    testQuestions = shuffled.slice(0, 40);
+    
+    const container = document.getElementById('test-container');
+    container.innerHTML = '';
+    
+    testQuestions.forEach((q, idx) => {
+        let html = `<div class="compact-q" id="test-q-${idx}">
+            <div class="q-title">Câu ${idx + 1}: ${q.question}</div>`;
+        q.options.forEach((opt, optIdx) => {
+            let letter = letters[optIdx];
+            html += `<label class="compact-opt hover:bg-gray-100 rounded">
+                <input type="radio" name="q-${idx}" value="${optIdx}">
+                <span><b>${letter}.</b> ${opt}</span>
+            </label>`;
+        });
+        html += `</div>`;
+        container.innerHTML += html;
+    });
+    
+    timerInterval = setInterval(() => {
+        timeLeft--;
+        updateTimerDisplay();
+        if (timeLeft <= 0) submitTest();
+    }, 1000);
+}
+
+function updateTimerDisplay() {
+    let m = Math.floor(timeLeft / 60).toString().padStart(2, '0');
+    let s = (timeLeft % 60).toString().padStart(2, '0');
+    document.getElementById('timer').innerText = `${m}:${s}`;
+}
+
+function submitTest() {
+    if(isSubmitted) return;
+    isSubmitted = true;
+    clearInterval(timerInterval);
+    
+    document.getElementById('btn-submit').classList.add('hidden');
+    document.getElementById('btn-submit-bottom').classList.add('hidden');
+    document.getElementById('btn-retry').classList.remove('hidden');
+    document.getElementById('btn-retry-bottom').classList.remove('hidden');
+    
+    let score = 0;
+    testQuestions.forEach((q, idx) => {
+        let selected = document.querySelector(`input[name="q-${idx}"]:checked`);
+        let qDiv = document.getElementById(`test-q-${idx}`);
+        let labels = qDiv.querySelectorAll('label');
+        
+        let correctIdx = q.options.findIndex(o => o === q.correct || q.correct.includes(o) || o.includes(q.correct));
+        if(correctIdx === -1) correctIdx = 0; 
+        
+        labels.forEach(l => {
+            let inp = l.querySelector('input');
+            inp.disabled = true;
+            if(parseInt(inp.value) === correctIdx) {
+                l.classList.add('bg-green-200', 'font-bold');
+                l.innerHTML += ' <span class="text-green-700">✔️</span>';
             }
         });
+        
+        if (selected) {
+            if (parseInt(selected.value) === correctIdx) {
+                score++;
+            } else {
+                selected.parentElement.classList.add('bg-red-200');
+                selected.parentElement.innerHTML += ' <span class="text-red-700">✖️</span>';
+            }
+        }
+    });
+    
+    let scoreDiv = document.getElementById('test-score');
+    scoreDiv.innerText = `Điểm của bạn: ${score} / 40`;
+    scoreDiv.classList.remove('hidden');
+    
+    // Lưu LocalStorage
+    let hs = Math.max(score, localStorage.getItem('quiz_high_score_khcb') || 0);
+    localStorage.setItem('quiz_high_score_khcb', hs);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
 
-        // 2. Generate Random Distractors for Multiple Choice
-        const allAnswers = questions.map(q => q.a);
-        questions.forEach(q => {
-            let aLower = q.a.toLowerCase();
-            let isBool = aLower.startsWith('đúng') || aLower.startsWith('sai');
+function renderReview() {
+    const container = document.getElementById('review-container');
+    if (container.children.length > 0) return; // Fix Bug Render nhiều lần
+    
+    let renderHTML = "";
+    questions.forEach((q) => {
+        let correctIdx = q.options.findIndex(o => o === q.correct || q.correct.includes(o) || o.includes(q.correct));
+        if(correctIdx === -1) correctIdx = 0;
+        
+        let html = `<div class="compact-q review-item">
+            <div class="q-title review-text">Câu ${q.id}: ${q.question}</div>`;
+        q.options.forEach((opt, optIdx) => {
+            let letter = letters[optIdx];
+            let isCorrect = (optIdx === correctIdx);
+            let bgClass = isCorrect ? 'bg-green-100 font-bold text-gray-900 border-l-[3px] border-green-500' : 'text-gray-500 opacity-70';
+            let mark = isCorrect ? ' <span class="text-green-700">✔️</span>' : '';
+            html += `<div class="compact-opt ${bgClass} review-text pl-1">
+                <span><b>${letter}.</b> ${opt}${mark}</span>
+            </div>`;
+        });
+        html += `</div>`;
+        renderHTML += html;
+    });
+    container.innerHTML = renderHTML;
+    isReviewRendered = true;
+}
+
+// Logic Lọc từ khóa realtime (KHÔNG DẤU, Highlight)
+function handleSearch() {
+    let rawKw = document.getElementById('search-box').value.trim();
+    let kw = removeAccents(rawKw.toLowerCase());
+    let items = document.querySelectorAll('.review-item');
+    
+    const removeHighlight = (el) => {
+        el.innerHTML = el.innerHTML.replace(/<span class="highlight">(.*?)<\/span>/gi, '$1');
+    };
+
+    items.forEach(item => {
+        let texts = item.querySelectorAll('.review-text');
+        let match = false;
+        
+        texts.forEach(t => {
+            removeHighlight(t);
+            if (kw === '') return;
             
-            if (isBool) {
-                q.opts = ["Đúng", "Sai"];
-                q.ansIdx = aLower.startsWith('đúng') ? 0 : 1;
-            } else {
-                let pool = allAnswers.filter(a => a !== q.a && !a.toLowerCase().startsWith('đúng') && !a.toLowerCase().startsWith('sai'));
-                // Shuffle pool and take 3
-                pool.sort(() => Math.random() - 0.5);
-                let distractors = [...new Set(pool)].slice(0, 3);
-                
-                // Combine and shuffle to fix A, B, C, D positions
-                let opts = [q.a, ...distractors];
-                opts.sort(() => Math.random() - 0.5);
-                
-                q.opts = opts;
-                q.ansIdx = opts.indexOf(q.a);
-            }
-        });
-
-        // 3. Tab State Management
-        let isReviewRendered = false;
-        
-        function switchTab(tab) {
-            const testSec = document.getElementById('test-section');
-            const revSec = document.getElementById('review-section');
-            const btnTest = document.getElementById('tab-test');
-            const btnRev = document.getElementById('tab-review');
-
-            if (tab === 'test') {
-                testSec.classList.remove('hidden');
-                revSec.classList.add('hidden');
-                
-                btnTest.classList.add('text-blue-700', 'border-blue-700');
-                btnTest.classList.remove('text-gray-500', 'border-transparent');
-                
-                btnRev.classList.remove('text-blue-700', 'border-blue-700');
-                btnRev.classList.add('text-gray-500', 'border-transparent');
-            } else {
-                testSec.classList.add('hidden');
-                revSec.classList.remove('hidden');
-                
-                btnRev.classList.add('text-blue-700', 'border-blue-700');
-                btnRev.classList.remove('text-gray-500', 'border-transparent');
-                
-                btnTest.classList.remove('text-blue-700', 'border-blue-700');
-                btnTest.classList.add('text-gray-500', 'border-transparent');
-                
-                // Render check fix specific bug
-                const reviewContainer = document.getElementById('review-questions');
-                if (!isReviewRendered || reviewContainer.children.length === 0) {
-                    renderReview(questions);
-                    isReviewRendered = true;
+            let originalHTML = t.innerHTML;
+            let tempDiv = document.createElement('div');
+            tempDiv.innerHTML = originalHTML;
+            let plainText = removeAccents((tempDiv.textContent || tempDiv.innerText).toLowerCase());
+            
+            if (plainText.includes(kw)) {
+                match = true;
+                // Bôi vàng từ khóa (hỗ trợ không dấu)
+                let regexWords = rawKw.split(' ').filter(w => w).join('|');
+                if(regexWords) {
+                    let regex = new RegExp('(' + regexWords + ')', 'gi');
+                    t.innerHTML = originalHTML.replace(/(>[^<]+<|[^<>]+)/g, function(m) {
+                        if(m.startsWith('>')) return '>' + m.substring(1, m.length-1).replace(regex, '<span class="highlight">$1</span>') + '<';
+                        return m.replace(regex, '<span class="highlight">$1</span>');
+                    });
                 }
             }
-        }
-
-        // 4. Tab 1 Logic: Testing Module
-        let testQuestions = [];
-        let timerInterval;
-        let seconds = 0;
-        let isSubmitted = false;
-
-        function initTest() {
-            let shuffled = [...questions].sort(() => Math.random() - 0.5);
-            testQuestions = shuffled.slice(0, 40);
-            renderTest();
-            startTimer();
-            isSubmitted = false;
-            document.getElementById('best-score').innerText = `Điểm cao: ${localStorage.getItem('quizBestScore') || 0}/40`;
-            window.scrollTo(0, 0);
-        }
-
-        function renderTest() {
-            const container = document.getElementById('test-questions');
-            let html = '';
-            const letters = ['A', 'B', 'C', 'D'];
-            
-            testQuestions.forEach((q, index) => {
-                html += `<div class="mb-3.5 test-q-block" data-id="${q.id}">
-                    <div class="font-bold text-[13px] mb-1 text-justify text-blue-900 leading-[1.25]">Câu ${index + 1}: ${q.q}</div>`;
-                
-                q.opts.forEach((opt, oIdx) => {
-                    html += `<label class="flex items-start p-1 bg-gray-50 mb-[2px] rounded border border-gray-200 cursor-pointer hover:bg-blue-50 text-[12.5px] leading-tight transition-colors">
-                        <input type="radio" name="test_q${index}" value="${oIdx}" class="mt-[2px] mr-1.5 shrink-0 cursor-pointer">
-                        <span class="flex-1">${letters[oIdx]}. ${opt}</span>
-                    </label>`;
-                });
-                html += `</div>`;
-            });
-            container.innerHTML = html;
-        }
-
-        function startTimer() {
-            clearInterval(timerInterval);
-            seconds = 0;
-            updateTimerDisplay();
-            timerInterval = setInterval(() => {
-                seconds++;
-                updateTimerDisplay();
-            }, 1000);
-        }
-
-        function updateTimerDisplay() {
-            let m = Math.floor(seconds / 60).toString().padStart(2, '0');
-            let s = (seconds % 60).toString().padStart(2, '0');
-            let timeStr = `${m}:${s}`;
-            document.getElementById('timer').innerText = timeStr;
-            document.getElementById('timer-bottom').innerText = timeStr;
-        }
-
-        function submitTest() {
-            if (isSubmitted) return;
-            clearInterval(timerInterval);
-            isSubmitted = true;
-            let score = 0;
-            
-            testQuestions.forEach((q, index) => {
-                let selected = document.querySelector(`input[name="test_q${index}"]:checked`);
-                let block = document.querySelector(`.test-q-block[data-id="${q.id}"]`);
-                let labels = block.querySelectorAll('label');
-                
-                block.querySelectorAll('input').forEach(inp => inp.disabled = true);
-                
-                let selectedVal = selected ? parseInt(selected.value) : -1;
-                if (selectedVal === q.ansIdx) score++;
-                
-                labels.forEach((lbl, oIdx) => {
-                    if (oIdx === q.ansIdx) {
-                        lbl.classList.remove('bg-gray-50', 'hover:bg-blue-50', 'border-gray-200');
-                        lbl.classList.add('bg-green-100', 'border-green-500', 'text-green-900', 'font-semibold');
-                        lbl.innerHTML += ' <span class="ml-1 text-green-700 text-xs">✔️</span>';
-                    } else if (selectedVal === oIdx) {
-                        lbl.classList.remove('bg-gray-50', 'hover:bg-blue-50', 'border-gray-200');
-                        lbl.classList.add('bg-red-100', 'border-red-400', 'text-red-900');
-                        lbl.innerHTML += ' <span class="ml-1 text-red-700 text-xs">✖️</span>';
-                    }
-                });
-            });
-            
-            let best = localStorage.getItem('quizBestScore') || 0;
-            if (score > best) {
-                localStorage.setItem('quizBestScore', score);
-                document.getElementById('best-score').innerText = `Điểm cao: ${score}/40`;
-            }
-            
-            let timeStr = document.getElementById('timer').innerText;
-            let resultMsg = `Kết quả: ${score}/40 câu - Thời gian: ${timeStr}`;
-            
-            // Auto copy & notify
-            navigator.clipboard.writeText(resultMsg).catch(() => {});
-            showToast(resultMsg);
-        }
-
-        function resetTest() {
-            if(!confirm("Xóa kết quả hiện tại và tạo bộ 40 câu hỏi mới?")) return;
-            initTest();
-        }
-
-        function showToast(msg) {
-            let toast = document.getElementById('toast');
-            toast.innerText = msg + " (Đã copy!)";
-            toast.classList.remove('translate-y-20', 'opacity-0');
-            setTimeout(() => {
-                toast.classList.add('translate-y-20', 'opacity-0');
-            }, 3500);
-        }
-
-        // 5. Tab 2 Logic: Review Module
-        const charMap = {
-            'a': '[aAàÀảẢãÃáÁạẠăĂằẰẳẲẵẴắẮặẶâÂầẦẩẨẫẪấẤậẬ]',
-            'e': '[eEèÈẻẺẽẼéÉẹẸêÊềỀểỂễỄếẾệỆ]',
-            'i': '[iIìÌỉỈĩĨíÍịỊ]',
-            'o': '[oOòÒỏỎõÕóÓọỌôÔồỒổỔỗỖốỐộỘơƠờỜởỞỡỠớỚợỢ]',
-            'u': '[uUùÙủỦũŨúÚụỤưƯừỪửỬữỮứỨựỰ]',
-            'y': '[yYỳỲỷỶỹỸýÝỵỴ]',
-            'd': '[dDđĐ]'
-        };
-
-        function removeDiacritics(str) {
-            return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/g, "d").replace(/Đ/g, "D");
-        }
-
-        function createHighlightRegex(keyword) {
-            let pattern = keyword.split('').map(char => {
-                let lowerChar = char.toLowerCase();
-                return charMap[lowerChar] || char.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-            }).join('');
-            return new RegExp(`(${pattern})`, 'gi');
-        }
-
-        function renderReview(list, keyword = '') {
-            const container = document.getElementById('review-questions');
-            let html = '';
-            const letters = ['A', 'B', 'C', 'D'];
-            let regex = keyword ? createHighlightRegex(keyword) : null;
-            
-            list.forEach((q, index) => {
-                let qText = `Câu ${index + 1}: ${q.q}`;
-                if (regex) qText = qText.replace(regex, '<mark>$1</mark>');
-                
-                html += `<div class="mb-3.5 border-b border-gray-100 pb-2">
-                    <div class="font-bold text-[13px] mb-1 text-justify text-blue-900 leading-[1.25]">${qText}</div>`;
-                    
-                q.opts.forEach((opt, oIdx) => {
-                    let optText = opt;
-                    if (regex) optText = optText.replace(regex, '<mark>$1</mark>');
-                    
-                    if (oIdx === q.ansIdx) {
-                        html += `<div class="flex items-start p-1 bg-blue-50/70 mb-[2px] rounded border border-blue-200 text-[12.5px] leading-tight text-blue-900 font-semibold shadow-sm">
-                            <span class="mr-1.5">${letters[oIdx]}.</span>
-                            <span class="flex-1">${optText} <span class="ml-1 text-green-600 text-[10px]">✔️</span></span>
-                        </div>`;
-                    } else {
-                        html += `<div class="flex items-start p-1 bg-gray-50 mb-[2px] rounded border border-transparent text-[12.5px] leading-tight text-gray-500">
-                            <span class="mr-1.5">${letters[oIdx]}.</span>
-                            <span class="flex-1">${optText}</span>
-                        </div>`;
-                    }
-                });
-                html += `</div>`;
-            });
-            container.innerHTML = html;
-        }
-
-        document.getElementById('search-input').addEventListener('input', function(e) {
-            let keyword = e.target.value.trim();
-            if (!keyword) {
-                renderReview(questions);
-                return;
-            }
-            
-            let searchStr = removeDiacritics(keyword).toLowerCase();
-            let filtered = questions.filter(q => {
-                let fullText = q.q + " " + q.opts.join(" ");
-                return removeDiacritics(fullText).toLowerCase().includes(searchStr);
-            });
-            
-            renderReview(filtered, keyword);
         });
+        
+        item.style.display = (kw === '' || match) ? 'block' : 'none';
+    });
+}
 
-        // Init App on load
-        window.onload = () => {
-            initTest();
-        };
-    </script>
+function removeAccents(str) {
+    return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D');
+}
+
+// Khởi chạy
+startTest();
+</script>
 </body>
 </html>
